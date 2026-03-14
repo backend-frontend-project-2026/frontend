@@ -1,4 +1,5 @@
 import { RoutePaths } from '../routePaths';
+import { ProtectedRoute } from '../guards/ProtectedRoute';
 
 import LandingPage from '../../../pages/landing/ui/LandingPage';
 import LoginPage from '../../../pages/auth/login/ui/LoginPage';
@@ -16,5 +17,13 @@ export const routesConfig = [
   {
     path: RoutePaths.REGISTER,
     element: <RegisterPage />,
+  },
+  {
+    path: RoutePaths.DISCOVER,
+    element: (
+      <ProtectedRoute isAuth={false}>
+        <DiscoverPage />
+      </ProtectedRoute>
+    ),
   },
 ];

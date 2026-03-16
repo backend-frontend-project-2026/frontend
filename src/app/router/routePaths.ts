@@ -17,5 +17,6 @@ export const RoutePaths = {
   ONBOARDING_STEP_2: '/onboarding/step-2',
   ONBOARDING_STEP_3: '/onboarding/step-3',
   ONBOARDING_STEP_4: '/onboarding/step-4',
+  ADMIN_REPORTS: '/admin/reports',
   NOT_FOUND: '*',
 };

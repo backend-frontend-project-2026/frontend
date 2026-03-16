@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { RoutePaths } from './routePaths';
-import { ProtectedRoute } from './guards/ProtectedRoute';
+import { ProtectedRoute } from '@/app/router/guards/ProtectedRoute';
 import { RoleRoute } from '@/app/router/guards/RoleRoute';
 import AdminReportsPage from '@/pages/admin/reports/ui/AdminReportsPage';
 

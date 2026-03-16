@@ -1,5 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { RoutePaths } from '@/app/router/routePaths';
+import { ProtectedRoute } from '@/app/router/guards/ProtectedRoute';
 
 interface RoleRouteProps {
   children: React.ReactNode;
@@ -7,16 +8,11 @@ interface RoleRouteProps {
 }
 
 export const RoleRoute = ({ children, allowedRoles }: RoleRouteProps) => {
-  const isAuth = localStorage.getItem('isAuth') === 'true';
-  const userRole = localStorage.getItem('userRole') ?? 'user';
+  const userRole = localStorage.getItem('userRole') ?? null;
 
-  if (!isAuth) {
-    return <Navigate to={RoutePaths.AUTH} />;
-  }
-
-  if (!allowedRoles.includes(userRole)) {
+  if (!userRole || !allowedRoles.includes(userRole)) {
     return <Navigate to={RoutePaths.LANDING} />;
   }
 
-  return children;
+  return <ProtectedRoute>{children}</ProtectedRoute>;
 };

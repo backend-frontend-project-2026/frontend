@@ -1,13 +1,97 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { routesConfig } from './config/routesConfig';
+import { RoutePaths } from './routePaths';
+import { ProtectedRoute } from './guards/ProtectedRoute';
+
+import MainLayout from '../layouts/MainLayout/MainLayout';
+import AuthLayout from '../layouts/AuthLayout/AuthLayout';
+import AppLayout from '../layouts/AppLayout/AppLayout';
+
+import LandingPage from '../../pages/landing/ui/LandingPage';
+import AuthPage from '../../pages/auth/ui/AuthPage';
+import VerifyEmailPage from '../../pages/auth/verify-email/ui/VerifyEmailPage';
+import VerifyCodePage from '../../pages/auth/verify-code/ui/VerifyCodePage';
+import ForgotPasswordPage from '../../pages/auth/forgot-password/ui/ForgotPasswordPage';
+import ResetPasswordPage from '../../pages/auth/reset-password/ui/ResetPasswordPage';
+
+import DiscoverPage from '../../pages/discover/ui/DiscoverPage';
+import MatchesPage from '../../pages/matches/ui/MatchesPage';
+import ChatsPage from '../../pages/chats/ui/ChatsPage';
+import ProfilePage from '../../pages/profile/ui/ProfilePage';
+
+import NotFoundPage from '../../pages/not-found/ui/NotFoundPage';
+
+const TodoPage = () => <div style={{ padding: 40 }}>TODO</div>;
 
 export const AppRouter = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {routesConfig.map((route) => (
-          <Route key={route.path} path={route.path} element={route.element} />
-        ))}
+        {/* Лендинг */}
+        <Route element={<MainLayout />}>
+          <Route path={RoutePaths.LANDING} element={<LandingPage />} />
+        </Route>
+
+        {/* Auth и онбординг */}
+        <Route element={<AuthLayout />}>
+          <Route path={RoutePaths.AUTH} element={<AuthPage />} />
+          <Route path={RoutePaths.VERIFY_EMAIL} element={<VerifyEmailPage />} />
+          <Route path={RoutePaths.VERIFY_CODE} element={<VerifyCodePage />} />
+          <Route path={RoutePaths.SUCCESS} element={<TodoPage />} />
+          <Route path={RoutePaths.ERROR} element={<TodoPage />} />
+          <Route path={RoutePaths.FORGOT_PASSWORD} element={<ForgotPasswordPage />} />
+          <Route path={RoutePaths.RESET_PASSWORD} element={<ResetPasswordPage />} />
+          <Route path={RoutePaths.ONBOARDING} element={<TodoPage />} />
+          <Route path={RoutePaths.ONBOARDING_STEP_1} element={<TodoPage />} />
+          <Route path={RoutePaths.ONBOARDING_STEP_2} element={<TodoPage />} />
+          <Route path={RoutePaths.ONBOARDING_STEP_3} element={<TodoPage />} />
+          <Route path={RoutePaths.ONBOARDING_STEP_4} element={<TodoPage />} />
+        </Route>
+
+        {/* Основное приложение */}
+        <Route element={<AppLayout />}>
+          <Route
+            path={RoutePaths.DISCOVER}
+            element={
+              <ProtectedRoute>
+                <DiscoverPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={RoutePaths.MATCHES}
+            element={
+              <ProtectedRoute>
+                <MatchesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={RoutePaths.CHATS}
+            element={
+              <ProtectedRoute>
+                <ChatsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={RoutePaths.PROFILE}
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={RoutePaths.SETTINGS}
+            element={
+              <ProtectedRoute>
+                <TodoPage />
+              </ProtectedRoute>
+            }
+          />
+        </Route>
+
+        <Route path={RoutePaths.NOT_FOUND} element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   );

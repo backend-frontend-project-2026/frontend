@@ -2,13 +2,14 @@ import { Navigate } from 'react-router-dom';
 import { RoutePaths } from '../routePaths';
 
 interface ProtectedRouteProps {
-  isAuth: boolean;
   children: React.ReactNode;
 }
 
-export const ProtectedRoute = ({ isAuth, children }: ProtectedRouteProps) => {
+export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
+  const isAuth = localStorage.getItem('isAuth') === 'true';
+
   if (!isAuth) {
-    return <Navigate to={RoutePaths.LOGIN} />;
+    return <Navigate to={RoutePaths.AUTH} />;
   }
 
   return children;

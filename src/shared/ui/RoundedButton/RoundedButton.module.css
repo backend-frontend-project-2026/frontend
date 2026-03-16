@@ -1,0 +1,7 @@
+.button {
+  border-radius: 999px !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}

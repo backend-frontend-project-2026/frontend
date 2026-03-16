@@ -1,0 +1,96 @@
+.pageWrapper {
+  display: flex;
+  gap: 24px;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 16px;
+}
+
+.left {
+  flex: 1;
+  min-width: 0;
+}
+
+.right {
+  width: 320px;
+  flex-shrink: 0;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 32px;
+}
+
+.cardTitle {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 8px;
+}
+
+.cardSubtitle {
+  font-size: 14px;
+  color: #8a8a8a;
+  margin: 0 0 24px;
+}
+
+.hint {
+  background: #fffbe6;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: #1a1a1a;
+  margin-bottom: 16px;
+}
+
+.linkRow {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+  font-size: 14px;
+  color: #8a8a8a;
+}
+
+.linkRow a,
+.linkRow span {
+  color: #1a1a1a;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.linkRow span.disabled {
+  color: #c0c0c0;
+  cursor: default;
+  text-decoration: none;
+}
+
+.rightTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 8px;
+}
+
+.rightTitle + .rightTitle,
+.rightText + .rightTitle {
+  margin-top: 24px;
+}
+
+.rightText {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.6;
+  margin: 0 0 12px;
+}
+
+@media (max-width: 680px) {
+  .pageWrapper {
+    flex-direction: column;
+  }
+
+  .right {
+    width: 100%;
+  }
+}

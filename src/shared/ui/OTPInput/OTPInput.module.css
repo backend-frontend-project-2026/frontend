@@ -1,0 +1,22 @@
+.container {
+  display: flex;
+  gap: 10px;
+}
+
+.input {
+  width: 48px;
+  height: 56px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 600;
+  border-radius: 12px;
+  border: 1.5px solid #e0e0e0;
+  outline: none;
+  color: #1a1a1a;
+  transition: border-color 0.15s;
+  background: #fff;
+}
+
+.input:focus {
+  border-color: #ccff00;
+}

@@ -17,9 +17,10 @@ const HabitTag = ({ label, selected = false, onChange, readonly = false }: Habit
   return (
     <button
       type="button"
-      aria-pressed={!readonly ? selected : undefined}
-      className={`${styles.tag} ${selected ? styles.selected : ''} ${readonly ? styles.readonly : ''}`}
+      className={`${styles.tag} ${selected ? styles.selected : ''}`}
       onClick={handleClick}
+      disabled={readonly}
+      aria-pressed={!readonly ? selected : undefined}
     >
       {label}
     </button>

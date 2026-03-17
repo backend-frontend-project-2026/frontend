@@ -1,3 +1,25 @@
+:root {
+  /* Акцентные цвета */
+  --color-accent: #dfff4f;
+  --color-accent-light: #f2ffd4;
+
+  /* Нейтральные */
+  --color-dark: #232427;
+  --color-white: #ffffff;
+  --color-divider: #e6e6e6;
+  --color-text-secondary: #8b8b8b;
+
+  /* Семантические */
+  --color-error: #ff4d4d;
+  --color-bg-page: #f5f6fa;
+  --color-bg-search: #f3f4f6;
+  --color-bg-input-border: #e0e0e0;
+
+  /* Теги */
+  --color-tag-active-bg: #dfff4f;
+  --color-tag-inactive-bg: #ffffff;
+}
+
 *,
 *::before,
 *::after {
@@ -22,8 +44,8 @@ body {
     sans-serif;
   font-size: 14px;
   line-height: 1.5;
-  color: #1a1a1a;
-  background-color: #f5f6fa;
+  color: var(--color-dark);
+  background-color: var(--color-bg-page);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

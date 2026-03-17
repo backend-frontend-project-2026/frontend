@@ -10,8 +10,8 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
     <ConfigProvider
       theme={{
         token: {
-          colorPrimary: '#CCFF00',
-          colorTextLightSolid: '#1a1a1a',
+          colorPrimary: '#DFFF4F',
+          colorTextLightSolid: '#232427',
           colorBgLayout: '#F5F6FA',
           fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
         },

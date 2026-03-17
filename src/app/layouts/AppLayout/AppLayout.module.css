@@ -3,12 +3,12 @@
   flex-direction: column;
   min-height: 100vh;
   width: 100%;
-  background: #f5f6fa;
+  background: var(--color-bg-page);
 }
 
 .header {
-  background: #ffffff;
-  border-bottom: 1px solid #f0f0f0;
+  background: var(--color-white);
+  border-bottom: 1px solid var(--color-divider);
   height: 64px;
   display: flex;
   align-items: center;
@@ -28,7 +28,7 @@
 .logo {
   font-size: 18px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--color-dark);
   text-decoration: none;
   flex-shrink: 0;
 }
@@ -45,17 +45,17 @@
   padding: 6px 16px;
   border-radius: 999px;
   font-size: 14px;
-  color: #1a1a1a;
+  color: var(--color-dark);
   text-decoration: none;
   transition: background 0.15s;
 }
 
 .navLink:hover {
-  background: #f5f5f5;
+  background: var(--color-bg-page);
 }
 
 .navLinkActive {
-  background: #f2ffd4;
+  background: var(--color-accent-light);
 }
 
 .actions {
@@ -68,20 +68,20 @@
 .search {
   width: 240px;
   border-radius: 8px !important;
-  background: #f3f4f6 !important;
+  background: var(--color-bg-search) !important;
   border-color: transparent !important;
 }
 
 .search:hover,
 .search:focus-within {
-  border-color: #ccff00 !important;
+  border-color: var(--color-accent) !important;
 }
 
 .avatar {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #e0e0e0;
+  background: var(--color-bg-input-border);
   flex-shrink: 0;
 }
 

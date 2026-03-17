@@ -3,9 +3,9 @@
   align-items: center;
   padding: 6px 16px;
   border-radius: 999px;
-  border: 1.5px solid #1a1a1a;
+  border: 1.5px solid var(--color-dark);
   background: transparent;
-  color: #1a1a1a;
+  color: var(--color-dark);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -15,22 +15,28 @@
 }
 
 .tag:hover {
-  border-color: #ccff00;
+  border-color: var(--color-accent);
 }
 
 .selected {
-  background: #ccff00;
-  border-color: #ccff00;
+  background: var(--color-accent);
+  border-color: var(--color-accent);
 }
 
-.readonly {
+.tag:disabled {
   cursor: default;
+  opacity: 1;
 }
 
-.readonly:hover {
-  border-color: #1a1a1a;
+.tag:disabled:hover {
+  border-color: var(--color-bg-input-border);
 }
 
-.readonly.selected:hover {
-  border-color: #ccff00;
+.tag:disabled.selected {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.tag:disabled.selected:hover {
+  border-color: var(--color-accent);
 }

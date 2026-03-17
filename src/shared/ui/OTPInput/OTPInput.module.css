@@ -10,13 +10,13 @@
   font-size: 24px;
   font-weight: 600;
   border-radius: 12px;
-  border: 1.5px solid #e0e0e0;
+  border: 1.5px solid var(--color-bg-input-border);
   outline: none;
-  color: #1a1a1a;
+  color: var(--color-dark);
   transition: border-color 0.15s;
-  background: #fff;
+  background: var(--color-white);
 }
 
 .input:focus {
-  border-color: #ccff00;
+  border-color: var(--color-accent);
 }

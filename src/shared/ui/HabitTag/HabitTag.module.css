@@ -1,0 +1,36 @@
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 16px;
+  border-radius: 999px;
+  border: 1.5px solid #1a1a1a;
+  background: transparent;
+  color: #1a1a1a;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+
+.tag:hover {
+  border-color: #ccff00;
+}
+
+.selected {
+  background: #ccff00;
+  border-color: #ccff00;
+}
+
+.readonly {
+  cursor: default;
+}
+
+.readonly:hover {
+  border-color: #1a1a1a;
+}
+
+.readonly.selected:hover {
+  border-color: #ccff00;
+}

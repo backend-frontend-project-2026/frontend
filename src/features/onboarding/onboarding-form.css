@@ -1,0 +1,342 @@
+.onboarding-feature-card,
+.rm-form-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid #e6e6e6;
+  border-radius: 20px;
+  background: rgb(255 255 255 / 88%);
+  box-shadow: 0 12px 28px rgb(0 0 0 / 6%);
+  backdrop-filter: blur(12px);
+}
+
+.rm-form-card--basic {
+  gap: 12px;
+}
+
+.onboarding-feature-copy,
+.rm-form-head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.onboarding-feature-eyebrow,
+.rm-form-step {
+  margin: 0;
+  color: #8b8b8b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.onboarding-feature-title,
+.rm-form-title {
+  margin: 0;
+  color: #0b0c0e;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.05;
+}
+
+.onboarding-feature-description,
+.rm-form-description {
+  margin: 0;
+  color: #8b8b8b;
+  font-size: 13px;
+}
+
+.onboarding-feature-grid,
+.onboarding-choice-row,
+.rm-form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.onboarding-field,
+.rm-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.onboarding-field-full {
+  grid-column: 1 / -1;
+}
+
+.onboarding-field span,
+.rm-form-label {
+  color: #8b8b8b;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.onboarding-field input,
+.onboarding-field select,
+.onboarding-field textarea,
+.rm-form-input {
+  width: 100%;
+  min-height: 52px;
+  padding: 12px 16px;
+  border: 1px solid #e6e6e6;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 94%);
+  box-shadow: 0 10px 24px rgb(0 0 0 / 6%);
+  color: #0b0c0e;
+  outline: none;
+}
+
+.onboarding-field textarea,
+.rm-form-textarea {
+  min-height: 72px;
+  border-radius: 20px;
+  resize: vertical;
+}
+
+.onboarding-field input::placeholder,
+.onboarding-field textarea::placeholder,
+.rm-form-input::placeholder {
+  color: #9ca3af;
+}
+
+.onboarding-field small,
+.onboarding-choice-header small,
+.rm-form-error {
+  color: #d14343;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.onboarding-form-state {
+  padding: 12px 14px;
+  border: 1px solid #e6e6e6;
+  border-radius: 18px;
+  background: rgb(255 255 255 / 88%);
+  box-shadow: 0 8px 20px rgb(0 0 0 / 5%);
+}
+
+.onboarding-form-state--warning {
+  border-color: #f2cf66;
+  background: rgb(255 245 214 / 90%);
+}
+
+.onboarding-form-state__title {
+  margin: 0 0 4px;
+  color: #0b0c0e;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.onboarding-form-state__text {
+  margin: 0;
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.onboarding-choice-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.onboarding-choice-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.onboarding-choice-header h4 {
+  margin: 0;
+  color: #0b0c0e;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.onboarding-choice-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.onboarding-choice-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 88px;
+  padding: 14px;
+  border: 1px solid #e6e6e6;
+  border-radius: 20px;
+  background: rgb(255 255 255 / 88%);
+  box-shadow: 0 10px 22px rgb(0 0 0 / 6%);
+  color: #0b0c0e;
+  text-align: left;
+  cursor: pointer;
+}
+
+.onboarding-choice-card.is-selected,
+.onboarding-tag-button.is-selected {
+  border-color: #dfff4f;
+  background: rgb(223 255 79 / 45%);
+}
+
+.onboarding-choice-card-title {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.onboarding-choice-card-description {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.onboarding-toggle-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.onboarding-toggle-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 84px;
+  padding: 14px;
+  border: 1px solid #e6e6e6;
+  border-radius: 20px;
+  background: rgb(255 255 255 / 88%);
+  box-shadow: 0 10px 22px rgb(0 0 0 / 6%);
+}
+
+.onboarding-toggle-card strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #0b0c0e;
+  font-size: 14px;
+}
+
+.onboarding-toggle-card p {
+  margin: 0;
+  color: #8b8b8b;
+  font-size: 12px;
+}
+
+.onboarding-tags-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.onboarding-tag-button {
+  padding: 12px 16px;
+  border: 1px solid #e6e6e6;
+  border-radius: 999px;
+  background: #fff;
+  color: #0b0c0e;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.onboarding-feature-actions,
+.rm-form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.onboarding-primary-button,
+.onboarding-secondary-button,
+.rm-nav-button {
+  display: inline-flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 12px 16px;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.onboarding-primary-button,
+.rm-nav-button--primary {
+  border: none;
+  background: linear-gradient(162.78deg, #0b0c0e 0%, #232427 70.721%);
+  color: #f6f6f4;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 10%);
+}
+
+.onboarding-secondary-button,
+.rm-nav-button--ghost {
+  border: 1px solid #e6e6e6;
+  background: #e6e6e6;
+  color: #0b0c0e;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 10%);
+}
+
+.rm-nav-button__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.rm-nav-button__icon--dark {
+  background: #111214;
+  color: #f6f6f4;
+}
+
+.rm-nav-button__icon--lime {
+  background: #dfff4f;
+  color: #0b0c0e;
+}
+
+.onboarding-secondary-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (width >= 901px) {
+  .onboarding-feature-card,
+  .rm-form-card {
+    padding: 24px;
+    border-radius: 24px;
+  }
+
+  .onboarding-feature-title,
+  .rm-form-title {
+    font-size: 24px;
+  }
+
+  .onboarding-choice-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .onboarding-toggle-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .rm-form-card--basic {
+    max-width: 436px;
+    padding: 22px;
+  }
+
+  .rm-form-actions {
+    max-width: 436px;
+  }
+}
+
+@media (width <= 720px) {
+  .onboarding-feature-actions,
+  .rm-form-actions {
+    flex-direction: row;
+  }
+}

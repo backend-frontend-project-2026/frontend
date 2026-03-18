@@ -321,16 +321,22 @@
     color: #8f949b;
     font-size: 10px;
     font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
   }
 
   .rm-shell--step-1 .rm-shell__nav-pill.is-active {
     border-color: #e6e6e6;
     background: #f2ffd4;
     color: #8b8b8b;
+    text-decoration: none;
+    white-space: nowrap;
   }
 
   .rm-shell--step-1 .rm-shell__nav-pill.is-active {
     box-shadow: none;
+    text-decoration: none;
+    white-space: nowrap;
   }
 
   .rm-shell--step-1 .rm-shell__search {
@@ -649,6 +655,8 @@
     padding: 0 18px;
     font-size: 14px;
     font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
   }
 
   .rm-shell--step-1 .rm-shell__search {

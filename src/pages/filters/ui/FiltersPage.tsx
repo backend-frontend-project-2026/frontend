@@ -488,6 +488,7 @@ export function FiltersPage({
     setBudgetMin(nextMax);
     setBudgetMax(nextMin);
   }
+
   void editBudgetRange;
 
   function editStayDuration() {

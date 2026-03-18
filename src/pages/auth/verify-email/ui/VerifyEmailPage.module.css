@@ -1,0 +1,14 @@
+.decorativeBlock {
+  background: var(--color-accent);
+  border-radius: 12px;
+  height: 160px;
+}
+
+.buttonPrimary {
+  margin-bottom: 12px;
+  width: 100%;
+}
+
+.buttonSecondary {
+  width: 100%;
+}

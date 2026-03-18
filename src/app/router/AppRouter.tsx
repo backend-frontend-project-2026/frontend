@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { RoutePaths } from '@/app/router/routePaths';
 import { ProtectedRoute } from '@/app/router/guards/ProtectedRoute';
 import { RoleRoute } from '@/app/router/guards/RoleRoute';
+import { mockDiscoverUsers } from '@/entities/user';
 
 import AuthLayout from '@/app/layouts/AuthLayout/AuthLayout';
 import AppLayout from '@/app/layouts/AppLayout/AppLayout';
@@ -54,7 +55,7 @@ export const AppRouter = () => {
             path={RoutePaths.DISCOVER}
             element={
               <ProtectedRoute>
-                <DiscoverPage />
+                <DiscoverPage users={mockDiscoverUsers} />
               </ProtectedRoute>
             }
           />

@@ -1,0 +1,42 @@
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 16px;
+  border-radius: 999px;
+  border: 1.5px solid var(--color-dark);
+  background: transparent;
+  color: var(--color-dark);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+
+.tag:hover {
+  border-color: var(--color-accent);
+}
+
+.selected {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.tag:disabled {
+  cursor: default;
+  opacity: 1;
+}
+
+.tag:disabled:hover {
+  border-color: var(--color-bg-input-border);
+}
+
+.tag:disabled.selected {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.tag:disabled.selected:hover {
+  border-color: var(--color-accent);
+}

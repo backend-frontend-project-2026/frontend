@@ -18,6 +18,12 @@
   /* Теги */
   --color-tag-active-bg: #dfff4f;
   --color-tag-inactive-bg: #ffffff;
+
+  /* Дополнительные цвета */
+  --color-black: #111214;
+  --color-black-text: #0b0c0e;
+  --color-white-soft: #f6f6f4;
+  --color-success: #4caf50;
 }
 
 *,

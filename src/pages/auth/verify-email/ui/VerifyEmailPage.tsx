@@ -1,12 +1,11 @@
-import { useSearchParams } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { Card, Typography } from 'antd';
 import RoundedButton from '@/shared/ui/RoundedButton/RoundedButton';
 import { RoutePaths } from '@/app/router/routePaths';
 import shared from '@/shared/styles/auth.shared.module.css';
 import styles from './VerifyEmailPage.module.css';
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 
 const VerifyEmailPage = () => {
   const [searchParams] = useSearchParams();
@@ -17,11 +16,11 @@ const VerifyEmailPage = () => {
       <div className={shared.left}>
         <Card variant="outlined">
           <Title level={2}>Проверь почту</Title>
-          <Typography.Paragraph type="secondary">
+          <Paragraph type="secondary">
             Мы отправили ссылку на {email}.
             <br />
             Перейди по ней, чтобы активировать профиль.
-          </Typography.Paragraph>
+          </Paragraph>
 
           <div className={shared.hint}>Если письма нет — проверь «Спам».</div>
 
@@ -49,12 +48,12 @@ const VerifyEmailPage = () => {
 
       <div className={shared.right}>
         <Card variant="outlined">
-          <h3 className={shared.rightTitle}>Зачем подтверждение?</h3>
-          <p className={shared.rightText}>
+          <Typography.Title level={4}>Зачем подтверждение?</Typography.Title>
+          <Typography.Paragraph type="secondary">
             Подтверждение защищает от фейковых аккаунтов и позволяет безопасно открывать чат только
             после мэтча.
-          </p>
-          <Text type="secondary" style={{ fontSize: 13 }}>
+          </Typography.Paragraph>
+          <Text type="secondary" className={styles.accessNote}>
             После подтверждения вы получите доступ к поиску соседей.
           </Text>
         </Card>

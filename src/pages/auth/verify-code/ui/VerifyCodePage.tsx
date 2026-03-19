@@ -68,10 +68,10 @@ const VerifyCodePage = () => {
 
       <div className={shared.right}>
         <Card variant="outlined">
-          <h3 className={shared.rightTitle}>Совет</h3>
-          <p className={shared.rightText}>
+          <Typography.Title level={4}>Совет</Typography.Title>
+          <Typography.Paragraph type="secondary">
             Если письмо не приходит, проверь правильность адреса и папку «Спам».
-          </p>
+          </Typography.Paragraph>
           <div className={shared.hint}>Можно запросить повторную отправку через 60 секунд.</div>
         </Card>
       </div>

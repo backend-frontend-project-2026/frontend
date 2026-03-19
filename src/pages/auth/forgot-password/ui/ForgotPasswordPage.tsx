@@ -1,12 +1,11 @@
-import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Card, Typography, Input, Form } from 'antd';
 import RoundedButton from '@/shared/ui/RoundedButton/RoundedButton';
 import { RoutePaths } from '@/app/router/routePaths';
 import shared from '@/shared/styles/auth.shared.module.css';
 import styles from './ForgotPasswordPage.module.css';
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 
 interface FormValues {
   email: string;
@@ -25,9 +24,9 @@ const ForgotPasswordPage = () => {
       <div className={shared.left}>
         <Card variant="outlined">
           <Title level={2}>Восстановление пароля</Title>
-          <Typography.Paragraph type="secondary">
+          <Paragraph type="secondary">
             Введи почту — отправим ссылку для сброса.
-          </Typography.Paragraph>
+          </Paragraph>
 
           <Form form={form} onFinish={handleSubmit} layout="vertical" requiredMark={false}>
             <Form.Item
@@ -57,12 +56,12 @@ const ForgotPasswordPage = () => {
 
       <div className={shared.right}>
         <Card variant="outlined">
-          <h3 className={shared.rightTitle}>Безопасность</h3>
-          <p className={shared.rightText}>
+          <Typography.Title level={4}>Безопасность</Typography.Title>
+          <Typography.Paragraph type="secondary">
             Ссылка для сброса действует 30 минут.
             <br />
             После перехода по ней старый пароль перестанет работать.
-          </p>
+          </Typography.Paragraph>
         </Card>
       </div>
     </div>

@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Card, Typography, Input, Form } from 'antd';
+import { Card, Typography, Input, Form, Button } from 'antd';
 import RoundedButton from '@/shared/ui/RoundedButton/RoundedButton';
 import styles from './AuthPage.module.css';
 
-const { Title, Text, Link } = Typography;
+const { Title, Text } = Typography;
 
 type AuthMode = 'login' | 'register';
 
@@ -80,7 +80,9 @@ const AuthPage = () => {
 
               <Text type="secondary">
                 Нет аккаунта?{' '}
-                <Link onClick={() => setMode('register')}>Зарегистрироваться</Link>
+                <Button type="link" onClick={() => setMode('register')} style={{ padding: 0 }}>
+                  Зарегистрироваться
+                </Button>
               </Text>
 
               {hint}
@@ -150,7 +152,10 @@ const AuthPage = () => {
               </Form>
 
               <Text type="secondary">
-                Уже есть аккаунт? <Link onClick={() => setMode('login')}>Войти</Link>
+                Уже есть аккаунт?{' '}
+                <Button type="link" onClick={() => setMode('login')} style={{ padding: 0 }}>
+                  Войти
+                </Button>
               </Text>
 
               {hint}

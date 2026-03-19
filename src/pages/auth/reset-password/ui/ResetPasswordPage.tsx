@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Card, Typography, Input, Form } from 'antd';
 import RoundedButton from '@/shared/ui/RoundedButton/RoundedButton';
-import ArrowUpRightIcon from '@/assets/icons/arrow-up-right.svg?react';
 import { RoutePaths } from '@/app/router/routePaths';
 import styles from './ResetPasswordPage.module.css';
 
@@ -72,17 +71,7 @@ const ResetPasswordPage = () => {
           <p className={styles.hint}>Минимум 8 символов.</p>
 
           <Form.Item>
-            <RoundedButton
-              type="primary"
-              htmlType="submit"
-              size="large"
-              className={styles.submitButton}
-              icon={
-                <span className={`${styles.iconCircle} ${styles.iconCircleLight}`}>
-                  <ArrowUpRightIcon />
-                </span>
-              }
-            >
+            <RoundedButton variant="dark" htmlType="submit" size="large">
               Сохранить пароль
             </RoundedButton>
           </Form.Item>

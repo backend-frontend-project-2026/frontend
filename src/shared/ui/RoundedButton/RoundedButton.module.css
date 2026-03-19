@@ -5,3 +5,46 @@
   gap: 6px;
   font-weight: 500;
 }
+
+.dark {
+  background: var(--color-black) !important;
+  border-color: var(--color-black) !important;
+  color: var(--color-white) !important;
+  height: 48px !important;
+}
+
+.dark:hover {
+  background: var(--color-dark) !important;
+  border-color: var(--color-dark) !important;
+}
+
+.gray {
+  background: var(--color-divider) !important;
+  border-color: var(--color-divider) !important;
+  color: var(--color-dark) !important;
+  height: 48px !important;
+}
+
+.gray:hover {
+  background: var(--color-bg-input-border) !important;
+  border-color: var(--color-bg-input-border) !important;
+}
+
+.iconCircle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.iconCircleLight {
+  background: var(--color-accent);
+  color: var(--color-black-text);
+}
+
+.iconCircleDark {
+  background: var(--color-black);
+  color: var(--color-white-soft);
+}

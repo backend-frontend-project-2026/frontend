@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { Input, Form } from 'antd';
+import { Card, Typography, Input, Form } from 'antd';
 import RoundedButton from '@/shared/ui/RoundedButton/RoundedButton';
 import styles from './AuthPage.module.css';
+
+const { Title, Text, Link } = Typography;
 
 type AuthMode = 'login' | 'register';
 
@@ -38,10 +40,12 @@ const AuthPage = () => {
   return (
     <div className={styles.page}>
       <div className={styles.left}>
-        <div className={styles.card}>
+        <Card variant="outlined" className={styles.card}>
           {mode === 'login' ? (
             <>
-              <h2 className={styles.title}>Добро пожаловать</h2>
+              <Title level={2} className={styles.title}>
+                Добро пожаловать
+              </Title>
               <Form form={loginForm} onFinish={handleLogin} layout="vertical" requiredMark={false}>
                 <Form.Item
                   name="email"
@@ -74,18 +78,18 @@ const AuthPage = () => {
                 </Form.Item>
               </Form>
 
-              <p className={styles.switchText}>
+              <Text type="secondary">
                 Нет аккаунта?{' '}
-                <button className={styles.switchLink} onClick={() => setMode('register')}>
-                  Зарегистрироваться
-                </button>
-              </p>
+                <Link onClick={() => setMode('register')}>Зарегистрироваться</Link>
+              </Text>
 
               {hint}
             </>
           ) : (
             <>
-              <h2 className={styles.title}>Создать аккаунт</h2>
+              <Title level={2} className={styles.title}>
+                Создать аккаунт
+              </Title>
               <Form
                 form={registerForm}
                 onFinish={handleRegister}
@@ -145,21 +149,18 @@ const AuthPage = () => {
                 </Form.Item>
               </Form>
 
-              <p className={styles.switchText}>
-                Уже есть аккаунт?{' '}
-                <button className={styles.switchLink} onClick={() => setMode('login')}>
-                  Войти
-                </button>
-              </p>
+              <Text type="secondary">
+                Уже есть аккаунт? <Link onClick={() => setMode('login')}>Войти</Link>
+              </Text>
 
               {hint}
             </>
           )}
-        </div>
+        </Card>
       </div>
 
       <div className={styles.right}>
-        <div className={styles.card}>
+        <Card variant="outlined" className={styles.card}>
           <h3 className={styles.rightTitle}>Как это работает</h3>
           <p className={styles.rightText}>
             1) Заполни привычки
@@ -173,7 +174,7 @@ const AuthPage = () => {
           <p className={styles.rightText}>
             Можно скрыть контакты и включить «тихие часы». В чате доступны жалоба и блокировка.
           </p>
-        </div>
+        </Card>
       </div>
     </div>
   );

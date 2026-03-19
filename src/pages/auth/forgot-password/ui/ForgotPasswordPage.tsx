@@ -1,9 +1,12 @@
 import { useNavigate } from 'react-router-dom';
-import { Input, Form } from 'antd';
+import { Link } from 'react-router-dom';
+import { Card, Typography, Input, Form } from 'antd';
 import RoundedButton from '@/shared/ui/RoundedButton/RoundedButton';
 import { RoutePaths } from '@/app/router/routePaths';
 import shared from '@/shared/styles/auth.shared.module.css';
 import styles from './ForgotPasswordPage.module.css';
+
+const { Title, Text } = Typography;
 
 interface FormValues {
   email: string;
@@ -20,9 +23,11 @@ const ForgotPasswordPage = () => {
   return (
     <div className={shared.pageWrapper}>
       <div className={shared.left}>
-        <div className={shared.card}>
-          <h2 className={shared.cardTitle}>Восстановление пароля</h2>
-          <p className={shared.cardSubtitle}>Введи почту — отправим ссылку для сброса.</p>
+        <Card variant="outlined">
+          <Title level={2}>Восстановление пароля</Title>
+          <Typography.Paragraph type="secondary">
+            Введи почту — отправим ссылку для сброса.
+          </Typography.Paragraph>
 
           <Form form={form} onFinish={handleSubmit} layout="vertical" requiredMark={false}>
             <Form.Item
@@ -43,20 +48,22 @@ const ForgotPasswordPage = () => {
           </Form>
 
           <div className={shared.linkRow}>
-            <span onClick={() => navigate(RoutePaths.AUTH)}>Вспомнил(а) пароль? Войти</span>
+            <Text type="secondary">
+              Вспомнил(а) пароль? <Link to={RoutePaths.AUTH}>Войти</Link>
+            </Text>
           </div>
-        </div>
+        </Card>
       </div>
 
       <div className={shared.right}>
-        <div className={shared.card}>
+        <Card variant="outlined">
           <h3 className={shared.rightTitle}>Безопасность</h3>
           <p className={shared.rightText}>
             Ссылка для сброса действует 30 минут.
             <br />
             После перехода по ней старый пароль перестанет работать.
           </p>
-        </div>
+        </Card>
       </div>
     </div>
   );

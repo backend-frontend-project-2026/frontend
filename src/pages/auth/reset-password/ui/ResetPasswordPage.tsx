@@ -1,9 +1,11 @@
 import { useNavigate } from 'react-router-dom';
-import { Input, Form } from 'antd';
+import { Card, Typography, Input, Form } from 'antd';
 import RoundedButton from '@/shared/ui/RoundedButton/RoundedButton';
 import ArrowUpRightIcon from '@/assets/icons/arrow-up-right.svg?react';
 import { RoutePaths } from '@/app/router/routePaths';
 import styles from './ResetPasswordPage.module.css';
+
+const { Title, Text } = Typography;
 
 interface FormValues {
   password: string;
@@ -20,9 +22,13 @@ const ResetPasswordPage = () => {
 
   return (
     <div className={styles.page}>
-      <div className={styles.card}>
-        <h2 className={styles.title}>Новый пароль</h2>
-        <p className={styles.subtitle}>Задай новый пароль для аккаунта.</p>
+      <Card variant="outlined" className={styles.card}>
+        <Title level={2} className={styles.title}>
+          Новый пароль
+        </Title>
+        <Text type="secondary" className={styles.subtitle}>
+          Задай новый пароль для аккаунта.
+        </Text>
 
         <Form form={form} onFinish={handleSubmit} layout="vertical" requiredMark={false}>
           <div className={styles.fieldsRow}>
@@ -81,7 +87,7 @@ const ResetPasswordPage = () => {
             </RoundedButton>
           </Form.Item>
         </Form>
-      </div>
+      </Card>
     </div>
   );
 };

@@ -20,16 +20,14 @@
 }
 
 .card {
-  background: var(--color-white);
-  border-radius: 16px;
-  padding: 32px;
+  border-radius: 16px !important;
 }
 
 .title {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--color-dark);
-  margin: 0 0 24px;
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  color: var(--color-dark) !important;
+  margin: 0 0 24px !important;
 }
 
 .input {
@@ -57,28 +55,6 @@
 :global(.ant-form-item-has-error) .input,
 :global(.ant-form-item-has-error) :global(.ant-input-affix-wrapper).input {
   border-color: var(--color-error) !important;
-}
-
-.switchText {
-  margin: 0 0 16px;
-  font-size: 14px;
-  color: var(--color-text-hint);
-  text-align: center;
-}
-
-.switchLink {
-  background: none;
-  border: none;
-  padding: 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-dark);
-  cursor: pointer;
-  text-decoration: underline;
-}
-
-.switchLink:hover {
-  opacity: 0.7;
 }
 
 .hint {

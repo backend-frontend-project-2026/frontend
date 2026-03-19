@@ -17,25 +17,6 @@
   flex-shrink: 0;
 }
 
-.card {
-  background: var(--color-white);
-  border-radius: 16px;
-  padding: 32px;
-}
-
-.cardTitle {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--color-dark);
-  margin: 0 0 8px;
-}
-
-.cardSubtitle {
-  font-size: 14px;
-  color: var(--color-text-secondary);
-  margin: 0 0 24px;
-}
-
 .hint {
   background: var(--color-warning-bg);
   border-radius: 8px;

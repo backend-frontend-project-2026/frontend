@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Card, Typography } from 'antd';
 import OTPInput from '@/shared/ui/OTPInput/OTPInput';
 import RoundedButton from '@/shared/ui/RoundedButton/RoundedButton';
 import { RoutePaths } from '@/app/router/routePaths';
 import shared from '@/shared/styles/auth.shared.module.css';
 import styles from './VerifyCodePage.module.css';
+
+const { Title } = Typography;
 
 const VerifyCodePage = () => {
   const navigate = useNavigate();
@@ -37,8 +40,8 @@ const VerifyCodePage = () => {
   return (
     <div className={shared.pageWrapper}>
       <div className={shared.left}>
-        <div className={shared.card}>
-          <h2 className={shared.cardTitle}>Код подтверждения</h2>
+        <Card variant="outlined">
+          <Title level={2}>Код подтверждения</Title>
 
           <OTPInput length={6} value={code} onChange={setCode} />
 
@@ -60,17 +63,17 @@ const VerifyCodePage = () => {
             </span>
             <span onClick={() => navigate(RoutePaths.AUTH)}>Изменить почту</span>
           </div>
-        </div>
+        </Card>
       </div>
 
       <div className={shared.right}>
-        <div className={shared.card}>
+        <Card variant="outlined">
           <h3 className={shared.rightTitle}>Совет</h3>
           <p className={shared.rightText}>
             Если письмо не приходит, проверь правильность адреса и папку «Спам».
           </p>
           <div className={shared.hint}>Можно запросить повторную отправку через 60 секунд.</div>
-        </div>
+        </Card>
       </div>
     </div>
   );

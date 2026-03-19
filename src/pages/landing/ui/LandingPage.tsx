@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
+import { Tag } from 'antd';
 import RoundedButton from '@/shared/ui/RoundedButton/RoundedButton';
-import ArrowUpRightIcon from '@/assets/icons/arrow-up-right.svg?react';
 import HabitTag from '@/shared/ui/HabitTag/HabitTag';
 import { RoutePaths } from '@/app/router/routePaths';
 import styles from './LandingPage.module.css';
@@ -47,38 +47,45 @@ const LandingPage = () => {
 
           <div className={styles.badges}>
             {badges.map(({ label, active }) => (
-              <span
+              <Tag
                 key={label}
-                className={`${styles.badge} ${active ? styles.badgeActive : ''}`}
+                style={{
+                  borderRadius: 999,
+                  padding: '4px 12px',
+                  fontSize: 14,
+                  color: 'var(--color-dark)',
+                  border: active
+                    ? '1.5px solid var(--color-accent)'
+                    : '1.5px solid var(--color-divider)',
+                  background: active ? 'var(--color-accent)' : 'var(--color-white)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  cursor: 'default',
+                }}
               >
-                <span className={styles.dot} />
+                <span
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    background: active
+                      ? 'var(--color-success)'
+                      : 'var(--color-text-secondary)',
+                    display: 'inline-block',
+                    flexShrink: 0,
+                  }}
+                />
                 {label}
-              </span>
+              </Tag>
             ))}
           </div>
 
           <div className={styles.buttons}>
-            <RoundedButton
-              type="primary"
-              onClick={() => navigate(RoutePaths.AUTH)}
-              className={styles.buttonPrimary}
-              icon={
-                <span className={`${styles.iconCircle} ${styles.iconCircleLight}`}>
-                  <ArrowUpRightIcon />
-                </span>
-              }
-            >
+            <RoundedButton variant="dark" onClick={() => navigate(RoutePaths.AUTH)}>
               Найти соседа
             </RoundedButton>
-            <RoundedButton
-              onClick={scrollToHowItWorks}
-              className={styles.buttonSecondary}
-              icon={
-                <span className={`${styles.iconCircle} ${styles.iconCircleDark}`}>
-                  <ArrowUpRightIcon />
-                </span>
-              }
-            >
+            <RoundedButton variant="gray" onClick={scrollToHowItWorks}>
               Как работает
             </RoundedButton>
           </div>

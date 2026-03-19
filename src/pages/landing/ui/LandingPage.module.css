@@ -42,76 +42,10 @@
   margin-bottom: 16px;
 }
 
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  border: 1.5px solid var(--color-bg-input-border);
-  border-radius: 999px;
-  padding: 6px 14px;
-  font-size: 14px;
-  color: var(--color-dark);
-  background: var(--color-white);
-}
-
-.badgeActive {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-}
-
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  background: var(--color-text-secondary);
-}
-
-.badgeActive .dot {
-  background: var(--color-success);
-}
-
 .buttons {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
-}
-
-.buttonPrimary {
-  background: var(--color-black) !important;
-  border-color: var(--color-black) !important;
-  color: var(--color-white) !important;
-  height: 48px !important;
-  padding: 0 24px !important;
-  font-size: 16px !important;
-}
-
-.buttonSecondary {
-  background: var(--color-divider) !important;
-  border-color: var(--color-divider) !important;
-  color: var(--color-dark) !important;
-  height: 48px !important;
-  padding: 0 24px !important;
-  font-size: 16px !important;
-}
-
-.iconCircle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-}
-
-.iconCircleLight {
-  background: var(--color-accent);
-  color: var(--color-black-text);
-}
-
-.iconCircleDark {
-  background: var(--color-black);
-  color: var(--color-white-soft);
 }
 
 .previewCard {
@@ -206,5 +140,25 @@
 
   .cards {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 24px 16px;
+    gap: 24px;
+  }
+  .h1 {
+    font-size: 28px;
+  }
+  .buttons {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .badges {
+    flex-wrap: wrap;
+  }
+  .howItWorks {
+    padding: 32px 16px;
   }
 }

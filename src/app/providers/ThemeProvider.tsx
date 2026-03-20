@@ -28,9 +28,16 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
             borderRadius: 999,
             borderRadiusLG: 999,
             borderRadiusSM: 999,
+            activeBorderColor: 'var(--color-accent)',
+            hoverBorderColor: 'var(--color-accent)',
+            colorBorder: 'var(--color-bg-input-border)',
+            lineWidth: 1.5,
           },
           Card: {
             borderRadiusLG: 16,
+          },
+          Typography: {
+            titleMarginBottom: 0,
           },
         },
       }}

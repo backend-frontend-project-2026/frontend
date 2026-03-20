@@ -174,6 +174,17 @@
   color: #a1a8b4;
 }
 
+.onboarding-page--step-3 .step-3-input.ant-input,
+.onboarding-page--step-3 .step-3-input.ant-input:hover,
+.onboarding-page--step-3 .step-3-input.ant-input:focus,
+.onboarding-page--step-3 .step-3-input.ant-input:focus-within,
+.onboarding-page--step-3 .step-3-input.ant-input.ant-input-focused {
+  border-color: #e0e1e4;
+  background: #fff;
+  box-shadow: 0 8px 18px rgb(190 193 198 / 16%);
+  outline: none;
+}
+
 .onboarding-page--step-3 .step-3-budget-visual {
   display: none;
 }
@@ -211,6 +222,27 @@
   text-align: left;
 }
 
+.onboarding-page--step-3 .step-3-condition-checkbox.ant-checkbox-wrapper {
+  margin-inline-end: 0;
+}
+
+.onboarding-page--step-3 .step-3-condition-checkbox .ant-checkbox {
+  display: none;
+}
+
+.onboarding-page--step-3 .step-3-condition-checkbox.ant-checkbox-wrapper > span:last-child {
+  display: inline-flex;
+  align-items: center;
+  gap: inherit;
+  padding-inline-start: 0;
+}
+
+.onboarding-page--step-3 .step-3-condition-checkbox.ant-checkbox-wrapper:hover,
+.onboarding-page--step-3 .step-3-condition-checkbox.ant-checkbox-wrapper:focus,
+.onboarding-page--step-3 .step-3-condition-checkbox.ant-checkbox-wrapper:active {
+  color: #2b2c31;
+}
+
 .onboarding-page--step-3 .step-3-condition__box {
   width: 15px;
   height: 15px;
@@ -221,7 +253,10 @@
   flex: 0 0 auto;
 }
 
-.onboarding-page--step-3 .step-3-condition.is-checked .step-3-condition__box {
+.onboarding-page--step-3 .step-3-condition.is-checked .step-3-condition__box,
+.onboarding-page--step-3
+  .step-3-condition-checkbox.ant-checkbox-wrapper-checked
+  .step-3-condition__box {
   border-color: #d8f23e;
   background: #d8f23e;
   box-shadow: none;
@@ -274,6 +309,37 @@
 .onboarding-page--step-3 .rm-nav-button__icon--dark {
   background: #111318;
   color: #fff;
+}
+
+.onboarding-page--step-3 .rm-nav-button.ant-btn,
+.onboarding-page--step-3 .rm-nav-button.ant-btn:hover,
+.onboarding-page--step-3 .rm-nav-button.ant-btn:focus,
+.onboarding-page--step-3 .rm-nav-button.ant-btn:focus-visible,
+.onboarding-page--step-3 .rm-nav-button.ant-btn:active {
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.onboarding-page--step-3 .rm-nav-button--ghost.ant-btn,
+.onboarding-page--step-3 .rm-nav-button--ghost.ant-btn:hover,
+.onboarding-page--step-3 .rm-nav-button--ghost.ant-btn:focus,
+.onboarding-page--step-3 .rm-nav-button--ghost.ant-btn:focus-visible,
+.onboarding-page--step-3 .rm-nav-button--ghost.ant-btn:active {
+  border: none !important;
+  background: #e7e7e6 !important;
+  color: #202226 !important;
+  box-shadow: none !important;
+}
+
+.onboarding-page--step-3 .rm-nav-button--primary.ant-btn,
+.onboarding-page--step-3 .rm-nav-button--primary.ant-btn:hover,
+.onboarding-page--step-3 .rm-nav-button--primary.ant-btn:focus,
+.onboarding-page--step-3 .rm-nav-button--primary.ant-btn:focus-visible,
+.onboarding-page--step-3 .rm-nav-button--primary.ant-btn:active {
+  border: none !important;
+  background: linear-gradient(160deg, #101217 0%, #20242c 100%) !important;
+  color: #f6f6f4 !important;
+  box-shadow: none !important;
 }
 
 .rm-shell--step-3 .rm-shell__footer {
@@ -546,6 +612,17 @@
     font-weight: 500;
   }
 
+  .onboarding-page--step-3 .step-3-input.ant-input,
+  .onboarding-page--step-3 .step-3-input.ant-input:hover,
+  .onboarding-page--step-3 .step-3-input.ant-input:focus,
+  .onboarding-page--step-3 .step-3-input.ant-input:focus-within,
+  .onboarding-page--step-3 .step-3-input.ant-input.ant-input-focused {
+    border-color: #dadde1;
+    background: rgb(255 255 255 / 96%);
+    box-shadow: 0 12px 24px rgb(175 181 190 / 18%);
+    outline: none;
+  }
+
   .onboarding-page--step-3 .step-3-input--budget-mobile {
     display: block;
     width: 260px;
@@ -600,6 +677,10 @@
     font-size: 12px;
   }
 
+  .onboarding-page--step-3 .step-3-condition-checkbox.ant-checkbox-wrapper > span:last-child {
+    gap: inherit;
+  }
+
   .onboarding-page--step-3 .step-3-condition__box {
     width: 13px;
     height: 13px;
@@ -626,6 +707,17 @@
     font-size: 12px;
     outline: none;
     box-shadow: none;
+  }
+
+  .onboarding-page--step-3 .step-3-ideal-textarea.ant-input,
+  .onboarding-page--step-3 .step-3-ideal-textarea.ant-input:hover,
+  .onboarding-page--step-3 .step-3-ideal-textarea.ant-input:focus,
+  .onboarding-page--step-3 .step-3-ideal-textarea.ant-input:focus-within,
+  .onboarding-page--step-3 .step-3-ideal-textarea.ant-input.ant-input-focused {
+    border-color: #dfe3e7;
+    background: #fff;
+    box-shadow: none;
+    outline: none;
   }
 
   .onboarding-page--step-3 .rm-form-error {
@@ -886,6 +978,19 @@
     font-weight: 500;
   }
 
+  .onboarding-page--step-3 .step-3-input.ant-input,
+  .onboarding-page--step-3 .step-3-input.ant-input:hover,
+  .onboarding-page--step-3 .step-3-input.ant-input:focus,
+  .onboarding-page--step-3 .step-3-input.ant-input:focus-within,
+  .onboarding-page--step-3 .step-3-input.ant-input.ant-input-focused {
+    border-color: #d8dde3;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfcfd 100%);
+    box-shadow:
+      0 10px 24px rgb(175 181 190 / 14%),
+      inset 0 1px 0 rgb(255 255 255 / 88%);
+    outline: none;
+  }
+
   .onboarding-page--step-3 .step-3-input--budget-mobile {
     width: 100%;
     max-width: none;
@@ -910,6 +1015,10 @@
     gap: 10px;
     font-size: 15px;
     line-height: 1.35;
+  }
+
+  .onboarding-page--step-3 .step-3-condition-checkbox.ant-checkbox-wrapper > span:last-child {
+    gap: inherit;
   }
 
   .onboarding-page--step-3 .step-3-condition__box {
@@ -937,6 +1046,19 @@
     font-size: 15px;
     line-height: 1.5;
     resize: none;
+  }
+
+  .onboarding-page--step-3 .step-3-ideal-textarea.ant-input,
+  .onboarding-page--step-3 .step-3-ideal-textarea.ant-input:hover,
+  .onboarding-page--step-3 .step-3-ideal-textarea.ant-input:focus,
+  .onboarding-page--step-3 .step-3-ideal-textarea.ant-input:focus-within,
+  .onboarding-page--step-3 .step-3-ideal-textarea.ant-input.ant-input-focused {
+    border-color: #d8dde3;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfcfd 100%);
+    box-shadow:
+      0 10px 24px rgb(175 181 190 / 14%),
+      inset 0 1px 0 rgb(255 255 255 / 88%);
+    outline: none;
   }
 
   .onboarding-page--step-3 .rm-form-error {

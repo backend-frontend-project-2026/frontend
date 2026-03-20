@@ -1,4 +1,5 @@
 import { useMemo, useState, type FormEvent, type KeyboardEvent } from 'react';
+import { Button, Input, Tag } from 'antd';
 import '../onboarding-form.css';
 
 export type InterestsFormValue = {
@@ -169,15 +170,15 @@ export function EditInterests({
             const selected = selectedInterests.includes(interest);
 
             return (
-              <button
+              <Tag.CheckableTag
                 key={interest}
-                type="button"
-                className={['step-4-tag', selected ? 'is-selected' : ''].join(' ')}
-                onClick={() => toggleInterest(interest)}
+                checked={selected}
+                className="step-4-tag step-4-tag-checkable"
+                onChange={() => toggleInterest(interest)}
               >
                 <span className="step-4-tag__dot" />
                 <span className="step-4-tag__label">{interest}</span>
-              </button>
+              </Tag.CheckableTag>
             );
           })}
         </div>
@@ -185,18 +186,19 @@ export function EditInterests({
 
       <label className="step-4-custom-field">
         <span className="step-4-field-label">Добавить тег</span>
-        <input
+        <Input
           className="step-4-input"
           value={customTag}
           onChange={(event) => setCustomTag(event.target.value)}
           onKeyDown={handleCustomTagKeyDown}
           placeholder="например: “йога”"
+          autoComplete="off"
         />
       </label>
 
       <label className="step-4-bio-field">
         <span className="step-4-field-label">Короткое био (2–3 строки)</span>
-        <textarea
+        <Input.TextArea
           className="step-4-bio-textarea"
           rows={3}
           value={bio}
@@ -207,16 +209,16 @@ export function EditInterests({
       </label>
 
       {!hideActions ? (
-        <div className="step-4-inner-actions">
-          <button type="button" className="rm-nav-button rm-nav-button--ghost" onClick={onBack}>
+        <div className="step-4-inner-actions onboarding-page__actions--step-4">
+          <Button htmlType="button" className="rm-nav-button rm-nav-button--ghost" onClick={onBack}>
             <span>Назад</span>
             <span className="rm-nav-button__icon rm-nav-button__icon--dark">↗</span>
-          </button>
+          </Button>
 
-          <button type="submit" className="rm-nav-button rm-nav-button--primary">
+          <Button htmlType="submit" className="rm-nav-button rm-nav-button--primary">
             <span>Готово</span>
             <span className="rm-nav-button__icon rm-nav-button__icon--lime">↗</span>
-          </button>
+          </Button>
         </div>
       ) : null}
 

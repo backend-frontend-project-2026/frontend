@@ -11,11 +11,14 @@ type OnboardingStep4PageProps = {
 const FORM_ID = 'roomie-step-4-form';
 
 export function OnboardingStep4Page({ value, onBack, onComplete }: OnboardingStep4PageProps) {
+  const formKey = JSON.stringify(value ?? {});
+
   return (
     <section className="onboarding-page onboarding-page--step-4">
       <OnboardingProgress currentStep={4} />
 
       <EditInterests
+        key={formKey}
         formId={FORM_ID}
         initialValue={value}
         onBack={onBack}

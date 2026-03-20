@@ -1,4 +1,5 @@
-import { useMemo, useState, type ChangeEvent, type FormEvent } from 'react';
+import { useEffect, useMemo, useState, type FormEvent, useRef } from 'react';
+import { Button, Input, Radio, Upload, type RadioChangeEvent } from 'antd';
 import type { User } from '../../../entities/user';
 import './edit-basic-info.css';
 
@@ -14,6 +15,7 @@ export type BasicInfoFormValue = {
   avatar: string;
   photos: string[];
 };
+const { TextArea } = Input;
 
 type BasicInfoErrors = Partial<Record<keyof BasicInfoFormValue, string>>;
 
@@ -64,6 +66,19 @@ export function EditBasicInfo({
 
   const [formValue, setFormValue] = useState<BasicInfoFormValue>(mergedInitialValue);
   const [errors, setErrors] = useState<BasicInfoErrors>({});
+  const objectUrlsRef = useRef<string[]>([]);
+
+  useEffect(() => {
+    objectUrlsRef.current = [formValue.avatar, ...formValue.photos].filter((url) =>
+      url.startsWith('blob:')
+    );
+  }, [formValue.avatar, formValue.photos]);
+
+  useEffect(() => {
+    return () => {
+      objectUrlsRef.current.forEach(revokeObjectUrl);
+    };
+  }, []);
 
   const filledMainFields = [
     formValue.name,
@@ -83,38 +98,6 @@ export function EditBasicInfo({
   function setField<K extends keyof BasicInfoFormValue>(field: K, value: BasicInfoFormValue[K]) {
     setFormValue((current) => ({ ...current, [field]: value }));
     setErrors((current) => ({ ...current, [field]: undefined }));
-  }
-
-  function handleAvatarUpload(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-
-    if (!file) {
-      return;
-    }
-
-    if (formValue.avatar) {
-      revokeObjectUrl(formValue.avatar);
-    }
-
-    setField('avatar', URL.createObjectURL(file));
-    event.target.value = '';
-  }
-
-  function handlePhotosUpload(event: ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(event.target.files ?? []);
-
-    if (files.length === 0) {
-      return;
-    }
-
-    const nextPhotos = files.map((file) => URL.createObjectURL(file));
-
-    setFormValue((current) => ({
-      ...current,
-      photos: [...current.photos, ...nextPhotos].slice(0, 6),
-    }));
-
-    event.target.value = '';
   }
 
   function removePhoto(index: number) {
@@ -225,9 +208,7 @@ export function EditBasicInfo({
       {isStepEmpty ? (
         <div className="onboarding-form-state">
           <h4 className="onboarding-form-state__title">Черновик пока пустой</h4>
-          <p className="onboarding-form-state__text">
-            Добавь имя, пол, вуз и хотя бы одно фото, чтобы анкета начала выглядеть живой.
-          </p>
+          <p className="onboarding-form-state__text">Добавь имя, пол, вуз и хотя бы одно фото.</p>
         </div>
       ) : null}
 
@@ -246,35 +227,31 @@ export function EditBasicInfo({
           <p className="rm-form-helper">Нужен для анкеты и фильтров</p>
         </div>
 
-        <div className="rm-form-choice-grid">
-          <button
-            type="button"
-            className={[
-              'onboarding-choice-card',
-              formValue.gender === 'female' ? 'is-selected' : '',
-            ].join(' ')}
-            onClick={() => setField('gender', 'female')}
-          >
-            <span className="onboarding-choice-card-title">Женский</span>
-            <span className="onboarding-choice-card-description">
-              Показывать в анкете как женский профиль
+        <Radio.Group
+          className="rm-form-choice-grid rm-form-radio-group"
+          value={formValue.gender}
+          onChange={(event: RadioChangeEvent) => setField('gender', event.target.value)}
+        >
+          <Radio value="female" className="rm-form-radio-card">
+            <span className="rm-form-radio-card__top">
+              <span className="onboarding-choice-card-title">Женский</span>
+              <span className="rm-form-radio-card__check" aria-hidden="true">
+                ✓
+              </span>
             </span>
-          </button>
+            <span className="onboarding-choice-card-description">Для анкеты и фильтров</span>
+          </Radio>
 
-          <button
-            type="button"
-            className={[
-              'onboarding-choice-card',
-              formValue.gender === 'male' ? 'is-selected' : '',
-            ].join(' ')}
-            onClick={() => setField('gender', 'male')}
-          >
-            <span className="onboarding-choice-card-title">Мужской</span>
-            <span className="onboarding-choice-card-description">
-              Показывать в анкете как мужской профиль
+          <Radio value="male" className="rm-form-radio-card">
+            <span className="rm-form-radio-card__top">
+              <span className="onboarding-choice-card-title">Мужской</span>
+              <span className="rm-form-radio-card__check" aria-hidden="true">
+                ✓
+              </span>
             </span>
-          </button>
-        </div>
+            <span className="onboarding-choice-card-description">Для анкеты и фильтров</span>
+          </Radio>
+        </Radio.Group>
 
         {errors.gender ? <small className="rm-form-error">{errors.gender}</small> : null}
       </section>
@@ -282,7 +259,7 @@ export function EditBasicInfo({
       <div className="rm-form-grid">
         <label className="rm-form-field rm-form-field--name">
           <span className="rm-form-label">Имя</span>
-          <input
+          <Input
             className="rm-form-input"
             value={formValue.name}
             onChange={(event) => setField('name', event.target.value)}
@@ -293,7 +270,7 @@ export function EditBasicInfo({
 
         <label className="rm-form-field rm-form-field--age">
           <span className="rm-form-label">Возраст</span>
-          <input
+          <Input
             className="rm-form-input"
             value={formValue.age}
             onChange={(event) => setField('age', event.target.value)}
@@ -305,7 +282,7 @@ export function EditBasicInfo({
 
         <label className="rm-form-field rm-form-field--university">
           <span className="rm-form-label">Вуз</span>
-          <input
+          <Input
             className="rm-form-input"
             value={formValue.university}
             onChange={(event) => setField('university', event.target.value)}
@@ -316,7 +293,7 @@ export function EditBasicInfo({
 
         <label className="rm-form-field rm-form-field--faculty">
           <span className="rm-form-label">Факультет</span>
-          <input
+          <Input
             className="rm-form-input"
             value={formValue.faculty}
             onChange={(event) => setField('faculty', event.target.value)}
@@ -327,7 +304,7 @@ export function EditBasicInfo({
 
         <label className="rm-form-field rm-form-field--course">
           <span className="rm-form-label">Курс</span>
-          <input
+          <Input
             className="rm-form-input"
             value={formValue.course}
             onChange={(event) => setField('course', event.target.value)}
@@ -338,7 +315,7 @@ export function EditBasicInfo({
 
         <label className="rm-form-field rm-form-field--location">
           <span className="rm-form-label">Город/район/общежитие</span>
-          <input
+          <Input
             className="rm-form-input"
             value={formValue.location}
             onChange={(event) => setField('location', event.target.value)}
@@ -349,7 +326,7 @@ export function EditBasicInfo({
 
         <label className="rm-form-field rm-form-field--bio">
           <span className="rm-form-label">Короткое био (2–3 строки)</span>
-          <textarea
+          <TextArea
             className="rm-form-input rm-form-textarea"
             value={formValue.bio}
             onChange={(event) => setField('bio', event.target.value)}
@@ -367,26 +344,54 @@ export function EditBasicInfo({
         </div>
 
         <div className="rm-form-upload-row">
-          <label className="rm-form-upload-button">
-            <input
-              type="file"
-              accept="image/*"
-              className="rm-form-upload-input"
-              onChange={handleAvatarUpload}
-            />
-            <span>{formValue.avatar ? 'Заменить аватар' : 'Загрузить аватар'}</span>
-          </label>
+          <Upload
+            accept="image/*"
+            showUploadList={false}
+            beforeUpload={(file) => {
+              if (formValue.avatar) {
+                revokeObjectUrl(formValue.avatar);
+              }
 
-          <label className="rm-form-upload-button rm-form-upload-button--secondary">
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              className="rm-form-upload-input"
-              onChange={handlePhotosUpload}
-            />
-            <span>Добавить фото</span>
-          </label>
+              setField('avatar', URL.createObjectURL(file));
+              return false;
+            }}
+          >
+            <Button htmlType="button" className="rm-form-upload-button rm-form-upload-button--ant">
+              {formValue.avatar ? 'Заменить аватар' : 'Загрузить аватар'}
+            </Button>
+          </Upload>
+
+          <Upload
+            accept="image/*"
+            multiple
+            showUploadList={false}
+            beforeUpload={(file) => {
+              const nextPhoto = URL.createObjectURL(file);
+
+              setFormValue((current) => {
+                const remainingSlots = Math.max(0, 6 - current.photos.length);
+
+                if (remainingSlots === 0) {
+                  revokeObjectUrl(nextPhoto);
+                  return current;
+                }
+
+                return {
+                  ...current,
+                  photos: [...current.photos, nextPhoto].slice(0, 6),
+                };
+              });
+
+              return false;
+            }}
+          >
+            <Button
+              htmlType="button"
+              className="rm-form-upload-button rm-form-upload-button--secondary rm-form-upload-button--ant"
+            >
+              Добавить фото
+            </Button>
+          </Upload>
         </div>
 
         {hasMedia ? (
@@ -401,9 +406,14 @@ export function EditBasicInfo({
                   />
                 </div>
 
-                <button type="button" className="rm-form-gallery-remove" onClick={clearAvatar}>
+                <Button
+                  htmlType="button"
+                  type="text"
+                  className="rm-form-gallery-remove"
+                  onClick={clearAvatar}
+                >
                   Убрать аватар
-                </button>
+                </Button>
               </div>
             ) : null}
 
@@ -417,13 +427,14 @@ export function EditBasicInfo({
                   />
                 </div>
 
-                <button
-                  type="button"
+                <Button
+                  htmlType="button"
+                  type="text"
                   className="rm-form-gallery-remove"
                   onClick={() => removePhoto(index)}
                 >
                   Убрать
-                </button>
+                </Button>
               </div>
             ))}
           </div>
@@ -436,20 +447,20 @@ export function EditBasicInfo({
 
       {!hideActions ? (
         <div className="rm-form-actions">
-          <button
-            type="button"
+          <Button
+            htmlType="button"
             className="rm-nav-button rm-nav-button--ghost"
             onClick={onBack}
             disabled={!onBack}
           >
             <span>Назад</span>
             <span className="rm-nav-button__icon rm-nav-button__icon--dark">↗</span>
-          </button>
+          </Button>
 
-          <button type="submit" className="rm-nav-button rm-nav-button--primary">
+          <Button htmlType="submit" className="rm-nav-button rm-nav-button--primary">
             <span>Далее</span>
             <span className="rm-nav-button__icon rm-nav-button__icon--lime">↗</span>
-          </button>
+          </Button>
         </div>
       ) : null}
     </form>

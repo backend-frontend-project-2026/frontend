@@ -189,6 +189,27 @@
   cursor: pointer;
 }
 
+.onboarding-page--step-2 .step-2-pill-radio.ant-radio-wrapper {
+  margin-inline-end: 0;
+}
+
+.onboarding-page--step-2 .step-2-pill-radio .ant-radio {
+  display: none;
+}
+
+.onboarding-page--step-2 .step-2-pill-radio.ant-radio-wrapper > span:last-child {
+  display: inline-flex;
+  align-items: center;
+  gap: inherit;
+  padding-inline-start: 0;
+}
+
+.onboarding-page--step-2 .step-2-pill-radio.ant-radio-wrapper:hover,
+.onboarding-page--step-2 .step-2-pill-radio.ant-radio-wrapper:focus,
+.onboarding-page--step-2 .step-2-pill-radio.ant-radio-wrapper:active {
+  color: #222328;
+}
+
 .onboarding-page--step-2 .step-2-pill--compact {
   min-height: 28px;
   padding: 0 12px;
@@ -196,7 +217,11 @@
   font-weight: 600;
 }
 
-.onboarding-page--step-2 .step-2-pill.is-selected {
+.onboarding-page--step-2 .step-2-pill.is-selected,
+.onboarding-page--step-2 .step-2-pill-radio.ant-radio-wrapper-checked,
+.onboarding-page--step-2 .step-2-pill-radio.ant-radio-wrapper-checked:hover,
+.onboarding-page--step-2 .step-2-pill-radio.ant-radio-wrapper-checked:focus,
+.onboarding-page--step-2 .step-2-pill-radio.ant-radio-wrapper-checked:active {
   border-color: transparent;
   background: #d8f23e;
   box-shadow: none;
@@ -232,6 +257,17 @@
 
 .onboarding-page--step-2 .step-2-interval-input::placeholder {
   color: #a1a8b4;
+}
+
+.onboarding-page--step-2 .step-2-interval-input.ant-input,
+.onboarding-page--step-2 .step-2-interval-input.ant-input:hover,
+.onboarding-page--step-2 .step-2-interval-input.ant-input:focus,
+.onboarding-page--step-2 .step-2-interval-input.ant-input:focus-within,
+.onboarding-page--step-2 .step-2-interval-input.ant-input.ant-input-focused {
+  border-color: #e0e1e4;
+  background: #fff;
+  box-shadow: 0 8px 18px rgb(190 193 198 / 16%);
+  outline: none;
 }
 
 .onboarding-page--step-2 .rm-form-error {
@@ -277,6 +313,36 @@
 .onboarding-page--step-2 .rm-nav-button__icon--dark {
   background: #111318;
   color: #fff;
+}
+
+.onboarding-page--step-2 .rm-nav-button.ant-btn,
+.onboarding-page--step-2 .rm-nav-button.ant-btn:hover,
+.onboarding-page--step-2 .rm-nav-button.ant-btn:focus,
+.onboarding-page--step-2 .rm-nav-button.ant-btn:focus-visible,
+.onboarding-page--step-2 .rm-nav-button.ant-btn:active {
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.onboarding-page--step-2 .rm-nav-button--ghost.ant-btn,
+.onboarding-page--step-2 .rm-nav-button--ghost.ant-btn:hover,
+.onboarding-page--step-2 .rm-nav-button--ghost.ant-btn:focus,
+.onboarding-page--step-2 .rm-nav-button--ghost.ant-btn:focus-visible,
+.onboarding-page--step-2 .rm-nav-button--ghost.ant-btn:active {
+  border: none !important;
+  background: #e7e7e6 !important;
+  color: #202226 !important;
+  box-shadow: none !important;
+}
+
+.onboarding-page--step-2 .rm-nav-button--primary.ant-btn,
+.onboarding-page--step-2 .rm-nav-button--primary.ant-btn:hover,
+.onboarding-page--step-2 .rm-nav-button--primary.ant-btn:focus,
+.onboarding-page--step-2 .rm-nav-button--primary.ant-btn:focus-visible,
+.onboarding-page--step-2 .rm-nav-button--primary.ant-btn:active {
+  border: none !important;
+  background: linear-gradient(160deg, #101217 0%, #20242c 100%) !important;
+  box-shadow: none !important;
 }
 
 .rm-shell--step-2 .rm-shell__footer {
@@ -557,6 +623,10 @@
     font-weight: 600;
   }
 
+  .onboarding-page--step-2 .step-2-pill-radio.ant-radio-wrapper > span:last-child {
+    gap: inherit;
+  }
+
   .onboarding-page--step-2 .step-2-pill--compact {
     min-height: 24px;
     padding: 0 11px;
@@ -588,6 +658,17 @@
     color: #202226;
     font-size: 12px;
     font-weight: 500;
+  }
+
+  .onboarding-page--step-2 .step-2-interval-input.ant-input,
+  .onboarding-page--step-2 .step-2-interval-input.ant-input:hover,
+  .onboarding-page--step-2 .step-2-interval-input.ant-input:focus,
+  .onboarding-page--step-2 .step-2-interval-input.ant-input:focus-within,
+  .onboarding-page--step-2 .step-2-interval-input.ant-input.ant-input-focused {
+    border-color: #dadde1;
+    background: rgb(255 255 255 / 96%);
+    box-shadow: 0 12px 24px rgb(175 181 190 / 18%);
+    outline: none;
   }
 
   .onboarding-page--step-2 .rm-form-error {
@@ -852,6 +933,10 @@
     font-weight: 600;
   }
 
+  .onboarding-page--step-2 .step-2-pill-radio.ant-radio-wrapper > span:last-child {
+    gap: inherit;
+  }
+
   .onboarding-page--step-2 .step-2-pill--compact {
     min-height: 40px;
     padding: 0 16px;
@@ -882,6 +967,19 @@
     color: #202226;
     font-size: 15px;
     font-weight: 500;
+  }
+
+  .onboarding-page--step-2 .step-2-interval-input.ant-input,
+  .onboarding-page--step-2 .step-2-interval-input.ant-input:hover,
+  .onboarding-page--step-2 .step-2-interval-input.ant-input:focus,
+  .onboarding-page--step-2 .step-2-interval-input.ant-input:focus-within,
+  .onboarding-page--step-2 .step-2-interval-input.ant-input.ant-input-focused {
+    border-color: #d8dde3;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfcfd 100%);
+    box-shadow:
+      0 10px 24px rgb(175 181 190 / 14%),
+      inset 0 1px 0 rgb(255 255 255 / 88%);
+    outline: none;
   }
 
   .onboarding-page--step-2 .rm-form-error {

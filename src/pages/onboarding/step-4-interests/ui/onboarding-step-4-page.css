@@ -178,9 +178,38 @@
   cursor: pointer;
 }
 
-.onboarding-page--step-4 .step-4-tag.is-selected {
+.onboarding-page--step-4 .step-4-tag-checkable.ant-tag {
+  margin-inline-end: 0;
+  margin-bottom: 0;
+}
+
+.onboarding-page--step-4 .step-4-tag-checkable.ant-tag,
+.onboarding-page--step-4 .step-4-tag-checkable.ant-tag:hover,
+.onboarding-page--step-4 .step-4-tag-checkable.ant-tag:active,
+.onboarding-page--step-4 .step-4-tag-checkable.ant-tag:focus,
+.onboarding-page--step-4 .step-4-tag-checkable.ant-tag:focus-visible {
+  color: #222328;
+  border-color: #d9d9dc;
+  background: #fff;
+  box-shadow: none;
+}
+
+.onboarding-page--step-4
+  .step-4-tag-checkable.ant-tag-checkable:not(.ant-tag-checkable-checked):hover {
+  color: #222328;
+  border-color: #d9d9dc;
+  background: #fff;
+}
+
+.onboarding-page--step-4 .step-4-tag.is-selected,
+.onboarding-page--step-4 .step-4-tag-checkable.ant-tag-checkable-checked,
+.onboarding-page--step-4 .step-4-tag-checkable.ant-tag-checkable-checked:hover,
+.onboarding-page--step-4 .step-4-tag-checkable.ant-tag-checkable-checked:active,
+.onboarding-page--step-4 .step-4-tag-checkable.ant-tag-checkable-checked:focus,
+.onboarding-page--step-4 .step-4-tag-checkable.ant-tag-checkable-checked:focus-visible {
   border-color: transparent;
   background: #d8f23e;
+  color: #222328;
 }
 
 .onboarding-page--step-4 .step-4-tag__dot {
@@ -220,6 +249,17 @@
 
 .onboarding-page--step-4 .step-4-input::placeholder {
   color: #a1a8b4;
+}
+
+.onboarding-page--step-4 .step-4-input.ant-input,
+.onboarding-page--step-4 .step-4-input.ant-input:hover,
+.onboarding-page--step-4 .step-4-input.ant-input:focus,
+.onboarding-page--step-4 .step-4-input.ant-input:focus-within,
+.onboarding-page--step-4 .step-4-input.ant-input.ant-input-focused {
+  border-color: #e0e1e4;
+  background: #fff;
+  box-shadow: 0 8px 18px rgb(190 193 198 / 16%);
+  outline: none;
 }
 
 .onboarding-page--step-4 .step-4-bio-field {
@@ -265,6 +305,37 @@
 .onboarding-page--step-4 .rm-nav-button__icon--dark {
   background: #111318;
   color: #fff;
+}
+
+.onboarding-page--step-4 .rm-nav-button.ant-btn,
+.onboarding-page--step-4 .rm-nav-button.ant-btn:hover,
+.onboarding-page--step-4 .rm-nav-button.ant-btn:focus,
+.onboarding-page--step-4 .rm-nav-button.ant-btn:focus-visible,
+.onboarding-page--step-4 .rm-nav-button.ant-btn:active {
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.onboarding-page--step-4 .rm-nav-button--ghost.ant-btn,
+.onboarding-page--step-4 .rm-nav-button--ghost.ant-btn:hover,
+.onboarding-page--step-4 .rm-nav-button--ghost.ant-btn:focus,
+.onboarding-page--step-4 .rm-nav-button--ghost.ant-btn:focus-visible,
+.onboarding-page--step-4 .rm-nav-button--ghost.ant-btn:active {
+  border: none !important;
+  background: #e7e7e6 !important;
+  color: #202226 !important;
+  box-shadow: none !important;
+}
+
+.onboarding-page--step-4 .rm-nav-button--primary.ant-btn,
+.onboarding-page--step-4 .rm-nav-button--primary.ant-btn:hover,
+.onboarding-page--step-4 .rm-nav-button--primary.ant-btn:focus,
+.onboarding-page--step-4 .rm-nav-button--primary.ant-btn:focus-visible,
+.onboarding-page--step-4 .rm-nav-button--primary.ant-btn:active {
+  border: none !important;
+  background: linear-gradient(160deg, #101217 0%, #20242c 100%) !important;
+  color: #f6f6f4 !important;
+  box-shadow: none !important;
 }
 
 .onboarding-page--step-4 .step-4-mobile-note {
@@ -556,9 +627,30 @@
     font-weight: 600;
   }
 
+  .onboarding-page--step-4 .step-4-tag-checkable.ant-tag,
+  .onboarding-page--step-4 .step-4-tag-checkable.ant-tag:hover,
+  .onboarding-page--step-4 .step-4-tag-checkable.ant-tag:active,
+  .onboarding-page--step-4 .step-4-tag-checkable.ant-tag:focus,
+  .onboarding-page--step-4 .step-4-tag-checkable.ant-tag:focus-visible {
+    border-color: #dadde1;
+    background: rgb(255 255 255 / 96%);
+    color: #23252a;
+  }
+
   .onboarding-page--step-4 .step-4-tag.is-selected {
     border-color: transparent;
     background: #d8f23e;
+  }
+
+  .onboarding-page--step-4 .step-4-tag.is-selected,
+  .onboarding-page--step-4 .step-4-tag-checkable.ant-tag-checkable-checked,
+  .onboarding-page--step-4 .step-4-tag-checkable.ant-tag-checkable-checked:hover,
+  .onboarding-page--step-4 .step-4-tag-checkable.ant-tag-checkable-checked:active,
+  .onboarding-page--step-4 .step-4-tag-checkable.ant-tag-checkable-checked:focus,
+  .onboarding-page--step-4 .step-4-tag-checkable.ant-tag-checkable-checked:focus-visible {
+    border-color: transparent;
+    background: #d8f23e;
+    color: #23252a;
   }
 
   .onboarding-page--step-4 .step-4-tag__dot {
@@ -596,6 +688,17 @@
     font-size: 12px;
     outline: none;
     box-shadow: none;
+  }
+
+  .onboarding-page--step-4 .step-4-bio-textarea.ant-input,
+  .onboarding-page--step-4 .step-4-bio-textarea.ant-input:hover,
+  .onboarding-page--step-4 .step-4-bio-textarea.ant-input:focus,
+  .onboarding-page--step-4 .step-4-bio-textarea.ant-input:focus-within,
+  .onboarding-page--step-4 .step-4-bio-textarea.ant-input.ant-input-focused {
+    border-color: #dfe3e7;
+    background: #fff;
+    box-shadow: none;
+    outline: none;
   }
 
   .onboarding-page--step-4 .step-4-bio-preview {
@@ -861,6 +964,27 @@
     font-weight: 600;
   }
 
+  .onboarding-page--step-4 .step-4-tag-checkable.ant-tag,
+  .onboarding-page--step-4 .step-4-tag-checkable.ant-tag:hover,
+  .onboarding-page--step-4 .step-4-tag-checkable.ant-tag:active,
+  .onboarding-page--step-4 .step-4-tag-checkable.ant-tag:focus,
+  .onboarding-page--step-4 .step-4-tag-checkable.ant-tag:focus-visible {
+    border-color: #e6e6e6;
+    background: #ffffff;
+    color: #0b0c0e;
+  }
+
+  .onboarding-page--step-4 .step-4-tag.is-selected,
+  .onboarding-page--step-4 .step-4-tag-checkable.ant-tag-checkable-checked,
+  .onboarding-page--step-4 .step-4-tag-checkable.ant-tag-checkable-checked:hover,
+  .onboarding-page--step-4 .step-4-tag-checkable.ant-tag-checkable-checked:active,
+  .onboarding-page--step-4 .step-4-tag-checkable.ant-tag-checkable-checked:focus,
+  .onboarding-page--step-4 .step-4-tag-checkable.ant-tag-checkable-checked:focus-visible {
+    border-color: transparent;
+    background: #d8f23e;
+    color: #0b0c0e;
+  }
+
   .onboarding-page--step-4 .step-4-tag__dot {
     width: 7px;
     height: 7px;
@@ -894,6 +1018,19 @@
     font-size: 15px;
     line-height: 1.5;
     resize: none;
+    outline: none;
+  }
+
+  .onboarding-page--step-4 .step-4-bio-textarea.ant-input,
+  .onboarding-page--step-4 .step-4-bio-textarea.ant-input:hover,
+  .onboarding-page--step-4 .step-4-bio-textarea.ant-input:focus,
+  .onboarding-page--step-4 .step-4-bio-textarea.ant-input:focus-within,
+  .onboarding-page--step-4 .step-4-bio-textarea.ant-input.ant-input-focused {
+    border-color: #d8dde3;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfcfd 100%);
+    box-shadow:
+      0 10px 24px rgb(175 181 190 / 14%),
+      inset 0 1px 0 rgb(255 255 255 / 88%);
     outline: none;
   }
 

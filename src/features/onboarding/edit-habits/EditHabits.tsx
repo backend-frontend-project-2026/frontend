@@ -1,4 +1,5 @@
 import { useMemo, useState, type FormEvent } from 'react';
+import { Button, Input, Radio } from 'antd';
 import type { User } from '../../../entities/user';
 import '../onboarding-form.css';
 
@@ -30,9 +31,8 @@ type EditHabitsProps = {
 };
 
 type HabitPillProps = {
-  selected: boolean;
+  value: string;
   label: string;
-  onClick: () => void;
   compact?: boolean;
 };
 
@@ -73,20 +73,17 @@ function parseQuietInterval(value: string) {
   };
 }
 
-function HabitPill({ selected, label, onClick, compact = false }: HabitPillProps) {
+function HabitPill({ value, label, compact = false }: HabitPillProps) {
   return (
-    <button
-      type="button"
-      className={[
-        'step-2-pill',
-        compact ? 'step-2-pill--compact' : '',
-        selected ? 'is-selected' : '',
-      ].join(' ')}
-      onClick={onClick}
+    <Radio
+      value={value}
+      className={['step-2-pill', 'step-2-pill-radio', compact ? 'step-2-pill--compact' : ''].join(
+        ' '
+      )}
     >
       <span className="step-2-pill__dot" />
       <span className="step-2-pill__label">{label}</span>
-    </button>
+    </Radio>
   );
 }
 
@@ -132,6 +129,14 @@ export function EditHabits({
       isSmokingAllowed: value === 'yes',
     }));
     setErrors((current) => ({ ...current, smokingPreference: undefined }));
+  }
+
+  function setPetPreference(value: HabitsFormValue['petPreference']) {
+    setFormValue((current) => ({
+      ...current,
+      petPreference: value,
+    }));
+    setErrors((current) => ({ ...current, petPreference: undefined }));
   }
 
   function validate(value: HabitsFormValue, intervalValue: string) {
@@ -237,18 +242,14 @@ export function EditHabits({
 
       <section className="step-2-group">
         <h4 className="step-2-group__title">Режим</h4>
-        <div className="step-2-pills step-2-pills--sleep">
-          <HabitPill
-            selected={formValue.sleepSchedule === 'early_bird'}
-            label="Ложусь рано"
-            onClick={() => setField('sleepSchedule', 'early_bird')}
-          />
-          <HabitPill
-            selected={formValue.sleepSchedule === 'night_owl'}
-            label="Ложусь позже"
-            onClick={() => setField('sleepSchedule', 'night_owl')}
-          />
-        </div>
+        <Radio.Group
+          className="step-2-pills step-2-pills--sleep"
+          value={formValue.sleepSchedule}
+          onChange={(event) => setField('sleepSchedule', event.target.value)}
+        >
+          <HabitPill value="early_bird" label="Ложусь рано" />
+          <HabitPill value="night_owl" label="Ложусь позже" />
+        </Radio.Group>
         {errors.sleepSchedule ? (
           <small className="rm-form-error">{errors.sleepSchedule}</small>
         ) : null}
@@ -256,26 +257,17 @@ export function EditHabits({
 
       <section className="step-2-group">
         <h4 className="step-2-group__title">Курение</h4>
-        <div className="step-2-pills step-2-pills--smoking">
-          <HabitPill
-            compact
-            selected={formValue.smokingPreference === 'no'}
-            label="Нет"
-            onClick={() => setSmoking('no')}
-          />
-          <HabitPill
-            compact
-            selected={formValue.smokingPreference === 'yes'}
-            label="Да"
-            onClick={() => setSmoking('yes')}
-          />
-          <HabitPill
-            compact
-            selected={formValue.smokingPreference === 'outside_only'}
-            label="Только на улице"
-            onClick={() => setSmoking('outside_only')}
-          />
-        </div>
+        <Radio.Group
+          className="step-2-pills step-2-pills--smoking"
+          value={formValue.smokingPreference}
+          onChange={(event) =>
+            setSmoking(event.target.value as HabitsFormValue['smokingPreference'])
+          }
+        >
+          <HabitPill compact value="no" label="Нет" />
+          <HabitPill compact value="yes" label="Да" />
+          <HabitPill compact value="outside_only" label="Только на улице" />
+        </Radio.Group>
         {errors.smokingPreference ? (
           <small className="rm-form-error">{errors.smokingPreference}</small>
         ) : null}
@@ -283,32 +275,16 @@ export function EditHabits({
 
       <section className="step-2-group">
         <h4 className="step-2-group__title">Алкоголь</h4>
-        <div className="step-2-pills step-2-pills--smoking">
-          <HabitPill
-            compact
-            selected={formValue.alcoholPreference === 'no'}
-            label="Не пью"
-            onClick={() => setField('alcoholPreference', 'no')}
-          />
-          <HabitPill
-            compact
-            selected={formValue.alcoholPreference === 'rarely'}
-            label="Редко"
-            onClick={() => setField('alcoholPreference', 'rarely')}
-          />
-          <HabitPill
-            compact
-            selected={formValue.alcoholPreference === 'socially'}
-            label="Иногда"
-            onClick={() => setField('alcoholPreference', 'socially')}
-          />
-          <HabitPill
-            compact
-            selected={formValue.alcoholPreference === 'yes'}
-            label="Нормально"
-            onClick={() => setField('alcoholPreference', 'yes')}
-          />
-        </div>
+        <Radio.Group
+          className="step-2-pills step-2-pills--smoking"
+          value={formValue.alcoholPreference}
+          onChange={(event) => setField('alcoholPreference', event.target.value)}
+        >
+          <HabitPill compact value="no" label="Не пью" />
+          <HabitPill compact value="rarely" label="Редко" />
+          <HabitPill compact value="socially" label="Иногда" />
+          <HabitPill compact value="yes" label="Нормально" />
+        </Radio.Group>
         {errors.alcoholPreference ? (
           <small className="rm-form-error">{errors.alcoholPreference}</small>
         ) : null}
@@ -320,51 +296,29 @@ export function EditHabits({
         <div className="step-2-inline-list">
           <div className="step-2-inline-row">
             <span className="step-2-inline-label">Шум</span>
-            <div className="step-2-pills step-2-pills--compact-row">
-              <HabitPill
-                compact
-                selected={formValue.noiseLevel === 'quiet'}
-                label="Тишина"
-                onClick={() => setField('noiseLevel', 'quiet')}
-              />
-              <HabitPill
-                compact
-                selected={formValue.noiseLevel === 'moderate'}
-                label="Норм"
-                onClick={() => setField('noiseLevel', 'moderate')}
-              />
-              <HabitPill
-                compact
-                selected={formValue.noiseLevel === 'social'}
-                label="Шумно"
-                onClick={() => setField('noiseLevel', 'social')}
-              />
-            </div>
+            <Radio.Group
+              className="step-2-pills step-2-pills--compact-row"
+              value={formValue.noiseLevel}
+              onChange={(event) => setField('noiseLevel', event.target.value)}
+            >
+              <HabitPill compact value="quiet" label="Тишина" />
+              <HabitPill compact value="moderate" label="Норм" />
+              <HabitPill compact value="social" label="Шумно" />
+            </Radio.Group>
           </div>
           {errors.noiseLevel ? <small className="rm-form-error">{errors.noiseLevel}</small> : null}
 
           <div className="step-2-inline-row">
             <span className="step-2-inline-label">Чистота</span>
-            <div className="step-2-pills step-2-pills--compact-row">
-              <HabitPill
-                compact
-                selected={formValue.cleanliness === 'high'}
-                label="Аккуратно"
-                onClick={() => setField('cleanliness', 'high')}
-              />
-              <HabitPill
-                compact
-                selected={formValue.cleanliness === 'medium'}
-                label="Средне"
-                onClick={() => setField('cleanliness', 'medium')}
-              />
-              <HabitPill
-                compact
-                selected={formValue.cleanliness === 'low'}
-                label="Не важно"
-                onClick={() => setField('cleanliness', 'low')}
-              />
-            </div>
+            <Radio.Group
+              className="step-2-pills step-2-pills--compact-row"
+              value={formValue.cleanliness}
+              onChange={(event) => setField('cleanliness', event.target.value)}
+            >
+              <HabitPill compact value="high" label="Аккуратно" />
+              <HabitPill compact value="medium" label="Средне" />
+              <HabitPill compact value="low" label="Не важно" />
+            </Radio.Group>
           </div>
           {errors.cleanliness ? (
             <small className="rm-form-error">{errors.cleanliness}</small>
@@ -372,26 +326,15 @@ export function EditHabits({
 
           <div className="step-2-inline-row">
             <span className="step-2-inline-label">Гости</span>
-            <div className="step-2-pills step-2-pills--compact-row">
-              <HabitPill
-                compact
-                selected={formValue.guestFrequency === 'rarely'}
-                label="Редко"
-                onClick={() => setField('guestFrequency', 'rarely')}
-              />
-              <HabitPill
-                compact
-                selected={formValue.guestFrequency === 'sometimes'}
-                label="Иногда"
-                onClick={() => setField('guestFrequency', 'sometimes')}
-              />
-              <HabitPill
-                compact
-                selected={formValue.guestFrequency === 'often'}
-                label="Часто"
-                onClick={() => setField('guestFrequency', 'often')}
-              />
-            </div>
+            <Radio.Group
+              className="step-2-pills step-2-pills--compact-row"
+              value={formValue.guestFrequency}
+              onChange={(event) => setField('guestFrequency', event.target.value)}
+            >
+              <HabitPill compact value="rarely" label="Редко" />
+              <HabitPill compact value="sometimes" label="Иногда" />
+              <HabitPill compact value="often" label="Часто" />
+            </Radio.Group>
           </div>
           {errors.guestFrequency ? (
             <small className="rm-form-error">{errors.guestFrequency}</small>
@@ -401,26 +344,15 @@ export function EditHabits({
 
       <section className="step-2-group">
         <h4 className="step-2-group__title">Порядок в комнате</h4>
-        <div className="step-2-pills step-2-pills--pets">
-          <HabitPill
-            compact
-            selected={formValue.roomOrderPreference === 'strict'}
-            label="Строго"
-            onClick={() => setField('roomOrderPreference', 'strict')}
-          />
-          <HabitPill
-            compact
-            selected={formValue.roomOrderPreference === 'balanced'}
-            label="Баланс"
-            onClick={() => setField('roomOrderPreference', 'balanced')}
-          />
-          <HabitPill
-            compact
-            selected={formValue.roomOrderPreference === 'flexible'}
-            label="Гибко"
-            onClick={() => setField('roomOrderPreference', 'flexible')}
-          />
-        </div>
+        <Radio.Group
+          className="step-2-pills step-2-pills--pets"
+          value={formValue.roomOrderPreference}
+          onChange={(event) => setField('roomOrderPreference', event.target.value)}
+        >
+          <HabitPill compact value="strict" label="Строго" />
+          <HabitPill compact value="balanced" label="Баланс" />
+          <HabitPill compact value="flexible" label="Гибко" />
+        </Radio.Group>
         {errors.roomOrderPreference ? (
           <small className="rm-form-error">{errors.roomOrderPreference}</small>
         ) : null}
@@ -428,20 +360,16 @@ export function EditHabits({
 
       <section className="step-2-group">
         <h4 className="step-2-group__title">Животные</h4>
-        <div className="step-2-pills step-2-pills--pets">
-          <HabitPill
-            compact
-            selected={formValue.petPreference === 'pet_friendly'}
-            label="Ок"
-            onClick={() => setField('petPreference', 'pet_friendly')}
-          />
-          <HabitPill
-            compact
-            selected={formValue.petPreference === 'no_pets'}
-            label="Не ок"
-            onClick={() => setField('petPreference', 'no_pets')}
-          />
-        </div>
+        <Radio.Group
+          className="step-2-pills step-2-pills--pets"
+          value={formValue.petPreference}
+          onChange={(event) =>
+            setPetPreference(event.target.value as HabitsFormValue['petPreference'])
+          }
+        >
+          <HabitPill compact value="pet_friendly" label="Ок" />
+          <HabitPill compact value="no_pets" label="Не ок" />
+        </Radio.Group>
         {errors.petPreference ? (
           <small className="rm-form-error">{errors.petPreference}</small>
         ) : null}
@@ -451,32 +379,33 @@ export function EditHabits({
         <h4 className="step-2-group__title">Тихие часы</h4>
         <label className="step-2-interval-field">
           <span className="step-2-inline-label">Интервал</span>
-          <input
+          <Input
             className="step-2-interval-input"
             value={quietInterval}
             onChange={(event) => setQuietInterval(event.target.value)}
             placeholder="23:00 — 08:00"
+            autoComplete="off"
           />
         </label>
         {errors.quietFrom ? <small className="rm-form-error">{errors.quietFrom}</small> : null}
       </section>
 
       {!hideActions ? (
-        <div className="onboarding-feature-actions">
-          <button
-            type="button"
+        <div className="onboarding-feature-actions onboarding-page__actions--step-2">
+          <Button
+            htmlType="button"
             className="rm-nav-button rm-nav-button--ghost"
             onClick={onBack}
             disabled={!onBack}
           >
             <span>Назад</span>
             <span className="rm-nav-button__icon rm-nav-button__icon--dark">↗</span>
-          </button>
+          </Button>
 
-          <button type="submit" className="rm-nav-button rm-nav-button--primary">
+          <Button htmlType="submit" className="rm-nav-button rm-nav-button--primary">
             <span>Далее</span>
             <span className="rm-nav-button__icon rm-nav-button__icon--lime">↗</span>
-          </button>
+          </Button>
         </div>
       ) : null}
     </form>

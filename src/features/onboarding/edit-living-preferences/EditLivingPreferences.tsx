@@ -1,13 +1,14 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import type { User } from '../../../entities/user';
 import '../onboarding-form.css';
+import { Button, Checkbox, Input } from 'antd';
 
 export type LivingPreferencesFormValue = {
   budgetMin: string;
   budgetMax: string;
   moveInDate: string;
   stayDuration: User['stayDuration'] | '';
-  housingType: 'dormitory' | 'rental' | 'flexible' | '';
+  housingType: User['housingType'] | '';
   livingNotes: string;
   idealRoommateDescription: string;
   rentalCriteria: string;
@@ -124,24 +125,20 @@ function parseStayDuration(value: string): LivingPreferencesFormValue['stayDurat
   return '';
 }
 
-function ConditionItem({
-  label,
-  checked,
-  onToggle,
-}: {
-  label: string;
-  checked: boolean;
-  onToggle: () => void;
-}) {
+function getSelectedConditionsFromNotes(value: string) {
+  const normalized = value.toLowerCase();
+
+  return [...mobileConditions, ...desktopConditions]
+    .filter((item) => normalized.includes(item.label.toLowerCase()))
+    .map((item) => item.key);
+}
+
+function ConditionItem({ value, label }: { value: string; label: string }) {
   return (
-    <button
-      type="button"
-      className={['step-3-condition', checked ? 'is-checked' : ''].join(' ')}
-      onClick={onToggle}
-    >
+    <Checkbox value={value} className="step-3-condition step-3-condition-checkbox">
       <span className="step-3-condition__box" />
       <span className="step-3-condition__text">{label}</span>
-    </button>
+    </Checkbox>
   );
 }
 
@@ -162,7 +159,9 @@ export function EditLivingPreferences({
   const [stayDurationText, setStayDurationText] = useState(
     formatStayDuration(mergedInitialValue.stayDuration)
   );
-  const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
+  const [selectedConditions, setSelectedConditions] = useState<string[]>(
+    getSelectedConditionsFromNotes(mergedInitialValue.livingNotes)
+  );
   const [errors, setErrors] = useState<LivingPreferencesErrors>({});
 
   const filledCount = [
@@ -183,12 +182,6 @@ export function EditLivingPreferences({
   ) {
     setFormValue((current) => ({ ...current, [field]: value }));
     setErrors((current) => ({ ...current, [field]: undefined }));
-  }
-
-  function toggleCondition(key: string) {
-    setSelectedConditions((current) =>
-      current.includes(key) ? current.filter((item) => item !== key) : [...current, key]
-    );
   }
 
   function validate() {
@@ -243,7 +236,7 @@ export function EditLivingPreferences({
       budgetMax: parsedBudget.max,
       moveInDate: formValue.moveInDate.trim(),
       stayDuration: parsedDuration,
-      housingType: formValue.housingType || 'flexible',
+      housingType: formValue.housingType,
       livingNotes: notesParts.join('. '),
       idealRoommateDescription: formValue.idealRoommateDescription.trim(),
       rentalCriteria: formValue.rentalCriteria.trim(),
@@ -289,11 +282,12 @@ export function EditLivingPreferences({
         <label className="step-3-field">
           <span className="step-3-label">Бюджет (диапазон)</span>
 
-          <input
+          <Input
             className="step-3-input step-3-input--budget-mobile"
             value={budgetRange}
             onChange={(event) => setBudgetRange(event.target.value)}
             placeholder="20–35 тыс ₽ / мес"
+            autoComplete="off"
           />
 
           <div className="step-3-budget-visual" aria-hidden="true">
@@ -309,11 +303,12 @@ export function EditLivingPreferences({
       <section className="step-3-group">
         <label className="step-3-field">
           <span className="step-3-label">Дата заезда</span>
-          <input
+          <Input
             className="step-3-input"
             value={formValue.moveInDate}
             onChange={(event) => setField('moveInDate', event.target.value)}
             placeholder="с 15 марта"
+            autoComplete="off"
           />
         </label>
 
@@ -323,11 +318,12 @@ export function EditLivingPreferences({
       <section className="step-3-group">
         <label className="step-3-field">
           <span className="step-3-label">Срок аренды</span>
-          <input
+          <Input
             className="step-3-input"
             value={stayDurationText}
             onChange={(event) => setStayDurationText(event.target.value)}
             placeholder="6 месяцев"
+            autoComplete="off"
           />
         </label>
 
@@ -339,32 +335,30 @@ export function EditLivingPreferences({
       <section className="step-3-group step-3-group--conditions">
         <h4 className="step-3-section-title">Жёсткие условия</h4>
 
-        <div className="step-3-conditions-list step-3-conditions-list--mobile">
+        <Checkbox.Group
+          className="step-3-conditions-list step-3-conditions-list--mobile"
+          value={selectedConditions}
+          onChange={(checkedValues) => setSelectedConditions(checkedValues.map(String))}
+        >
           {mobileConditions.map((item) => (
-            <ConditionItem
-              key={item.key}
-              label={item.label}
-              checked={selectedConditions.includes(item.key)}
-              onToggle={() => toggleCondition(item.key)}
-            />
+            <ConditionItem key={item.key} value={item.key} label={item.label} />
           ))}
-        </div>
+        </Checkbox.Group>
 
-        <div className="step-3-conditions-list step-3-conditions-list--desktop">
+        <Checkbox.Group
+          className="step-3-conditions-list step-3-conditions-list--desktop"
+          value={selectedConditions}
+          onChange={(checkedValues) => setSelectedConditions(checkedValues.map(String))}
+        >
           {desktopConditions.map((item) => (
-            <ConditionItem
-              key={item.key}
-              label={item.label}
-              checked={selectedConditions.includes(item.key)}
-              onToggle={() => toggleCondition(item.key)}
-            />
+            <ConditionItem key={item.key} value={item.key} label={item.label} />
           ))}
-        </div>
+        </Checkbox.Group>
       </section>
 
       <label className="step-3-ideal-field">
         <span className="step-3-label">Идеальный сосед</span>
-        <textarea
+        <Input.TextArea
           className="step-3-ideal-textarea"
           rows={3}
           value={formValue.idealRoommateDescription}
@@ -375,7 +369,7 @@ export function EditLivingPreferences({
 
       <label className="step-3-ideal-field">
         <span className="step-3-label">Критерии для съёма квартиры</span>
-        <textarea
+        <Input.TextArea
           className="step-3-ideal-textarea"
           rows={3}
           value={formValue.rentalCriteria}
@@ -385,21 +379,21 @@ export function EditLivingPreferences({
       </label>
 
       {!hideActions ? (
-        <div className="onboarding-feature-actions">
-          <button
-            type="button"
+        <div className="onboarding-feature-actions onboarding-page__actions--step-3">
+          <Button
+            htmlType="button"
             className="rm-nav-button rm-nav-button--ghost"
             onClick={onBack}
             disabled={!onBack}
           >
             <span>Назад</span>
             <span className="rm-nav-button__icon rm-nav-button__icon--dark">↗</span>
-          </button>
+          </Button>
 
-          <button type="submit" className="rm-nav-button rm-nav-button--primary">
+          <Button htmlType="submit" className="rm-nav-button rm-nav-button--primary">
             <span>Далее</span>
             <span className="rm-nav-button__icon rm-nav-button__icon--lime">↗</span>
-          </button>
+          </Button>
         </div>
       ) : null}
     </form>

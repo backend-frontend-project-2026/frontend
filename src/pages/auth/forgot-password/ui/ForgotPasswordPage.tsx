@@ -16,7 +16,7 @@ const ForgotPasswordPage = () => {
   const [form] = Form.useForm<FormValues>();
 
   const handleSubmit = (values: FormValues) => {
-    navigate(`${RoutePaths.VERIFY_EMAIL}?email=${encodeURIComponent(values.email)}`);
+    navigate(RoutePaths.VERIFY_EMAIL, { state: { email: values.email } });
   };
 
   return (
@@ -40,7 +40,7 @@ const ForgotPasswordPage = () => {
             </Form.Item>
 
             <Form.Item>
-              <RoundedButton type="primary" htmlType="submit" block size="large">
+              <RoundedButton htmlType="submit" block size="large">
                 Отправить
               </RoundedButton>
             </Form.Item>

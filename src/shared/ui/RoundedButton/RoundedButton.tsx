@@ -5,7 +5,7 @@ import styles from './RoundedButton.module.css';
 
 type RoundedButtonVariant = 'accent' | 'dark' | 'gray';
 
-interface RoundedButtonProps extends Omit<ButtonProps, 'type'> {
+interface RoundedButtonProps extends Omit<ButtonProps, 'type' | 'variant'> {
   children: React.ReactNode;
   variant?: RoundedButtonVariant;
 }

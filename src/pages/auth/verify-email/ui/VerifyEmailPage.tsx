@@ -1,4 +1,4 @@
-import { useSearchParams, Link } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { Card, Typography } from 'antd';
 import RoundedButton from '@/shared/ui/RoundedButton/RoundedButton';
 import { RoutePaths } from '@/app/router/routePaths';
@@ -8,8 +8,8 @@ import styles from './VerifyEmailPage.module.css';
 const { Title, Text, Paragraph } = Typography;
 
 const VerifyEmailPage = () => {
-  const [searchParams] = useSearchParams();
-  const email = searchParams.get('email') ?? 'your@email.com';
+  const location = useLocation();
+  const email = location.state?.email ?? 'your@email.com';
 
   return (
     <div className={shared.pageWrapper}>
@@ -25,7 +25,6 @@ const VerifyEmailPage = () => {
           <div className={shared.hint}>Если письма нет — проверь «Спам».</div>
 
           <RoundedButton
-            type="primary"
             block
             size="large"
             onClick={() => window.open('https://mail.google.com')}

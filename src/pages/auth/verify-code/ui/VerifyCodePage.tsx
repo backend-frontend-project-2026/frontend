@@ -48,7 +48,6 @@ const VerifyCodePage = () => {
           <p className={styles.codeHint}>Код действителен 10 минут.</p>
 
           <RoundedButton
-            type="primary"
             block
             size="large"
             disabled={code.length < 6}

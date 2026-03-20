@@ -19,42 +19,36 @@
   min-width: 0;
 }
 
-.card {
-  border-radius: 16px !important;
-}
-
 .title {
-  font-size: 24px !important;
-  font-weight: 700 !important;
-  color: var(--color-dark) !important;
-  margin: 0 0 24px !important;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-dark);
+  margin: 0 0 24px;
 }
 
 .input {
-  border-radius: 999px !important;
-  border: 1.5px solid var(--color-bg-input-border) !important;
+  border: 1.5px solid var(--color-bg-input-border);
 }
 
 .input:focus,
 .input:hover {
-  border-color: var(--color-accent) !important;
+  border-color: var(--color-accent);
 }
 
 /* Ant Design Input.Password wrapper */
 :global(.ant-input-affix-wrapper).input {
-  border-radius: 999px !important;
-  border: 1.5px solid var(--color-bg-input-border) !important;
+  border: 1.5px solid var(--color-bg-input-border);
 }
 
 :global(.ant-input-affix-wrapper).input:hover,
 :global(.ant-input-affix-wrapper-focused).input {
-  border-color: var(--color-accent) !important;
+  border-color: var(--color-accent);
 }
 
 /* Error state */
 :global(.ant-form-item-has-error) .input,
 :global(.ant-form-item-has-error) :global(.ant-input-affix-wrapper).input {
-  border-color: var(--color-error) !important;
+  border-color: var(--color-error);
 }
 
 .hint {

@@ -72,7 +72,7 @@ const AuthPage = () => {
                 </Form.Item>
 
                 <Form.Item>
-                  <RoundedButton type="primary" htmlType="submit" block size="large">
+                  <RoundedButton htmlType="submit" block size="large">
                     Войти
                   </RoundedButton>
                 </Form.Item>
@@ -145,7 +145,7 @@ const AuthPage = () => {
                 </Form.Item>
 
                 <Form.Item>
-                  <RoundedButton type="primary" htmlType="submit" block size="large">
+                  <RoundedButton htmlType="submit" block size="large">
                     Зарегистрироваться
                   </RoundedButton>
                 </Form.Item>

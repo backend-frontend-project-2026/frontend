@@ -1,0 +1,9 @@
+.codeHint {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 12px 0 20px;
+}
+
+.submitButton {
+  margin-bottom: 12px;
+}

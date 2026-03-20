@@ -1,5 +1,5 @@
 .button {
-  border-radius: 999px !important;
+  border-radius: 999px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -7,27 +7,31 @@
 }
 
 .dark {
-  background: var(--color-black) !important;
-  border-color: var(--color-black) !important;
-  color: var(--color-white) !important;
-  height: 48px !important;
+  background: var(--color-black);
+  border-color: var(--color-black);
+  color: var(--color-white);
+  height: 48px;
+  padding: 0 24px;
+  font-size: 16px;
 }
 
 .dark:hover {
-  background: var(--color-dark) !important;
-  border-color: var(--color-dark) !important;
+  background: var(--color-dark);
+  border-color: var(--color-dark);
 }
 
 .gray {
-  background: var(--color-divider) !important;
-  border-color: var(--color-divider) !important;
-  color: var(--color-dark) !important;
-  height: 48px !important;
+  background: var(--color-divider);
+  border-color: var(--color-divider);
+  color: var(--color-dark);
+  height: 48px;
+  padding: 0 24px;
+  font-size: 16px;
 }
 
 .gray:hover {
-  background: var(--color-bg-input-border) !important;
-  border-color: var(--color-bg-input-border) !important;
+  background: var(--color-bg-input-border);
+  border-color: var(--color-bg-input-border);
 }
 
 .iconCircle {

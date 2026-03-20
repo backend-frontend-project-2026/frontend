@@ -19,11 +19,14 @@
   --color-tag-active-bg: #dfff4f;
   --color-tag-inactive-bg: #ffffff;
 
-  /* Дополнительные цвета */
+  /* Дополнительные */
   --color-black: #111214;
   --color-black-text: #0b0c0e;
   --color-white-soft: #f6f6f4;
   --color-success: #4caf50;
+  --color-warning-bg: #fffbe6;
+  --color-text-hint: #555555;
+  --color-placeholder: #c0c0c0;
 }
 
 *,

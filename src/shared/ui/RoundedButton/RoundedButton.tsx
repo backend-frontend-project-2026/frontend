@@ -5,7 +5,7 @@ import styles from './RoundedButton.module.css';
 
 type RoundedButtonVariant = 'accent' | 'dark' | 'gray';
 
-interface RoundedButtonProps extends Omit<ButtonProps, 'type'> {
+interface RoundedButtonProps extends Omit<ButtonProps, 'type' | 'variant'> {
   children: React.ReactNode;
   variant?: RoundedButtonVariant;
 }
@@ -26,7 +26,9 @@ const RoundedButton = ({ children, className, variant, ...props }: RoundedButton
 
   return (
     <Button
-      className={[styles.button, variant ? styles[variant] : '', className].filter(Boolean).join(' ')}
+      className={[styles.button, variant ? styles[variant] : '', className]
+        .filter(Boolean)
+        .join(' ')}
       icon={icon}
       iconPlacement="end"
       type={variant === 'accent' || !variant ? 'primary' : 'default'}

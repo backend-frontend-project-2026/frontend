@@ -1,3 +1,5 @@
+import { Button } from 'antd';
+
 import './bottom-nav.css';
 
 type BottomNavItem = {
@@ -21,9 +23,9 @@ export function BottomNav({
   return (
     <nav className={`${classNamePrefix}__bottom-nav`} aria-label={ariaLabel}>
       {items.map((item) => (
-        <button
+        <Button
           key={item.key}
-          type="button"
+          htmlType="button"
           className={[`${classNamePrefix}__nav-item`, item.active ? 'is-active' : '']
             .filter(Boolean)
             .join(' ')}
@@ -31,7 +33,7 @@ export function BottomNav({
         >
           <span className={`${classNamePrefix}__nav-icon`} />
           <span>{item.label}</span>
-        </button>
+        </Button>
       ))}
     </nav>
   );

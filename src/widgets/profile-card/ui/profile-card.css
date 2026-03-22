@@ -142,8 +142,55 @@
   background: #eff8c8;
 }
 
+.profile-card-button.ant-btn {
+  height: 48px;
+  padding: 0 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 16px;
+  background: #fff;
+  color: #111827;
+  font-weight: 700;
+  box-shadow: none !important;
+}
+
+.profile-card-button.ant-btn::before {
+  display: none !important;
+}
+
+.profile-card-button.ant-btn:hover,
+.profile-card-button.ant-btn:focus,
+.profile-card-button.ant-btn:focus-visible,
+.profile-card-button.ant-btn:active {
+  border-color: #d1d5db !important;
+  background: #fff !important;
+  color: #111827 !important;
+  box-shadow: none !important;
+}
+
+.profile-card-super-like.ant-btn,
+.profile-card-super-like.ant-btn:hover,
+.profile-card-super-like.ant-btn:focus,
+.profile-card-super-like.ant-btn:focus-visible,
+.profile-card-super-like.ant-btn:active {
+  border-color: #d6ff47 !important;
+  background: #eff8c8 !important;
+  color: #111827 !important;
+  box-shadow: none !important;
+}
+
+.profile-card-button-primary.ant-btn,
+.profile-card-button-primary.ant-btn:hover,
+.profile-card-button-primary.ant-btn:focus,
+.profile-card-button-primary.ant-btn:focus-visible,
+.profile-card-button-primary.ant-btn:active {
+  border-color: #111827 !important;
+  background: #111827 !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
 @media (hover: hover) {
-  .profile-card-button:hover {
+  .profile-card-button.ant-btn:hover {
     transform: translateY(-1px);
   }
 }

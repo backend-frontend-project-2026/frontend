@@ -1,3 +1,4 @@
+import { Button } from 'antd';
 import type { ReactNode } from 'react';
 
 type ApplyFiltersButtonProps = {
@@ -12,8 +13,8 @@ export function ApplyFiltersButton({
   children = 'Применить',
 }: ApplyFiltersButtonProps) {
   return (
-    <button type="button" className={className} onClick={onClick}>
+    <Button htmlType="button" className={className} onClick={onClick}>
       {children}
-    </button>
+    </Button>
   );
 }

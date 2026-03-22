@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Button, Input } from 'antd';
 import type { User, UserFilters } from '../../../entities/user';
 import {
   LikeProfileButton,
@@ -38,9 +39,9 @@ function DiscoverEmptyState({ title, text, buttonText, onButtonClick }: Discover
       <div className="discover-empty__icon">◎</div>
       <h3 className="discover-empty__title">{title}</h3>
       <p className="discover-empty__text">{text}</p>
-      <button type="button" className="discover-empty__button" onClick={onButtonClick}>
+      <Button type="default" className="discover-empty__button" onClick={onButtonClick}>
         {buttonText}
-      </button>
+      </Button>
     </div>
   );
 }
@@ -304,10 +305,10 @@ export default function DiscoverPage({
         <div className="discover-mobile__top">
           <h1 className="discover-mobile__title">Поиск</h1>
 
-          <button type="button" className="discover-mobile__filters" onClick={onOpenFilters}>
+          <Button type="default" className="discover-mobile__filters" onClick={onOpenFilters}>
             <span>Фильтры</span>
             <span className="discover-mobile__filters-icon">↗</span>
-          </button>
+          </Button>
         </div>
 
         {currentUser ? (
@@ -375,17 +376,16 @@ export default function DiscoverPage({
           <div className="discover-panel__head">
             <h2 className="discover-panel__title">Фильтры</h2>
 
-            <button type="button" className="discover-panel__more-filters" onClick={onOpenFilters}>
+            <Button type="default" className="discover-panel__more-filters" onClick={onOpenFilters}>
               <span>Все фильтры</span>
               <span className="discover-panel__more-filters-icon">↗</span>
-            </button>
+            </Button>
           </div>
 
           <div className="discover-panel__fields">
             <label className="discover-panel__field">
               <span>Бюджет</span>
-              <input
-                type="text"
+              <Input
                 value={budgetValue}
                 onChange={(event) => setBudgetValue(event.target.value)}
                 placeholder="20–35 тыс ₽"
@@ -394,8 +394,7 @@ export default function DiscoverPage({
 
             <label className="discover-panel__field">
               <span>Дата заезда</span>
-              <input
-                type="text"
+              <Input
                 value={moveInDateValue}
                 onChange={(event) => setMoveInDateValue(event.target.value)}
                 placeholder={moveInDatePlaceholder}
@@ -407,8 +406,9 @@ export default function DiscoverPage({
             <p className="discover-panel__subtitle">Привычки</p>
 
             <div className="discover-panel__chips">
-              <button
-                type="button"
+              <Button
+                type="default"
+                htmlType="button"
                 className={[
                   'discover-chip',
                   'discover-chip--small',
@@ -419,10 +419,11 @@ export default function DiscoverPage({
                 onClick={() => setNoiseValue((current) => getNextNoiseValue(current))}
               >
                 {getNoiseLabel(noiseValue)}
-              </button>
+              </Button>
 
-              <button
-                type="button"
+              <Button
+                type="default"
+                htmlType="button"
                 className={[
                   'discover-chip',
                   'discover-chip--small',
@@ -433,10 +434,11 @@ export default function DiscoverPage({
                 onClick={() => setSmokingValue((current) => getNextSmokingValue(current))}
               >
                 {getSmokingLabel(smokingValue)}
-              </button>
+              </Button>
 
-              <button
-                type="button"
+              <Button
+                type="default"
+                htmlType="button"
                 className={[
                   'discover-chip',
                   'discover-chip--small',
@@ -447,10 +449,11 @@ export default function DiscoverPage({
                 onClick={() => setCleanlinessValue((current) => getNextCleanlinessValue(current))}
               >
                 {getCleanlinessLabel(cleanlinessValue)}
-              </button>
+              </Button>
 
-              <button
-                type="button"
+              <Button
+                type="default"
+                htmlType="button"
                 className={[
                   'discover-chip',
                   'discover-chip--small',
@@ -461,13 +464,13 @@ export default function DiscoverPage({
                 onClick={() => setGuestValue((current) => getNextGuestValue(current))}
               >
                 {getGuestLabel(guestValue)}
-              </button>
+              </Button>
             </div>
           </div>
 
           <div className="discover-panel__actions">
-            <button
-              type="button"
+            <Button
+              type="default"
               className="discover-desktop-button discover-desktop-button--soft"
               onClick={onResetFilters}
             >
@@ -475,10 +478,10 @@ export default function DiscoverPage({
               <span className="discover-desktop-button__icon discover-desktop-button__icon--dark">
                 ↗
               </span>
-            </button>
+            </Button>
 
-            <button
-              type="button"
+            <Button
+              type="default"
               className="discover-desktop-button discover-desktop-button--primary"
               onClick={handleApplyDesktopFilters}
             >
@@ -486,7 +489,7 @@ export default function DiscoverPage({
               <span className="discover-desktop-button__icon discover-desktop-button__icon--lime">
                 ↗
               </span>
-            </button>
+            </Button>
           </div>
         </aside>
 

@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react';
+import { Tag } from 'antd';
 
 type UserBadgeVariant = 'default' | 'accent' | 'outline';
 
@@ -27,10 +28,11 @@ const variantStyles: Record<UserBadgeVariant, CSSProperties> = {
 
 export function UserBadge({ label, variant = 'default' }: UserBadgeProps) {
   return (
-    <span
+    <Tag
       style={{
         display: 'inline-flex',
         alignItems: 'center',
+        margin: 0,
         padding: '6px 12px',
         borderRadius: '999px',
         fontSize: 12,
@@ -40,6 +42,6 @@ export function UserBadge({ label, variant = 'default' }: UserBadgeProps) {
       }}
     >
       {label}
-    </span>
+    </Tag>
   );
 }

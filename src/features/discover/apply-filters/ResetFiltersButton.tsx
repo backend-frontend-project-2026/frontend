@@ -1,3 +1,4 @@
+import { Button } from 'antd';
 import type { ReactNode } from 'react';
 
 type ResetFiltersButtonProps = {
@@ -12,8 +13,8 @@ export function ResetFiltersButton({
   children = 'Сбросить',
 }: ResetFiltersButtonProps) {
   return (
-    <button type="button" className={className} onClick={onClick}>
+    <Button htmlType="button" className={className} onClick={onClick}>
       {children}
-    </button>
+    </Button>
   );
 }

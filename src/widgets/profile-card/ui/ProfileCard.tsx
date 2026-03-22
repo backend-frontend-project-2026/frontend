@@ -1,5 +1,6 @@
 import { UserBadge, type User } from '../../../entities/user';
 import './profile-card.css';
+import { Button } from 'antd';
 
 type ProfileCardProps = {
   user: User;
@@ -264,23 +265,27 @@ export function ProfileCard({
 
         {showActions ? (
           <div className="profile-card-actions">
-            <button type="button" className="profile-card-button" onClick={() => onSkip?.(user)}>
+            <Button
+              htmlType="button"
+              className="profile-card-button"
+              onClick={() => onSkip?.(user)}
+            >
               Пропустить
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
+              htmlType="button"
               className="profile-card-button profile-card-super-like"
               onClick={() => onSuperLike?.(user)}
             >
               Супер-лайк
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
+              htmlType="button"
               className="profile-card-button profile-card-button-primary"
               onClick={() => onLike?.(user)}
             >
               Лайк
-            </button>
+            </Button>
           </div>
         ) : null}
       </div>

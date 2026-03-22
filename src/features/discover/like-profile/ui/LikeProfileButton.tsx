@@ -1,3 +1,4 @@
+import { Button } from 'antd';
 import type { ReactNode } from 'react';
 
 type LikeProfileButtonProps = {
@@ -14,8 +15,8 @@ export function LikeProfileButton({
   ariaLabel = 'Лайк',
 }: LikeProfileButtonProps) {
   return (
-    <button type="button" className={className} onClick={onClick} aria-label={ariaLabel}>
+    <Button htmlType="button" className={className} onClick={onClick} aria-label={ariaLabel}>
       {children}
-    </button>
+    </Button>
   );
 }

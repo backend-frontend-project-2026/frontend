@@ -72,6 +72,26 @@
   box-shadow: 0 8px 18px rgb(120 123 132 / 10%);
 }
 
+.discover-mobile__filters.ant-btn {
+  height: auto;
+  padding: 0 12px 0 16px;
+  box-shadow: 0 8px 18px rgb(120 123 132 / 10%) !important;
+}
+
+.discover-mobile__filters.ant-btn::before {
+  display: none !important;
+}
+
+.discover-mobile__filters.ant-btn:hover,
+.discover-mobile__filters.ant-btn:focus,
+.discover-mobile__filters.ant-btn:focus-visible,
+.discover-mobile__filters.ant-btn:active {
+  border: 1px solid #dedee2 !important;
+  background: rgb(255 255 255 / 84%) !important;
+  color: #17181b !important;
+  box-shadow: 0 8px 18px rgb(120 123 132 / 10%) !important;
+}
+
 .discover-mobile__filters-icon {
   display: inline-flex;
   align-items: center;
@@ -285,6 +305,44 @@
   background: #d6f33d;
 }
 
+.discover-mobile__nav-item.ant-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: auto;
+  padding: 0;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #8e9097;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.discover-mobile__nav-item.ant-btn::before {
+  display: none !important;
+}
+
+.discover-mobile__nav-item.ant-btn:hover,
+.discover-mobile__nav-item.ant-btn:focus,
+.discover-mobile__nav-item.ant-btn:focus-visible,
+.discover-mobile__nav-item.ant-btn:active {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #8e9097 !important;
+}
+
+.discover-mobile__nav-item.is-active.ant-btn,
+.discover-mobile__nav-item.is-active.ant-btn:hover,
+.discover-mobile__nav-item.is-active.ant-btn:focus,
+.discover-mobile__nav-item.is-active.ant-btn:focus-visible,
+.discover-mobile__nav-item.is-active.ant-btn:active {
+  color: #62656d !important;
+}
+
 .rm-shell--discover .rm-shell__footer {
   display: flex;
   flex-direction: column;
@@ -415,7 +473,8 @@
     font-weight: 500;
   }
 
-  .rm-shell--discover .rm-shell__avatar {
+  .rm-shell--discover .rm-shell__avatar,
+  .rm-shell--discover .rm-shell__avatar.ant-avatar {
     width: 28px;
     height: 28px;
     border-radius: 50%;
@@ -486,6 +545,26 @@
     cursor: pointer;
   }
 
+  .discover-panel__more-filters.ant-btn {
+    height: auto;
+    padding: 0 12px;
+    box-shadow: none !important;
+  }
+
+  .discover-panel__more-filters.ant-btn::before {
+    display: none !important;
+  }
+
+  .discover-panel__more-filters.ant-btn:hover,
+  .discover-panel__more-filters.ant-btn:focus,
+  .discover-panel__more-filters.ant-btn:focus-visible,
+  .discover-panel__more-filters.ant-btn:active {
+    border: 1px solid #dde2e7 !important;
+    background: #fff !important;
+    color: #17181b !important;
+    box-shadow: none !important;
+  }
+
   .discover-panel__more-filters-icon {
     display: inline-flex;
     align-items: center;
@@ -518,19 +597,30 @@
     font-weight: 500;
   }
 
-  .discover-panel__field input {
-    width: 260px;
-    max-width: 100%;
-    min-height: 38px;
-    padding: 0 14px;
+  .discover-panel__field input,
+  .discover-panel__field .ant-input {
+    width: 100%;
+    max-width: none;
+    min-height: 48px;
+    padding: 0 16px;
     border: 1px solid #dadde1;
-    border-radius: 999px;
+    border-radius: 16px;
     background: rgb(255 255 255 / 96%);
     box-shadow: 0 12px 24px rgb(175 181 190 / 18%);
     color: #a5adb8;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 500;
     outline: none;
+  }
+
+  .discover-panel__field .ant-input:hover,
+  .discover-panel__field .ant-input:focus,
+  .discover-panel__field .ant-input:focus-visible,
+  .discover-panel__field .ant-input-focused {
+    border: 1px solid #dadde1 !important;
+    background: rgb(255 255 255 / 96%) !important;
+    box-shadow: 0 12px 24px rgb(175 181 190 / 18%) !important;
+    outline: none !important;
   }
 
   .discover-panel__group {
@@ -667,6 +757,46 @@
   .discover-desktop-button__icon--lime {
     background: #d6f33d;
     color: #111318;
+  }
+
+  .discover-desktop-button.ant-btn {
+    box-shadow: none !important;
+    transition: transform 0.18s ease !important;
+  }
+
+  .discover-desktop-button.ant-btn::before {
+    display: none !important;
+  }
+
+  .discover-desktop-button.ant-btn:hover,
+  .discover-desktop-button.ant-btn:focus,
+  .discover-desktop-button.ant-btn:focus-visible,
+  .discover-desktop-button.ant-btn:active {
+    outline: none !important;
+    box-shadow: none !important;
+    transform: translateY(-2px);
+  }
+
+  .discover-desktop-button--soft.ant-btn,
+  .discover-desktop-button--soft.ant-btn:hover,
+  .discover-desktop-button--soft.ant-btn:focus,
+  .discover-desktop-button--soft.ant-btn:focus-visible,
+  .discover-desktop-button--soft.ant-btn:active {
+    border: 1px solid #eceef1 !important;
+    background: #f6f6f7 !important;
+    color: #17181b !important;
+    box-shadow: none !important;
+  }
+
+  .discover-desktop-button--primary.ant-btn,
+  .discover-desktop-button--primary.ant-btn:hover,
+  .discover-desktop-button--primary.ant-btn:focus,
+  .discover-desktop-button--primary.ant-btn:focus-visible,
+  .discover-desktop-button--primary.ant-btn:active {
+    border: none !important;
+    background: linear-gradient(160deg, #0c0e12 0%, #20232c 100%) !important;
+    color: #fff !important;
+    box-shadow: none !important;
   }
 
   .rm-shell--discover .rm-shell__footer {
@@ -809,30 +939,63 @@
   font-weight: 700;
 }
 
-.discover-panel__field input {
+.discover-empty__button.ant-btn {
+  height: auto;
+  box-shadow: none !important;
+}
+
+.discover-empty__button.ant-btn::before {
+  display: none !important;
+}
+
+.discover-empty__button.ant-btn:hover,
+.discover-empty__button.ant-btn:focus,
+.discover-empty__button.ant-btn:focus-visible,
+.discover-empty__button.ant-btn:active {
+  border: 1px solid #dedee2 !important;
+  background: #fff !important;
+  color: #17181b !important;
+  box-shadow: none !important;
+}
+
+.discover-panel__field input,
+.discover-panel__field .ant-input {
   color: #202226;
 }
 
-button.discover-chip {
+button.discover-chip,
+.discover-chip.ant-btn {
   appearance: none;
+  height: auto;
   border: 1px solid #dadde1;
   cursor: pointer;
+  box-shadow: none !important;
 }
 
-button.discover-chip.is-selected {
-  border-color: transparent;
-  background: #d8f23e;
+.discover-chip.ant-btn::before {
+  display: none !important;
 }
 
-button.discover-chip {
-  appearance: none;
-  border: 1px solid #dadde1;
-  cursor: pointer;
+.discover-chip.ant-btn:hover,
+.discover-chip.ant-btn:focus,
+.discover-chip.ant-btn:focus-visible,
+.discover-chip.ant-btn:active {
+  border: 1px solid #dadde1 !important;
+  background: #fafafa !important;
+  color: #24252a !important;
+  box-shadow: none !important;
 }
 
-button.discover-chip.is-selected {
-  border-color: transparent;
-  background: #d8f23e;
+button.discover-chip.is-selected,
+.discover-chip.ant-btn.is-selected,
+.discover-chip.ant-btn.is-selected:hover,
+.discover-chip.ant-btn.is-selected:focus,
+.discover-chip.ant-btn.is-selected:focus-visible,
+.discover-chip.ant-btn.is-selected:active {
+  border-color: transparent !important;
+  background: #d8f23e !important;
+  color: #24252a !important;
+  box-shadow: none !important;
 }
 
 @media (min-width: 1024px) {
@@ -900,7 +1063,8 @@ button.discover-chip.is-selected {
     font-size: 14px;
   }
 
-  .rm-shell--discover .rm-shell__avatar {
+  .rm-shell--discover .rm-shell__avatar,
+  .rm-shell--discover .rm-shell__avatar.ant-avatar {
     width: 42px;
     height: 42px;
   }
@@ -963,13 +1127,14 @@ button.discover-chip.is-selected {
     gap: 10px;
   }
 
-  .discover-panel__field input {
+  .discover-panel__field input,
+  .discover-panel__field .ant-input {
     width: 100%;
     max-width: none;
     min-height: 56px;
     padding: 0 18px;
     border: 1px solid #d8dde3;
-    border-radius: 18px;
+    border-radius: 16px;
     background: linear-gradient(180deg, #ffffff 0%, #fbfcfd 100%);
     box-shadow:
       0 10px 24px rgb(175 181 190 / 14%),
@@ -978,6 +1143,18 @@ button.discover-chip.is-selected {
     font-size: 15px;
     font-weight: 500;
     outline: none;
+  }
+
+  .discover-panel__field .ant-input:hover,
+  .discover-panel__field .ant-input:focus,
+  .discover-panel__field .ant-input:focus-visible,
+  .discover-panel__field .ant-input-focused {
+    border: 1px solid #d8dde3 !important;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfcfd 100%) !important;
+    box-shadow:
+      0 10px 24px rgb(175 181 190 / 14%),
+      inset 0 1px 0 rgb(255 255 255 / 88%) !important;
+    outline: none !important;
   }
 
   .discover-panel__group {

@@ -1,3 +1,4 @@
+import { Avatar } from 'antd';
 import { NavLink } from 'react-router-dom';
 import type { PropsWithChildren } from 'react';
 import { RoutePaths } from '@/app/router/routePaths';
@@ -63,7 +64,7 @@ export function PageShell({ mode, children }: PageShellProps) {
           </nav>
 
           <div className="rm-shell__search">Поиск по мэтчам/чатам...</div>
-          <div className="rm-shell__avatar" />
+          <Avatar className="rm-shell__avatar" />
         </header>
 
         <div className="rm-shell__content">{children}</div>

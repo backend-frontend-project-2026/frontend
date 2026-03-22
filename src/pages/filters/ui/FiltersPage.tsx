@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { Button, Input, Switch } from 'antd';
 import type { User, UserFilters } from '../../../entities/user';
 import {
   applyFiltersToUsers,
@@ -107,8 +108,8 @@ function FilterChip({
   compact?: boolean;
 }) {
   return (
-    <button
-      type="button"
+    <Button
+      type="default"
       className={[
         'filters-chip',
         compact ? 'filters-chip--compact' : '',
@@ -120,7 +121,7 @@ function FilterChip({
     >
       <span className="filters-chip__dot" />
       <span>{label}</span>
-    </button>
+    </Button>
   );
 }
 
@@ -134,12 +135,27 @@ function FilterToggle({
   onToggle: () => void;
 }) {
   return (
-    <button type="button" className="filters-toggle-row" onClick={onToggle}>
+    <div
+      className="filters-toggle-row"
+      role="button"
+      tabIndex={0}
+      onClick={onToggle}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onToggle();
+        }
+      }}
+    >
       <span className="filters-toggle-row__label">{label}</span>
-      <span className={['filters-toggle', checked ? 'is-active' : ''].join(' ')}>
-        <span className="filters-toggle__thumb" />
-      </span>
-    </button>
+
+      <Switch
+        checked={checked}
+        className="filters-toggle"
+        onChange={onToggle}
+        onClick={(_, event) => event.stopPropagation()}
+      />
+    </div>
   );
 }
 
@@ -528,8 +544,8 @@ export function FiltersPage({
         <div className="filters-mobile__top">
           <h1 className="filters-mobile__title">Фильтры</h1>
 
-          <button
-            type="button"
+          <Button
+            type="text"
             className="filters-mobile__close"
             aria-label="Закрыть фильтры"
             onClick={onBack}
@@ -540,8 +556,7 @@ export function FiltersPage({
           <section className="filters-block">
             <label className="filters-field">
               <span className="filters-field__label">Бюджет</span>
-              <input
-                type="text"
+              <Input
                 className="filters-field__input"
                 value={[budgetMin, budgetMax].filter(Boolean).join('-')}
                 onChange={(event) => {
@@ -557,8 +572,7 @@ export function FiltersPage({
           <section className="filters-block">
             <label className="filters-field">
               <span className="filters-field__label">Возраст</span>
-              <input
-                type="text"
+              <Input
                 className="filters-field__input"
                 value={[ageMin, ageMax].filter(Boolean).join('-')}
                 onChange={(event) => {
@@ -574,8 +588,7 @@ export function FiltersPage({
           <section className="filters-block">
             <label className="filters-field">
               <span className="filters-field__label">Дата заезда</span>
-              <input
-                type="text"
+              <Input
                 className="filters-field__input"
                 value={moveInDate}
                 onChange={(event) => setMoveInDate(event.target.value)}
@@ -587,8 +600,7 @@ export function FiltersPage({
           <section className="filters-block">
             <label className="filters-field">
               <span className="filters-field__label">Вуз</span>
-              <input
-                type="text"
+              <Input
                 className="filters-field__input"
                 value={university}
                 onChange={(event) => setUniversity(event.target.value)}
@@ -600,8 +612,7 @@ export function FiltersPage({
           <section className="filters-block">
             <label className="filters-field">
               <span className="filters-field__label">Факультет</span>
-              <input
-                type="text"
+              <Input
                 className="filters-field__input"
                 value={faculty}
                 onChange={(event) => setFaculty(event.target.value)}
@@ -613,12 +624,11 @@ export function FiltersPage({
           <section className="filters-block">
             <label className="filters-field">
               <span className="filters-field__label">Курс</span>
-              <input
-                type="text"
+              <Input
                 className="filters-field__input"
-                value={course}
-                onChange={(event) => setCourse(event.target.value)}
-                placeholder="2 курс"
+                value={faculty}
+                onChange={(event) => setFaculty(event.target.value)}
+                placeholder="Институт ИТИС"
               />
             </label>
           </section>
@@ -626,8 +636,7 @@ export function FiltersPage({
           <section className="filters-block">
             <label className="filters-field">
               <span className="filters-field__label">Район</span>
-              <input
-                type="text"
+              <Input
                 className="filters-field__input"
                 value={district}
                 onChange={(event) => setDistrict(event.target.value)}
@@ -639,8 +648,7 @@ export function FiltersPage({
           <section className="filters-block">
             <label className="filters-field">
               <span className="filters-field__label">Общежитие / локация</span>
-              <input
-                type="text"
+              <Input
                 className="filters-field__input"
                 value={location}
                 onChange={(event) => setLocation(event.target.value)}
@@ -652,8 +660,7 @@ export function FiltersPage({
           <section className="filters-block">
             <label className="filters-field">
               <span className="filters-field__label">Критерии съёма</span>
-              <input
-                type="text"
+              <Input
                 className="filters-field__input"
                 value={rentalCriteria}
                 onChange={(event) => setRentalCriteria(event.target.value)}
@@ -925,8 +932,7 @@ export function FiltersPage({
           <section className="filters-desktop__section">
             <label className="filters-desktop__field">
               <span className="filters-desktop__label">Бюджет</span>
-              <input
-                type="text"
+              <Input
                 value={[budgetMin, budgetMax].filter(Boolean).join('-')}
                 onChange={(event) => {
                   const values = event.target.value.match(/\d+/g) ?? [];
@@ -941,8 +947,7 @@ export function FiltersPage({
           <section className="filters-desktop__section">
             <label className="filters-desktop__field">
               <span className="filters-desktop__label">Возраст</span>
-              <input
-                type="text"
+              <Input
                 value={[ageMin, ageMax].filter(Boolean).join('-')}
                 onChange={(event) => {
                   const values = event.target.value.match(/\d+/g) ?? [];
@@ -957,8 +962,7 @@ export function FiltersPage({
           <section className="filters-desktop__section">
             <label className="filters-desktop__field">
               <span className="filters-desktop__label">Дата заезда</span>
-              <input
-                type="text"
+              <Input
                 value={moveInDate}
                 onChange={(event) => setMoveInDate(event.target.value)}
                 placeholder="01.09.2026"
@@ -969,8 +973,7 @@ export function FiltersPage({
           <section className="filters-desktop__section">
             <label className="filters-desktop__field">
               <span className="filters-desktop__label">Срок аренды</span>
-              <input
-                type="text"
+              <Input
                 value={formatStayDuration(stayDuration)}
                 onClick={editStayDuration}
                 onKeyDown={(event) => {
@@ -989,8 +992,7 @@ export function FiltersPage({
             <section className="filters-desktop__section">
               <label className="filters-desktop__field">
                 <span className="filters-desktop__label">Вуз</span>
-                <input
-                  type="text"
+                <Input
                   value={university}
                   onChange={(event) => setUniversity(event.target.value)}
                   placeholder="КФУ"
@@ -1001,8 +1003,7 @@ export function FiltersPage({
             <section className="filters-desktop__section">
               <label className="filters-desktop__field">
                 <span className="filters-desktop__label">Факультет</span>
-                <input
-                  type="text"
+                <Input
                   value={faculty}
                   onChange={(event) => setFaculty(event.target.value)}
                   placeholder="Институт ИТИС"
@@ -1013,8 +1014,7 @@ export function FiltersPage({
             <section className="filters-desktop__section">
               <label className="filters-desktop__field">
                 <span className="filters-desktop__label">Курс</span>
-                <input
-                  type="text"
+                <Input
                   value={course}
                   onChange={(event) => setCourse(event.target.value)}
                   placeholder="2 курс"
@@ -1025,8 +1025,7 @@ export function FiltersPage({
             <section className="filters-desktop__section">
               <label className="filters-desktop__field">
                 <span className="filters-desktop__label">Район</span>
-                <input
-                  type="text"
+                <Input
                   value={district}
                   onChange={(event) => setDistrict(event.target.value)}
                   placeholder="Приволжский район"
@@ -1037,8 +1036,7 @@ export function FiltersPage({
             <section className="filters-desktop__section">
               <label className="filters-desktop__field">
                 <span className="filters-desktop__label">Общежитие / локация</span>
-                <input
-                  type="text"
+                <Input
                   value={location}
                   onChange={(event) => setLocation(event.target.value)}
                   placeholder="Деревня Универсиады, корпус 3"
@@ -1049,8 +1047,7 @@ export function FiltersPage({
             <section className="filters-desktop__section">
               <label className="filters-desktop__field">
                 <span className="filters-desktop__label">Критерии съёма</span>
-                <input
-                  type="text"
+                <Input
                   value={rentalCriteria}
                   onChange={(event) => setRentalCriteria(event.target.value)}
                   placeholder="мебель, 2 комнаты, рабочее место"

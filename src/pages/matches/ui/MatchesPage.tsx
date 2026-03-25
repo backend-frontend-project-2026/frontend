@@ -1,4 +1,6 @@
+import { useNavigate } from 'react-router-dom';
 import styles from './MatchesPage.module.css';
+import { List, Avatar, Empty, Input, Button } from 'antd';
 
 type Match = {
   id: string;
@@ -13,35 +15,21 @@ const mockMatches: Match[] = [
     id: '1',
     name: 'Катя',
     age: 20,
-    lastMessage: 'Совпадение! Начать чат?',
+    lastMessage: 'Около 23:30. А ты?',
     time: '12:24',
   },
   {
     id: '2',
-    name: 'Илья',
-    age: 21,
-    lastMessage: 'Ок, договорились',
-    time: '12:24',
-  },
-  {
-    id: '3',
-    name: 'Маша',
+    name: 'Оля',
     age: 19,
-    lastMessage: 'Когда тебе удобно созвониться?',
-    time: '12:24',
-  },
-  {
-    id: '4',
-    name: 'Артём',
-    age: 22,
-    lastMessage: 'Есть вопросы по бюджету',
-    time: '12:24',
+    lastMessage: 'Привет! Договоримся о проживании?',
+    time: '12:12',
   },
 ];
 
 const MatchesPage = () => {
+  const navigate = useNavigate();
   const matches = mockMatches;
-  const hasMatches = matches.length > 0;
 
   return (
     <div className={styles.page}>
@@ -49,35 +37,36 @@ const MatchesPage = () => {
         <div className={styles.header}>
           <h1 className={styles.title}>Мэтчи</h1>
 
-          <input className={styles.search} placeholder="Поиск..." />
+          <Input className={styles.search} placeholder="Поиск..." />
         </div>
 
-        {hasMatches ? (
-          <div className={styles.list}>
-            {matches.map((m) => (
-              <div key={m.id} className={styles.card}>
-                <div className={styles.avatar} />
-
-                <div className={styles.info}>
+        <List
+          className={styles.list}
+          dataSource={matches}
+          locale={{
+            emptyText: <Empty description="Пока нет мэтчей" />,
+          }}
+          renderItem={(m) => (
+            <List.Item
+              key={m.id}
+              onClick={() => navigate(`/chat/${m.id}`)}
+              style={{ cursor: 'pointer' }}
+            >
+              <List.Item.Meta
+                avatar={<Avatar />}
+                title={
                   <div className={styles.topRow}>
                     <span className={styles.name}>
                       {m.name}, {m.age}
                     </span>
                     <span className={styles.time}>{m.time}</span>
                   </div>
-
-                  <div className={styles.message}>{m.lastMessage}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className={styles.empty}>
-            <div className={styles.emptyBox} />
-            <p className={styles.emptyTitle}>Пока нет мэтчей</p>
-            <p className={styles.emptyText}>Продолжай лайкать — они появятся 💛</p>
-          </div>
-        )}
+                }
+                description={<div className={styles.message}>{m.lastMessage}</div>}
+              />
+            </List.Item>
+          )}
+        />
       </div>
 
       <div className={styles.right}>
@@ -86,7 +75,9 @@ const MatchesPage = () => {
           <h3>Выбери мэтч слева</h3>
           <p>Тут появится переписка и быстрые действия</p>
 
-          <button className={styles.primaryBtn}>Открыть чат</button>
+          <Button type="primary" onClick={() => matches[0] && navigate(`/chat/${matches[0].id}`)}>
+            Открыть чат
+          </Button>
         </div>
       </div>
     </div>

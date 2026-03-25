@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import styles from './ChatPage.module.css';
+import { Input, Button } from 'antd';
 
 type Message = {
   id: number;
@@ -16,7 +18,7 @@ type Chat = {
 const mockChats: Chat[] = [
   {
     id: 1,
-    name: 'Катя',
+    name: 'Катя, 20',
     messages: [
       { id: 1, text: 'Привет! Видела твою анкету 😌', fromMe: false },
       { id: 2, text: 'Привет! Да, супер. Во сколько обычно ложишься?', fromMe: true },
@@ -26,19 +28,25 @@ const mockChats: Chat[] = [
   {
     id: 2,
     name: 'Оля, 19',
-    messages: [{ id: 1, text: 'Последнее сообщение...', fromMe: false }],
+    messages: [{ id: 1, text: 'Привет! Договоримся о проживании?', fromMe: false }],
   },
 ];
 
 const ChatsPage = () => {
   const [chats, setChats] = useState<Chat[]>(mockChats);
-  const [activeChatId, setActiveChatId] = useState<number>(1);
   const [input, setInput] = useState('');
 
-  const activeChat = chats.find((c) => c.id === activeChatId)!;
+  const navigate = useNavigate();
+  const { id } = useParams();
+
+  const activeChatId = Number(id);
+  const activeChat = chats.find((c) => c.id === activeChatId);
+  if (!activeChat) {
+    return <div>Чат не найден</div>;
+  }
 
   const sendMessage = () => {
-    if (!input.trim()) return;
+    if (!input.trim() || !activeChat) return;
 
     const newMessage: Message = {
       id: Date.now(),
@@ -55,6 +63,8 @@ const ChatsPage = () => {
     setInput('');
   };
 
+  const { TextArea } = Input;
+
   return (
     <div className={styles.chats}>
       <aside className={styles.chats__sidebar}>
@@ -65,7 +75,7 @@ const ChatsPage = () => {
             <div
               key={chat.id}
               className={`${styles.chatItem} ${chat.id === activeChatId ? styles.active : ''}`}
-              onClick={() => setActiveChatId(chat.id)}
+              onClick={() => navigate(`/chat/${chat.id}`)}
             >
               <div className={styles.chatItem__avatar} />
               <div>
@@ -78,24 +88,34 @@ const ChatsPage = () => {
       </aside>
 
       <main className={styles.chat}>
-        <div className={styles.chat__header}>{activeChat.name}</div>
+        {!activeChat ? (
+          <div className={styles.chat__empty}>Выберите чат</div>
+        ) : (
+          <>
+            <div className={styles.chat__header}>{activeChat.name}</div>
 
-        <div className={styles.chat__messages}>
-          {activeChat.messages.map((m) => (
-            <div key={m.id} className={`${styles.msg} ${m.fromMe ? styles.me : styles.them}`}>
-              {m.text}
+            <div className={styles.chat__messages}>
+              {activeChat.messages.map((m) => (
+                <div key={m.id} className={`${styles.msg} ${m.fromMe ? styles.me : styles.them}`}>
+                  {m.text}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-        <div className={styles.chat__input}>
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Сообщение..."
-          />
-          <button onClick={sendMessage}>Отпр</button>
-        </div>
+            <div className={styles.chat__input}>
+              <TextArea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Сообщение..."
+                autoSize={{ minRows: 1, maxRows: 4 }}
+              />
+
+              <Button type="primary" onClick={sendMessage}>
+                Отпр
+              </Button>
+            </div>
+          </>
+        )}
       </main>
     </div>
   );

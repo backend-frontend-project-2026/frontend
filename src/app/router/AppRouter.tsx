@@ -92,7 +92,16 @@ export const AppRouter = () => {
               </RoleRoute>
             }
           />
-          <Route path="/chat/:id" element={<ChatPage />} />
+
+          <Route
+            path="/chat/:id"
+            element={
+              <ProtectedRoute>
+                <ChatPage />
+              </ProtectedRoute>
+            }
+          />
+
           <Route
             path={RoutePaths.REPORT}
             element={

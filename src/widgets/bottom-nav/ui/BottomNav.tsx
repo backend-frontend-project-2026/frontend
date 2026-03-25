@@ -1,13 +1,7 @@
 import { Button } from 'antd';
 
 import './bottom-nav.css';
-
-type BottomNavItem = {
-  key: string;
-  label: string;
-  active?: boolean;
-  onClick?: () => void;
-};
+import type { BottomNavItem } from '../types';
 
 type BottomNavProps = {
   items: BottomNavItem[];

@@ -1,4 +1,6 @@
 import { Avatar } from 'antd';
+import './user-ui.css';
+import { getUserAvatarSizeClass } from './getUserAvatarSizeClass';
 
 type UserAvatarProps = {
   src?: string;
@@ -15,13 +17,7 @@ export function UserAvatar({ src, alt, name, size = 56 }: UserAvatarProps) {
       src={src}
       alt={alt}
       size={size}
-      style={{
-        background: '#E5F4EA',
-        color: '#1F2937',
-        fontWeight: 700,
-        fontSize: size / 2.5,
-        flexShrink: 0,
-      }}
+      className={['user-avatar', getUserAvatarSizeClass(size)].join(' ')}
     >
       {initial}
     </Avatar>

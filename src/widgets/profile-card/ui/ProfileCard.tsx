@@ -1,6 +1,15 @@
 import { UserBadge, type User } from '../../../entities/user';
 import './profile-card.css';
-import { Button } from 'antd';
+import { Button, Typography } from 'antd';
+
+import {
+  getConditionHighlights,
+  getDiscoverChips,
+  getHabitHighlights,
+  getPrimaryPhoto,
+} from '../lib/profileCardGetters';
+
+const { Title } = Typography;
 
 type ProfileCardProps = {
   user: User;
@@ -13,126 +22,6 @@ type ProfileCardProps = {
   onSkip?: (user: User) => void;
   onSuperLike?: (user: User) => void;
 };
-
-function getCleanlinessLabel(value: User['habits']['cleanliness']) {
-  switch (value) {
-    case 'low':
-      return 'Базовая чистота';
-    case 'medium':
-      return 'Средняя чистота';
-    case 'high':
-      return 'Любит порядок';
-    default:
-      return value;
-  }
-}
-
-function getNoiseLabel(value: User['habits']['noiseLevel']) {
-  switch (value) {
-    case 'quiet':
-      return 'Тихий ритм';
-    case 'moderate':
-      return 'Умеренный шум';
-    case 'social':
-      return 'Социальный ритм';
-    default:
-      return value;
-  }
-}
-
-function getGuestLabel(value: User['habits']['guestFrequency']) {
-  switch (value) {
-    case 'never':
-      return 'Без гостей';
-    case 'rarely':
-      return 'Гости редко';
-    case 'sometimes':
-      return 'Гости иногда';
-    case 'often':
-      return 'Гости часто';
-    default:
-      return value;
-  }
-}
-
-function getSleepLabel(value: User['habits']['sleepSchedule']) {
-  switch (value) {
-    case 'early_bird':
-      return 'Рано встаёт';
-    case 'night_owl':
-      return 'Поздно ложится';
-    case 'flexible':
-      return 'Гибкий режим';
-    default:
-      return value;
-  }
-}
-
-function getHabitHighlights(user: User) {
-  return [
-    getCleanlinessLabel(user.habits.cleanliness),
-    getNoiseLabel(user.habits.noiseLevel),
-    getGuestLabel(user.habits.guestFrequency),
-    getSleepLabel(user.habits.sleepSchedule),
-  ].slice(0, 3);
-}
-
-function getConditionHighlights(user: User) {
-  const budget = `${user.budget.min}–${user.budget.max}${user.budget.currency}/${user.budget.period}`;
-  const conditions = [
-    `Бюджет: ${budget}`,
-    `Заезд: ${user.moveInDate}`,
-    `Срок: ${user.stayDuration}`,
-  ];
-
-  if (user.hasQuietHours && user.habits.quietTime) {
-    conditions.push(`Тихие часы: ${user.habits.quietTime.from}–${user.habits.quietTime.to}`);
-  }
-
-  return conditions.slice(0, 3);
-}
-
-function getDiscoverChips(user: User): string[] {
-  const chips: string[] = [];
-
-  if (user.habits.noiseLevel === 'quiet') {
-    chips.push('Тишина');
-  } else if (user.habits.noiseLevel === 'moderate') {
-    chips.push('Норм шум');
-  } else {
-    chips.push('Активный ритм');
-  }
-
-  if (user.habits.smokingPreference === 'no') {
-    chips.push('Не курю');
-  } else if (user.habits.smokingPreference === 'outside_only') {
-    chips.push('Курение только вне дома');
-  } else {
-    chips.push('Курение ок');
-  }
-
-  if (user.habits.cleanliness === 'high') {
-    chips.push('Аккуратно');
-  } else if (user.habits.cleanliness === 'medium') {
-    chips.push('Норм по быту');
-  } else {
-    chips.push('Без фанатизма');
-  }
-
-  if (user.habits.guestFrequency === 'never' || user.habits.guestFrequency === 'rarely') {
-    chips.push('Гости редко');
-  } else if (user.habits.guestFrequency === 'sometimes') {
-    chips.push('Гости иногда');
-  } else {
-    chips.push('Люблю компании');
-  }
-
-  return chips.slice(0, 4);
-}
-
-function getPrimaryPhoto(user: User) {
-  return user.photos[0] || user.avatar;
-}
 
 export function ProfileCard({
   user,
@@ -151,11 +40,15 @@ export function ProfileCard({
 
     return (
       <article
-        className={['discover-card', compact ? 'discover-card--compact' : '', className ?? '']
+        className={[
+          'discover-card',
+          compact ? 'discover-card--compact' : '',
+          onOpenProfile ? 'discover-card--clickable' : '',
+          className ?? '',
+        ]
           .filter(Boolean)
           .join(' ')}
         onClick={() => onOpenProfile?.(user)}
-        style={{ cursor: onOpenProfile ? 'pointer' : 'default' }}
       >
         <div className="discover-card__image">
           {photo ? (
@@ -164,7 +57,7 @@ export function ProfileCard({
               alt=""
               className="discover-card__photo"
               onError={(event) => {
-                event.currentTarget.style.display = 'none';
+                event.currentTarget.classList.add('is-hidden');
               }}
             />
           ) : null}
@@ -173,9 +66,9 @@ export function ProfileCard({
         </div>
 
         <div className="discover-card__body">
-          <h3 className="discover-card__name">
+          <Title level={3} className="discover-card__name">
             {user.name}, {user.age}
-          </h3>
+          </Title>
 
           <p className="discover-card__meta">
             {user.university} • {user.faculty} • {user.district}
@@ -209,7 +102,7 @@ export function ProfileCard({
             alt={`${user.name} photo`}
             className="profile-card-image"
             onError={(event) => {
-              event.currentTarget.style.display = 'none';
+              event.currentTarget.classList.add('is-hidden');
             }}
           />
         ) : null}
@@ -222,9 +115,9 @@ export function ProfileCard({
       <div className="profile-card-body">
         <header className="profile-card-header">
           <div>
-            <h3 className="profile-card-name">
+            <Title level={3} className="profile-card-name">
               {user.name}, {user.age}
-            </h3>
+            </Title>
             <p className="profile-card-subtitle">
               {user.university} • {user.faculty}
             </p>
@@ -237,7 +130,9 @@ export function ProfileCard({
         <p className="profile-card-bio">{user.bio}</p>
 
         <section className="profile-card-section">
-          <h4 className="profile-card-section-title">Краткие привычки</h4>
+          <Title level={4} className="profile-card-section-title">
+            Краткие привычки
+          </Title>
           <div className="profile-card-tags">
             {habits.map((habit) => (
               <UserBadge key={habit} label={habit} variant="outline" />
@@ -246,7 +141,9 @@ export function ProfileCard({
         </section>
 
         <section className="profile-card-section">
-          <h4 className="profile-card-section-title">Краткие условия</h4>
+          <Title level={4} className="profile-card-section-title">
+            Краткие условия
+          </Title>
           <div className="profile-card-tags">
             {conditions.map((condition) => (
               <UserBadge key={condition} label={condition} />
@@ -255,7 +152,9 @@ export function ProfileCard({
         </section>
 
         <section className="profile-card-section">
-          <h4 className="profile-card-section-title">Интересы</h4>
+          <Title level={4} className="profile-card-section-title">
+            Интересы
+          </Title>
           <div className="profile-card-tags">
             {interests.map((interest) => (
               <UserBadge key={interest} label={interest} variant="accent" />

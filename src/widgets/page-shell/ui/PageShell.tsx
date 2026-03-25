@@ -1,16 +1,9 @@
-import { Avatar } from 'antd';
 import { NavLink } from 'react-router-dom';
 import type { PropsWithChildren } from 'react';
 import { RoutePaths } from '@/app/router/routePaths';
-
-type PageShellMode =
-  | 'step-1'
-  | 'step-2'
-  | 'step-3'
-  | 'step-4'
-  | 'discover'
-  | 'filters'
-  | 'candidate';
+import AppFooter from '@/shared/ui/AppFooter/AppFooter';
+import type { PageShellMode } from '../types';
+import { Avatar } from 'antd';
 
 type PageShellProps = PropsWithChildren<{
   mode: PageShellMode;
@@ -69,26 +62,7 @@ export function PageShell({ mode, children }: PageShellProps) {
 
         <div className="rm-shell__content">{children}</div>
 
-        <footer className="rm-shell__footer rm-shell__footer--step-1">
-          <div className="rm-shell__footer-brand">
-            <strong>RoomieMatch</strong>
-            <span>Поиск соседа по привычкам</span>
-          </div>
-
-          <div className="rm-shell__footer-links">
-            <span>О проекте</span>
-            <span>Правила</span>
-            <span>Конфиденциальность</span>
-            <span>Поддержка</span>
-          </div>
-
-          <div className="rm-shell__footer-badge">© 2026</div>
-
-          <div className="rm-shell__footer-copy">
-            <span>© 2026 RoomieMatch</span>
-            <span>Сделано для студентов</span>
-          </div>
-        </footer>
+        <AppFooter />
       </div>
     </main>
   );

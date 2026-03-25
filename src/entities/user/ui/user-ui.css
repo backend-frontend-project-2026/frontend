@@ -1,0 +1,61 @@
+.user-avatar.ant-avatar {
+  background: #e5f4ea;
+  color: #1f2937;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.user-avatar--size-40.ant-avatar {
+  font-size: 16px;
+}
+
+.user-avatar--size-48.ant-avatar {
+  font-size: 19px;
+}
+
+.user-avatar--size-56.ant-avatar {
+  font-size: 22px;
+}
+
+.user-avatar--size-64.ant-avatar {
+  font-size: 26px;
+}
+
+.user-avatar--size-72.ant-avatar {
+  font-size: 29px;
+}
+
+.user-badge.ant-tag {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.user-badge--default.ant-tag {
+  background: #f3f4f6;
+  color: #111827;
+  border: 1px solid transparent;
+}
+
+.user-badge--accent.ant-tag {
+  background: #ddfb7c;
+  color: #111827;
+  border: 1px solid transparent;
+}
+
+.user-badge--outline.ant-tag {
+  background: #ffffff;
+  color: #111827;
+  border: 1px solid #d1d5db;
+}
+
+.user-habits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

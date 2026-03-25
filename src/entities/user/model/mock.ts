@@ -1,6 +1,6 @@
 import type { User } from './types';
 
-export const mockDiscoverUsers: User[] = [
+export const MOCK_DISCOVER_USERS: User[] = [
   {
     id: 'user-1',
     name: 'Катя',
@@ -181,8 +181,8 @@ export const mockDiscoverUsers: User[] = [
   },
 ];
 
-export const mockDetailedUser: User = {
-  ...mockDiscoverUsers[0],
+export const MOCK_DETAILED_USER: User = {
+  ...MOCK_DISCOVER_USERS[0],
   bio: 'Ищу соседку или соседа для спокойного совместного проживания. Важно, чтобы дома было чисто, без внезапных шумных компаний, с понятными правилами по уборке и уважением к личному пространству. Люблю тихие вечера, музыку в наушниках и уютную атмосферу.',
   interests: ['Кино', 'Йога', 'Музыка', 'Кофейни', 'Прогулки', 'Фотография'],
   photos: ['/mock/users/alina/1.jpg', '/mock/users/alina/2.jpg', '/mock/users/alina/3.jpg'],
@@ -192,4 +192,4 @@ export const mockDetailedUser: User = {
     'Нужна квартира с мебелью, местом для хранения вещей, нормальной кухней и удобным районом рядом с транспортом.',
 };
 
-export const mockEmptyDiscoverUsers: User[] = [];
+export const MOCK_EMPTY_DISCOVER_USERS: User[] = [];

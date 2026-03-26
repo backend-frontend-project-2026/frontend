@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState, type PropsWithChildren } from 'react';
 import { MOCK_DISCOVER_USERS, type User } from '@/entities/user';
 import {
   applyFiltersToUsers,
-  INITIAL_DISCOVER_ACTION_STATE,
+  initialDiscoverActionState,
   likeProfile,
   skipProfile,
   superLikeProfile,
@@ -16,7 +16,7 @@ import { keepOnlyLikedAndSuperLikedIds } from './lib/discoverState';
 export function DiscoverProvider({ children }: PropsWithChildren) {
   const { activeFilters } = useFiltersFlow();
   const [discoverState, setDiscoverState] = useState<DiscoverActionState>(
-    INITIAL_DISCOVER_ACTION_STATE
+    initialDiscoverActionState
   );
 
   const filteredUsers = useMemo(

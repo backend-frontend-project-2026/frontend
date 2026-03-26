@@ -1,0 +1,155 @@
+.container {
+  min-height: 100vh;
+  padding: 16px;
+  background: var(--color-bg);
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--color-white);
+  border-radius: 20px;
+  padding: 16px;
+  padding-bottom: 16px;
+}
+
+.title {
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--color-gray);
+  margin-bottom: 12px;
+}
+
+.radioGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.radioItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.radioItem input {
+  accent-color: var(--color-accent);
+}
+
+.infoBox {
+  font-size: 12px;
+  background: var(--color-warning-bg);
+  border: 1px solid var(--color-warning-border);
+  padding: 10px;
+  border-radius: 12px;
+  margin: 16px 0;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 999px;
+  border: none;
+  font-size: 14px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.primary {
+  background: var(--color-dark);
+  color: var(--color-accent);
+}
+
+.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px var(--color-shadow);
+}
+
+.primary:disabled {
+  opacity: 0.4;
+}
+
+.secondary {
+  background: var(--color-gray-light);
+}
+
+.secondary:hover {
+  background: var(--color-gray-hover);
+  transform: translateY(-2px);
+}
+
+.arrow {
+  font-size: 14px;
+}
+
+.confirmBox {
+  margin-top: 16px;
+  padding: 12px;
+  background: var(--color-light-bg);
+  border-radius: 14px;
+}
+
+.confirmTitle {
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+
+.confirmText {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-bottom: 12px;
+}
+
+/* desktop */
+
+@media (min-width: 1024px) {
+  .container {
+    padding: 40px;
+  }
+
+  .card {
+    max-width: 520px;
+    padding: 28px;
+  }
+
+  .title {
+    font-size: 22px;
+  }
+
+  .subtitle {
+    font-size: 15px;
+  }
+
+  .radioItem {
+    font-size: 15px;
+  }
+
+  .btn {
+    padding: 12px;
+    font-size: 15px;
+  }
+
+  .confirmBox {
+    padding: 16px;
+  }
+}

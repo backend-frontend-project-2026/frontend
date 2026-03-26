@@ -1,0 +1,124 @@
+import { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import styles from './ChatPage.module.css';
+import { Input, Button } from 'antd';
+
+type Message = {
+  id: number;
+  text: string;
+  fromMe: boolean;
+};
+
+type Chat = {
+  id: number;
+  name: string;
+  messages: Message[];
+};
+
+const mockChats: Chat[] = [
+  {
+    id: 1,
+    name: 'Катя, 20',
+    messages: [
+      { id: 1, text: 'Привет! Видела твою анкету 😌', fromMe: false },
+      { id: 2, text: 'Привет! Да, супер. Во сколько обычно ложишься?', fromMe: true },
+      { id: 3, text: 'Около 23:30. А ты?', fromMe: false },
+    ],
+  },
+  {
+    id: 2,
+    name: 'Оля, 19',
+    messages: [{ id: 1, text: 'Привет! Договоримся о проживании?', fromMe: false }],
+  },
+];
+
+const ChatsPage = () => {
+  const [chats, setChats] = useState<Chat[]>(mockChats);
+  const [input, setInput] = useState('');
+
+  const navigate = useNavigate();
+  const { id } = useParams();
+
+  const activeChatId = Number(id);
+  const activeChat = chats.find((c) => c.id === activeChatId);
+  if (!activeChat) {
+    return <div>Чат не найден</div>;
+  }
+
+  const sendMessage = () => {
+    if (!input.trim() || !activeChat) return;
+
+    const newMessage: Message = {
+      id: Date.now(),
+      text: input,
+      fromMe: true,
+    };
+
+    setChats((prev) =>
+      prev.map((chat) =>
+        chat.id === activeChatId ? { ...chat, messages: [...chat.messages, newMessage] } : chat
+      )
+    );
+
+    setInput('');
+  };
+
+  const { TextArea } = Input;
+
+  return (
+    <div className={styles.chats}>
+      <aside className={styles.chats__sidebar}>
+        <div className={styles.chats__title}>Чаты</div>
+
+        <div className={styles.chats__list}>
+          {chats.map((chat) => (
+            <div
+              key={chat.id}
+              className={`${styles.chatItem} ${chat.id === activeChatId ? styles.active : ''}`}
+              onClick={() => navigate(`/chat/${chat.id}`)}
+            >
+              <div className={styles.chatItem__avatar} />
+              <div>
+                <div className={styles.chatItem__name}>{chat.name}</div>
+                <div className={styles.chatItem__last}>{chat.messages.at(-1)?.text}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </aside>
+
+      <main className={styles.chat}>
+        {!activeChat ? (
+          <div className={styles.chat__empty}>Выберите чат</div>
+        ) : (
+          <>
+            <div className={styles.chat__header}>{activeChat.name}</div>
+
+            <div className={styles.chat__messages}>
+              {activeChat.messages.map((m) => (
+                <div key={m.id} className={`${styles.msg} ${m.fromMe ? styles.me : styles.them}`}>
+                  {m.text}
+                </div>
+              ))}
+            </div>
+
+            <div className={styles.chat__input}>
+              <TextArea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Сообщение..."
+                autoSize={{ minRows: 1, maxRows: 4 }}
+              />
+
+              <Button type="primary" onClick={sendMessage}>
+                Отпр
+              </Button>
+            </div>
+          </>
+        )}
+      </main>
+    </div>
+  );
+};
+
+export default ChatsPage;

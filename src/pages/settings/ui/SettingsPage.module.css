@@ -1,0 +1,230 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 16px;
+}
+
+/* ЛЕВАЯ ЧАСТЬ */
+.profileForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.photos {
+  display: flex;
+  gap: 8px;
+}
+
+.photoSlot input {
+  width: 80px;
+  height: 80px;
+}
+
+/* ИНПУТЫ */
+.input {
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid #ccc;
+  transition: all 0.2s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #000;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+}
+
+.quietHours {
+  border-color: red;
+}
+
+/* ПРАВАЯ ЧАСТЬ */
+.preferences {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.section h4 {
+  margin-bottom: 8px;
+}
+
+.options {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.option {
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  background: #f5f5f5;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.option.active {
+  background: #d4ff00;
+  border-color: #d4ff00;
+}
+
+.option:hover {
+  transform: translateY(-1px);
+}
+
+.dot {
+  font-size: 10px;
+  color: #000;
+}
+
+/* БИО */
+.bioBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bioLabel {
+  font-size: 14px;
+  color: #000;
+  font-weight: 500;
+}
+
+.bio {
+  width: 100%;
+  height: 90px;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid #ccc;
+  resize: none;
+  transition: all 0.2s ease;
+}
+
+.bio:focus {
+  outline: none;
+  border-color: #000;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+}
+
+/* КНОПКИ */
+.buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.cancel,
+.save {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  padding: 12px 18px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+
+  font-size: 15px;
+  font-weight: 500;
+
+  transition: all 0.25s ease;
+}
+
+.cancel {
+  background: #e0e0e0;
+  color: #000;
+}
+
+.save {
+  background: #000;
+  color: #fff;
+}
+
+.iconCircle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: all 0.25s ease;
+}
+
+.cancel .iconCircle {
+  background: #000;
+}
+
+.save .iconCircle {
+  background: #d4ff00;
+}
+
+.arrow {
+  font-size: 16px;
+  font-weight: bold;
+  transition: all 0.25s ease;
+}
+
+.cancel .arrow {
+  color: #fff;
+}
+
+.save .arrow {
+  color: #000;
+}
+
+/* ЭФФЕКТЫ */
+.cancel:hover,
+.save:hover {
+  transform: translateY(-2px);
+}
+
+.cancel:hover {
+  background: #d5d5d5;
+}
+
+.cancel:hover .iconCircle {
+  transform: rotate(15deg) scale(1.1);
+}
+
+.save:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.save:hover .iconCircle {
+  transform: translateX(3px) scale(1.15);
+}
+
+.save:hover .arrow,
+.cancel:hover .arrow {
+  transform: translate(2px, -2px);
+}
+
+.cancel:active,
+.save:active {
+  transform: scale(0.97);
+}
+
+/* ДЕСКТОП */
+@media (min-width: 768px) {
+  .container {
+    flex-direction: row;
+    gap: 32px;
+  }
+
+  .profileForm {
+    flex: 1;
+  }
+
+  .preferences {
+    flex: 2;
+  }
+}

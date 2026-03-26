@@ -20,6 +20,7 @@ export const RoutePaths = {
   FILTERS: '/discover/filters',
   USER_PROFILE_BASE: '/user-profile',
   ADMIN_REPORTS: '/admin/reports',
+  REPORT: '/report',
   NOT_FOUND: '*',
-  userProfile: (userId: string) => `/user-profile/${userId}`,
+  userProfile: (userId: string): string => `/user-profile/${userId}`,
 };

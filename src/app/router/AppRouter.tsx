@@ -35,10 +35,12 @@ import DiscoverPage from '@/pages/discover/ui/DiscoverPage';
 import { FiltersPage } from '@/pages/filters';
 import { UserProfilePage } from '@/pages/user-profile';
 import MatchesPage from '@/pages/matches/ui/MatchesPage';
-import ChatsPage from '@/pages/chats/ui/ChatsPage';
 import ProfilePage from '@/pages/profile/ui/ProfilePage';
 import SettingsPage from '@/pages/settings/ui/SettingsPage';
 import AdminReportsPage from '@/pages/admin/reports/ui/AdminReportsPage';
+
+import ChatPage from '@/pages/chat/ui/ChatPage';
+import ReportPage from '@/pages/report/ui/ReportPage';
 
 import NotFoundPage from '@/pages/not-found/ui/NotFoundPage';
 import { useRoomieFlow } from '@/app/providers/roomie-flow';
@@ -384,14 +386,6 @@ export const AppRouter = () => {
             }
           />
           <Route
-            path={RoutePaths.CHATS}
-            element={
-              <ProtectedRoute>
-                <ChatsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
             path={RoutePaths.PROFILE}
             element={
               <ProtectedRoute>
@@ -413,6 +407,24 @@ export const AppRouter = () => {
               <RoleRoute allowedRoles={['admin']}>
                 <AdminReportsPage />
               </RoleRoute>
+            }
+          />
+
+          <Route
+            path="/chat/:id"
+            element={
+              <ProtectedRoute>
+                <ChatPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path={RoutePaths.REPORT}
+            element={
+              <ProtectedRoute>
+                <ReportPage />
+              </ProtectedRoute>
             }
           />
         </Route>

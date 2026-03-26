@@ -1,7 +1,54 @@
 .button {
-  border-radius: 999px !important;
+  border-radius: 999px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   font-weight: 500;
+}
+
+.dark {
+  background: var(--color-black);
+  border-color: var(--color-black);
+  color: var(--color-white);
+  height: 48px;
+  padding: 0 24px;
+  font-size: 16px;
+}
+
+.dark:hover {
+  background: var(--color-dark);
+  border-color: var(--color-dark);
+}
+
+.gray {
+  background: var(--color-divider);
+  border-color: var(--color-divider);
+  color: var(--color-dark);
+  height: 48px;
+  padding: 0 24px;
+  font-size: 16px;
+}
+
+.gray:hover {
+  background: var(--color-bg-input-border);
+  border-color: var(--color-bg-input-border);
+}
+
+.iconCircle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.iconCircleLight {
+  background: var(--color-accent);
+  color: var(--color-black-text);
+}
+
+.iconCircleDark {
+  background: var(--color-black);
+  color: var(--color-white-soft);
 }

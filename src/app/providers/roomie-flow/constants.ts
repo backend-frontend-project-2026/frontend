@@ -1,0 +1,45 @@
+import type { OnboardingDraft } from './types';
+
+export const INITIAL_ONBOARDING_DRAFT: OnboardingDraft = {
+  basicInfo: {
+    name: '',
+    age: '',
+    gender: '',
+    university: '',
+    faculty: '',
+    course: '',
+    location: '',
+    bio: '',
+    avatar: '',
+    photos: [],
+  },
+  habits: {
+    sleepSchedule: '',
+    cleanliness: '',
+    noiseLevel: '',
+    guestFrequency: '',
+    smokingPreference: '',
+    alcoholPreference: '',
+    roomOrderPreference: '',
+    petPreference: '',
+    hasQuietHours: true,
+    quietFrom: '',
+    quietTo: '',
+    isSmokingAllowed: false,
+    hasPets: false,
+  },
+  living: {
+    budgetMin: '',
+    budgetMax: '',
+    moveInDate: '',
+    stayDuration: '',
+    housingType: '',
+    livingNotes: '',
+    idealRoommateDescription: '',
+    rentalCriteria: '',
+  },
+  interests: {
+    interests: [],
+    compatibilityNote: '',
+  },
+};

@@ -1,3 +1,4 @@
+import { Button } from 'antd';
 import styles from './HabitTag.module.css';
 
 interface HabitTagProps {
@@ -15,15 +16,16 @@ const HabitTag = ({ label, selected = false, onChange, readonly = false }: Habit
   };
 
   return (
-    <button
-      type="button"
+    <Button
+      type="default"
+      htmlType="button"
       className={`${styles.tag} ${selected ? styles.selected : ''}`}
       onClick={handleClick}
       disabled={readonly}
       aria-pressed={!readonly ? selected : undefined}
     >
       {label}
-    </button>
+    </Button>
   );
 };
 

@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local OpenAPI specification from backend team
+openapi.yaml
+openapi.yml
+openapi.json

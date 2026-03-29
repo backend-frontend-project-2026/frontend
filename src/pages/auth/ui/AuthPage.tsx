@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, Typography, Input, Form, Button, message } from 'antd';
 import { RoutePaths } from '@/app/router/routePaths';
 import RoundedButton from '@/shared/ui/RoundedButton/RoundedButton';
-import { getApiErrorMessage } from '@/shared/api';
+import { getApiErrorMessage, type AuthResponse } from '@/shared/api';
 import { authApi } from '@/shared/api/services/auth';
 import { saveAuthSession } from '@/shared/api/auth/session';
 import styles from './AuthPage.module.css';
@@ -33,16 +33,13 @@ const AuthPage = () => {
   const [loginForm] = Form.useForm<LoginFormValues>();
   const [registerForm] = Form.useForm<RegisterFormValues>();
 
-  const handleLogin = async (values: LoginFormValues) => {
+  const handleAuth = async (apiCall: () => Promise<AuthResponse>, successMessage: string) => {
     try {
       setIsSubmitting(true);
-      const authResponse = await authApi.login({
-        email: values.email,
-        password: values.password,
-      });
+      const authResponse = await apiCall();
 
       saveAuthSession(authResponse);
-      messageApi.success('Вход выполнен');
+      messageApi.success(successMessage);
       navigate(RoutePaths.DISCOVER);
     } catch (error) {
       messageApi.error(getApiErrorMessage(error));
@@ -51,24 +48,28 @@ const AuthPage = () => {
     }
   };
 
-  const handleRegister = async (values: RegisterFormValues) => {
-    try {
-      setIsSubmitting(true);
-      const authResponse = await authApi.register({
-        first_name: values.firstName.trim(),
-        last_name: values.lastName.trim(),
-        email: values.email,
-        password: values.password,
-      });
+  const handleLogin = async (values: LoginFormValues) => {
+    await handleAuth(
+      () =>
+        authApi.login({
+          email: values.email,
+          password: values.password,
+        }),
+      'Вход выполнен'
+    );
+  };
 
-      saveAuthSession(authResponse);
-      messageApi.success('Аккаунт успешно создан');
-      navigate(RoutePaths.DISCOVER);
-    } catch (error) {
-      messageApi.error(getApiErrorMessage(error));
-    } finally {
-      setIsSubmitting(false);
-    }
+  const handleRegister = async (values: RegisterFormValues) => {
+    await handleAuth(
+      () =>
+        authApi.register({
+          first_name: values.firstName.trim(),
+          last_name: values.lastName.trim(),
+          email: values.email,
+          password: values.password,
+        }),
+      'Аккаунт успешно создан'
+    );
   };
 
   const hint = (

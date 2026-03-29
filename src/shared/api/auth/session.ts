@@ -3,8 +3,38 @@ import type { AuthResponse, UserResponse } from '@/shared/api/generated';
 const ACCESS_TOKEN_KEY = 'accessToken';
 const TOKEN_TYPE_KEY = 'tokenType';
 const AUTH_USER_KEY = 'authUser';
-const IS_AUTH_KEY = 'isAuth';
 const USER_ROLE_KEY = 'userRole';
+
+interface JwtPayload {
+  exp?: number;
+}
+
+function parseJwtPayload(token: string): JwtPayload | null {
+  const parts = token.split('.');
+
+  if (parts.length !== 3) {
+    return null;
+  }
+
+  try {
+    const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    const normalized = base64.padEnd(Math.ceil(base64.length / 4) * 4, '=');
+
+    return JSON.parse(atob(normalized)) as JwtPayload;
+  } catch {
+    return null;
+  }
+}
+
+function isTokenExpired(token: string): boolean {
+  const payload = parseJwtPayload(token);
+
+  if (!payload?.exp) {
+    return false;
+  }
+
+  return payload.exp * 1000 <= Date.now();
+}
 
 export function saveAuthSession(auth: AuthResponse): void {
   if (auth.access_token) {
@@ -21,20 +51,28 @@ export function saveAuthSession(auth: AuthResponse): void {
       localStorage.setItem(USER_ROLE_KEY, auth.user.role);
     }
   }
-
-  localStorage.setItem(IS_AUTH_KEY, 'true');
 }
 
 export function clearAuthSession(): void {
   localStorage.removeItem(ACCESS_TOKEN_KEY);
   localStorage.removeItem(TOKEN_TYPE_KEY);
   localStorage.removeItem(AUTH_USER_KEY);
-  localStorage.removeItem(IS_AUTH_KEY);
   localStorage.removeItem(USER_ROLE_KEY);
 }
 
 export function getAccessToken(): string | null {
-  return localStorage.getItem(ACCESS_TOKEN_KEY);
+  const token = localStorage.getItem(ACCESS_TOKEN_KEY);
+
+  if (!token) {
+    return null;
+  }
+
+  if (isTokenExpired(token)) {
+    clearAuthSession();
+    return null;
+  }
+
+  return token;
 }
 
 export function getTokenType(): string | null {
@@ -42,7 +80,7 @@ export function getTokenType(): string | null {
 }
 
 export function isAuthenticated(): boolean {
-  return localStorage.getItem(IS_AUTH_KEY) === 'true' && Boolean(getAccessToken());
+  return Boolean(getAccessToken());
 }
 
 export function getStoredUser(): UserResponse | null {

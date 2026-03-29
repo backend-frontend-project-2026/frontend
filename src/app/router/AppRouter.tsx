@@ -1,10 +1,13 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { RoutePaths } from '@/app/router/routePaths';
 import { ProtectedRoute } from '@/app/router/guards/ProtectedRoute';
 import { RoleRoute } from '@/app/router/guards/RoleRoute';
+import { MOCK_DISCOVER_USERS } from '@/entities/user';
 
 import AuthLayout from '@/app/layouts/AuthLayout/AuthLayout';
 import AppLayout from '@/app/layouts/AppLayout/AppLayout';
+import MainLayout from '@/app/layouts/MainLayout/MainLayout';
 
 import LandingPage from '@/pages/landing/ui/LandingPage';
 
@@ -15,8 +18,22 @@ import SuccessPage from '@/pages/auth/success/ui/SuccessPage';
 import ErrorPage from '@/pages/auth/error/ui/ErrorPage';
 import ForgotPasswordPage from '@/pages/auth/forgot-password/ui/ForgotPasswordPage';
 import ResetPasswordPage from '@/pages/auth/reset-password/ui/ResetPasswordPage';
+import {
+  OnboardingStep1Page,
+  OnboardingStep2Page,
+  OnboardingStep3Page,
+  OnboardingStep4Page,
+} from '@/pages/onboarding';
+
+import type {
+  BasicInfoFormValue,
+  HabitsFormValue,
+  LivingPreferencesFormValue,
+} from '@/features/onboarding';
 
 import DiscoverPage from '@/pages/discover/ui/DiscoverPage';
+import { FiltersPage } from '@/pages/filters';
+import { UserProfilePage } from '@/pages/user-profile';
 import MatchesPage from '@/pages/matches/ui/MatchesPage';
 import ProfilePage from '@/pages/profile/ui/ProfilePage';
 import SettingsPage from '@/pages/settings/ui/SettingsPage';
@@ -26,8 +43,286 @@ import ChatPage from '@/pages/chat/ui/ChatPage';
 import ReportPage from '@/pages/report/ui/ReportPage';
 
 import NotFoundPage from '@/pages/not-found/ui/NotFoundPage';
+import { useRoomieFlow } from '@/app/providers/roomie-flow';
 
-const TodoPage = () => <div style={{ padding: 40 }}>TODO</div>;
+function isBasicInfoStepComplete(value: BasicInfoFormValue) {
+  return Boolean(
+    value.name.trim() &&
+    value.age.trim() &&
+    value.gender &&
+    value.university.trim() &&
+    value.faculty.trim() &&
+    value.course.trim() &&
+    value.location.trim() &&
+    value.bio.trim()
+  );
+}
+
+function isHabitsStepComplete(value: HabitsFormValue) {
+  return Boolean(
+    value.sleepSchedule &&
+    value.cleanliness &&
+    value.noiseLevel &&
+    value.guestFrequency &&
+    value.smokingPreference &&
+    value.alcoholPreference &&
+    value.roomOrderPreference &&
+    value.petPreference &&
+    (!value.hasQuietHours || (value.quietFrom.trim() && value.quietTo.trim()))
+  );
+}
+
+function isLivingStepComplete(value: LivingPreferencesFormValue) {
+  return Boolean(
+    value.budgetMin.trim() &&
+    value.budgetMax.trim() &&
+    value.moveInDate.trim() &&
+    value.stayDuration
+  );
+}
+
+function OnboardingStep1Route() {
+  const navigate = useNavigate();
+  const { completed, draft, updateBasicInfo } = useRoomieFlow();
+
+  if (completed) {
+    return <Navigate to={RoutePaths.DISCOVER} replace />;
+  }
+
+  return (
+    <OnboardingStep1Page
+      value={draft.basicInfo}
+      onBack={() => navigate(RoutePaths.LANDING)}
+      onNext={(value) => {
+        updateBasicInfo(value);
+        navigate(RoutePaths.ONBOARDING_STEP_2);
+      }}
+    />
+  );
+}
+
+function OnboardingStep2Route() {
+  const navigate = useNavigate();
+  const { completed, draft, updateHabits } = useRoomieFlow();
+
+  if (completed) {
+    return <Navigate to={RoutePaths.DISCOVER} replace />;
+  }
+
+  if (!isBasicInfoStepComplete(draft.basicInfo)) {
+    return <Navigate to={RoutePaths.ONBOARDING_STEP_1} replace />;
+  }
+
+  return (
+    <OnboardingStep2Page
+      value={draft.habits}
+      onBack={() => navigate(RoutePaths.ONBOARDING_STEP_1)}
+      onNext={(value) => {
+        updateHabits(value);
+        navigate(RoutePaths.ONBOARDING_STEP_3);
+      }}
+    />
+  );
+}
+
+function OnboardingStep3Route() {
+  const navigate = useNavigate();
+  const { completed, draft, updateLiving } = useRoomieFlow();
+
+  if (completed) {
+    return <Navigate to={RoutePaths.DISCOVER} replace />;
+  }
+
+  if (!isBasicInfoStepComplete(draft.basicInfo)) {
+    return <Navigate to={RoutePaths.ONBOARDING_STEP_1} replace />;
+  }
+
+  if (!isHabitsStepComplete(draft.habits)) {
+    return <Navigate to={RoutePaths.ONBOARDING_STEP_2} replace />;
+  }
+
+  return (
+    <OnboardingStep3Page
+      value={draft.living}
+      onBack={() => navigate(RoutePaths.ONBOARDING_STEP_2)}
+      onNext={(value) => {
+        updateLiving(value);
+        navigate(RoutePaths.ONBOARDING_STEP_4);
+      }}
+    />
+  );
+}
+
+function OnboardingStep4Route() {
+  const navigate = useNavigate();
+  const { completed, draft, updateInterests, finishOnboarding } = useRoomieFlow();
+
+  if (completed) {
+    return <Navigate to={RoutePaths.DISCOVER} replace />;
+  }
+
+  if (!isBasicInfoStepComplete(draft.basicInfo)) {
+    return <Navigate to={RoutePaths.ONBOARDING_STEP_1} replace />;
+  }
+
+  if (!isHabitsStepComplete(draft.habits)) {
+    return <Navigate to={RoutePaths.ONBOARDING_STEP_2} replace />;
+  }
+
+  if (!isLivingStepComplete(draft.living)) {
+    return <Navigate to={RoutePaths.ONBOARDING_STEP_3} replace />;
+  }
+
+  return (
+    <OnboardingStep4Page
+      value={draft.interests}
+      onBack={() => navigate(RoutePaths.ONBOARDING_STEP_3)}
+      onComplete={(value) => {
+        updateInterests(value);
+        finishOnboarding();
+        navigate(RoutePaths.DISCOVER);
+      }}
+    />
+  );
+}
+
+function DiscoverRoute() {
+  const navigate = useNavigate();
+  const {
+    completed,
+    activeFilters,
+    availableUsers,
+    totalUsersCount,
+    matchingUsersCount,
+    filtersAreActive,
+    applyCurrentFilters,
+    resetFilters,
+    clearSkippedProfiles,
+    openProfile,
+    handleLike,
+    handleSkip,
+    handleSuperLike,
+  } = useRoomieFlow();
+
+  if (!completed) {
+    return <Navigate to={RoutePaths.ONBOARDING_STEP_1} replace />;
+  }
+
+  return (
+    <DiscoverPage
+      users={availableUsers}
+      totalUsersCount={totalUsersCount}
+      matchingUsersCount={matchingUsersCount}
+      hasActiveFilters={filtersAreActive}
+      activeFilters={activeFilters}
+      onOpenFilters={() => navigate(RoutePaths.FILTERS)}
+      onResetFilters={() => {
+        clearSkippedProfiles();
+        resetFilters();
+      }}
+      onApplyFilters={applyCurrentFilters}
+      onOpenProfile={(user) => {
+        openProfile(user);
+        navigate(RoutePaths.userProfile(user.id));
+      }}
+      onLike={handleLike}
+      onSkip={handleSkip}
+      onSuperLike={handleSuperLike}
+    />
+  );
+}
+
+function FiltersRoute() {
+  const navigate = useNavigate();
+  const { completed, draft, activeFilters, applyCurrentFilters, clearSkippedProfiles } =
+    useRoomieFlow();
+
+  if (!completed) {
+    return <Navigate to={RoutePaths.ONBOARDING_STEP_1} replace />;
+  }
+
+  return (
+    <FiltersPage
+      initialFilters={activeFilters}
+      currentUserUniversity={draft.basicInfo.university}
+      currentUserLocation={draft.basicInfo.location}
+      usersForPreview={MOCK_DISCOVER_USERS}
+      onBack={() => navigate(RoutePaths.DISCOVER)}
+      onApply={(filters) => {
+        clearSkippedProfiles();
+        applyCurrentFilters(filters);
+        navigate(RoutePaths.DISCOVER);
+      }}
+    />
+  );
+}
+
+function UserProfileRoute() {
+  const navigate = useNavigate();
+  const { userId } = useParams();
+  const {
+    completed,
+    profileUser,
+    selectProfileById,
+    clearSelectedUser,
+    handleLike,
+    handleSkip,
+    handleSuperLike,
+  } = useRoomieFlow();
+
+  React.useEffect(() => {
+    selectProfileById(userId);
+
+    return () => {
+      clearSelectedUser();
+    };
+  }, [userId, selectProfileById, clearSelectedUser]);
+
+  if (!completed) {
+    return <Navigate to={RoutePaths.ONBOARDING_STEP_1} replace />;
+  }
+
+  return (
+    <UserProfilePage
+      user={profileUser}
+      onBack={() => navigate(RoutePaths.DISCOVER)}
+      onLike={() => {
+        handleLike(profileUser);
+        navigate(RoutePaths.DISCOVER);
+      }}
+      onSkip={() => {
+        handleSkip(profileUser);
+        navigate(RoutePaths.DISCOVER);
+      }}
+      onSuperLike={() => {
+        handleSuperLike(profileUser);
+        navigate(RoutePaths.DISCOVER);
+      }}
+    />
+  );
+}
+
+function OnboardingEntryRoute() {
+  const { completed, draft } = useRoomieFlow();
+
+  if (completed) {
+    return <Navigate to={RoutePaths.DISCOVER} replace />;
+  }
+
+  if (isLivingStepComplete(draft.living)) {
+    return <Navigate to={RoutePaths.ONBOARDING_STEP_4} replace />;
+  }
+
+  if (isHabitsStepComplete(draft.habits)) {
+    return <Navigate to={RoutePaths.ONBOARDING_STEP_3} replace />;
+  }
+
+  if (isBasicInfoStepComplete(draft.basicInfo)) {
+    return <Navigate to={RoutePaths.ONBOARDING_STEP_2} replace />;
+  }
+
+  return <Navigate to={RoutePaths.ONBOARDING_STEP_1} replace />;
+}
 
 export const AppRouter = () => {
   return (
@@ -42,24 +337,46 @@ export const AppRouter = () => {
           <Route path={RoutePaths.ERROR} element={<ErrorPage />} />
           <Route path={RoutePaths.FORGOT_PASSWORD} element={<ForgotPasswordPage />} />
           <Route path={RoutePaths.RESET_PASSWORD} element={<ResetPasswordPage />} />
-          <Route path={RoutePaths.ONBOARDING} element={<TodoPage />} />
-          <Route path={RoutePaths.ONBOARDING_STEP_1} element={<TodoPage />} />
-          <Route path={RoutePaths.ONBOARDING_STEP_2} element={<TodoPage />} />
-          <Route path={RoutePaths.ONBOARDING_STEP_3} element={<TodoPage />} />
-          <Route path={RoutePaths.ONBOARDING_STEP_4} element={<TodoPage />} />
+        </Route>
+
+        <Route element={<MainLayout />}>
+          <Route path={RoutePaths.ONBOARDING} element={<OnboardingEntryRoute />} />
+          <Route path={RoutePaths.ONBOARDING_STEP_1} element={<OnboardingStep1Route />} />
+          <Route path={RoutePaths.ONBOARDING_STEP_2} element={<OnboardingStep2Route />} />
+          <Route path={RoutePaths.ONBOARDING_STEP_3} element={<OnboardingStep3Route />} />
+          <Route path={RoutePaths.ONBOARDING_STEP_4} element={<OnboardingStep4Route />} />
+
+          <Route
+            path={RoutePaths.DISCOVER}
+            element={
+              <ProtectedRoute>
+                <DiscoverRoute />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path={RoutePaths.FILTERS}
+            element={
+              <ProtectedRoute>
+                <FiltersRoute />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path={`${RoutePaths.USER_PROFILE_BASE}/:userId`}
+            element={
+              <ProtectedRoute>
+                <UserProfileRoute />
+              </ProtectedRoute>
+            }
+          />
         </Route>
 
         {/* Основное приложение */}
         <Route element={<AppLayout />}>
           <Route path={RoutePaths.LANDING} element={<LandingPage />} />
-          <Route
-            path={RoutePaths.DISCOVER}
-            element={
-              <ProtectedRoute>
-                <DiscoverPage />
-              </ProtectedRoute>
-            }
-          />
           <Route
             path={RoutePaths.MATCHES}
             element={

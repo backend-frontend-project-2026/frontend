@@ -1,6 +1,8 @@
 .tag {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  height: auto;
   padding: 6px 16px;
   border-radius: 999px;
   border: 1.5px solid var(--color-dark);
@@ -8,35 +10,60 @@
   color: var(--color-dark);
   font-size: 14px;
   font-weight: 500;
+  line-height: 1.2;
   cursor: pointer;
+  box-shadow: none !important;
   transition:
     background 0.15s,
     border-color 0.15s;
 }
 
-.tag:hover {
-  border-color: var(--color-accent);
+.tag::before {
+  display: none !important;
 }
 
-.selected {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
+.tag:hover,
+.tag:focus,
+.tag:focus-visible,
+.tag:active {
+  background: transparent !important;
+  color: var(--color-dark) !important;
+  border-color: var(--color-accent) !important;
+  box-shadow: none !important;
+}
+
+.selected,
+.selected:hover,
+.selected:focus,
+.selected:focus-visible,
+.selected:active {
+  background: var(--color-accent) !important;
+  border-color: var(--color-accent) !important;
+  color: var(--color-dark) !important;
 }
 
 .tag:disabled {
   cursor: default;
   opacity: 1;
+  box-shadow: none !important;
 }
 
-.tag:disabled:hover {
-  border-color: var(--color-bg-input-border);
+.tag:disabled:hover,
+.tag:disabled:focus,
+.tag:disabled:focus-visible,
+.tag:disabled:active {
+  background: transparent !important;
+  color: var(--color-dark) !important;
+  border-color: var(--color-bg-input-border) !important;
+  box-shadow: none !important;
 }
 
-.tag:disabled.selected {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-}
-
-.tag:disabled.selected:hover {
-  border-color: var(--color-accent);
+.tag:disabled.selected,
+.tag:disabled.selected:hover,
+.tag:disabled.selected:focus,
+.tag:disabled.selected:focus-visible,
+.tag:disabled.selected:active {
+  background: var(--color-accent) !important;
+  border-color: var(--color-accent) !important;
+  color: var(--color-dark) !important;
 }

@@ -17,7 +17,10 @@ export const RoutePaths = {
   ONBOARDING_STEP_2: '/onboarding/step-2',
   ONBOARDING_STEP_3: '/onboarding/step-3',
   ONBOARDING_STEP_4: '/onboarding/step-4',
+  FILTERS: '/discover/filters',
+  USER_PROFILE_BASE: '/user-profile',
   ADMIN_REPORTS: '/admin/reports',
-  NOT_FOUND: '*',
   REPORT: '/report',
+  NOT_FOUND: '*',
+  userProfile: (userId: string): string => `/user-profile/${userId}`,
 };

@@ -1,0 +1,183 @@
+@import url('../onboarding-form.css');
+
+.rm-form-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.rm-form-gallery-item {
+  width: 72px;
+  height: 72px;
+  overflow: hidden;
+  border: 1px solid #e6e6e6;
+  border-radius: 16px;
+  background: #f7f7f7;
+}
+
+.rm-form-gallery-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.rm-form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rm-form-section__head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rm-form-section__title {
+  margin: 0;
+  color: #0b0c0e;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.rm-form-helper {
+  margin: 0;
+  color: #8b8b8b;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.rm-form-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.rm-form-upload-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.rm-form-upload-row .ant-upload-wrapper {
+  display: inline-flex;
+}
+
+.rm-form-upload-row .ant-upload {
+  display: inline-flex;
+}
+
+.rm-form-upload-button.ant-btn > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rm-form-upload-button,
+.rm-form-upload-button.ant-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  height: 42px;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: #dfff4f;
+  color: #0b0c0e;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: 0 8px 18px rgb(0 0 0 / 6%);
+  transition:
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+.rm-form-upload-button--secondary,
+.rm-form-upload-button--secondary.ant-btn {
+  border: 1px solid #e6e6e6;
+  background: rgb(255 255 255 / 96%);
+  color: #0b0c0e;
+}
+
+.rm-form-upload-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.rm-form-upload-button.ant-btn:hover,
+.rm-form-upload-button.ant-btn:focus,
+.rm-form-upload-button.ant-btn:focus-visible,
+.rm-form-upload-button.ant-btn:active {
+  border-color: transparent !important;
+  background: #dfff4f !important;
+  color: #0b0c0e !important;
+  box-shadow: 0 8px 18px rgb(0 0 0 / 6%) !important;
+  transform: translateY(-2px);
+}
+
+.rm-form-upload-button--secondary.ant-btn:hover,
+.rm-form-upload-button--secondary.ant-btn:focus,
+.rm-form-upload-button--secondary.ant-btn:focus-visible,
+.rm-form-upload-button--secondary.ant-btn:active {
+  border-color: #e6e6e6 !important;
+  background: rgb(255 255 255 / 96%) !important;
+  color: #0b0c0e !important;
+  box-shadow: 0 8px 18px rgb(0 0 0 / 6%) !important;
+  transform: translateY(-2px);
+}
+
+.rm-form-upload-button.ant-btn::before {
+  display: none !important;
+}
+
+.rm-form-upload-button.ant-btn,
+.rm-form-upload-button.ant-btn:hover,
+.rm-form-upload-button.ant-btn:focus,
+.rm-form-upload-button.ant-btn:focus-visible,
+.rm-form-upload-button.ant-btn:active,
+.rm-form-upload-button--secondary.ant-btn,
+.rm-form-upload-button--secondary.ant-btn:hover,
+.rm-form-upload-button--secondary.ant-btn:focus,
+.rm-form-upload-button--secondary.ant-btn:focus-visible,
+.rm-form-upload-button--secondary.ant-btn:active {
+  text-decoration: none !important;
+}
+
+.rm-form-upload-button.ant-btn:focus,
+.rm-form-upload-button.ant-btn:focus-visible {
+  outline: none;
+}
+
+.rm-form-gallery-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.rm-form-gallery-remove,
+.rm-form-gallery-remove.ant-btn {
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  height: auto;
+  box-shadow: none;
+}
+
+.rm-form-gallery-remove.ant-btn:hover,
+.rm-form-gallery-remove.ant-btn:focus,
+.rm-form-gallery-remove.ant-btn:active {
+  background: transparent;
+  color: #6b7280;
+  box-shadow: none;
+}

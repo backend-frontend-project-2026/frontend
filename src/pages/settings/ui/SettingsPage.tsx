@@ -35,7 +35,7 @@ const SettingsPage: React.FC = () => {
       {/* ЛЕВАЯ ЧАСТЬ */}
       <div className={styles.profileForm}>
         <div className={styles.photos}>
-          {photos.map((photo, idx) => (
+          {photos.map((_, idx) => (
             <div key={idx} className={styles.photoSlot}>
               <input
                 type="file"

@@ -1,13 +1,11 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { RoutePaths } from '@/app/router/routePaths';
-import { ProtectedRoute } from '@/app/router/guards/ProtectedRoute';
 import { RoleRoute } from '@/app/router/guards/RoleRoute';
 
 import AuthLayout from '@/app/layouts/AuthLayout/AuthLayout';
 import AppLayout from '@/app/layouts/AppLayout/AppLayout';
 
 import LandingPage from '@/pages/landing/ui/LandingPage';
-
 import AuthPage from '@/pages/auth/ui/AuthPage';
 import VerifyEmailPage from '@/pages/auth/verify-email/ui/VerifyEmailPage';
 import VerifyCodePage from '@/pages/auth/verify-code/ui/VerifyCodePage';
@@ -35,7 +33,9 @@ export const AppRouter = () => {
       <Routes>
         {/* Auth и онбординг */}
         <Route element={<AuthLayout />}>
-          <Route path={RoutePaths.AUTH} element={<AuthPage />} />
+          <Route path={RoutePaths.LOGIN} element={<AuthPage mode="login" />} />
+          <Route path={RoutePaths.REGISTER} element={<AuthPage mode="register" />} />
+          <Route path={RoutePaths.AUTH} element={<Navigate to={RoutePaths.LOGIN} />} />
           <Route path={RoutePaths.VERIFY_EMAIL} element={<VerifyEmailPage />} />
           <Route path={RoutePaths.VERIFY_CODE} element={<VerifyCodePage />} />
           <Route path={RoutePaths.SUCCESS} element={<SuccessPage />} />
@@ -52,36 +52,37 @@ export const AppRouter = () => {
         {/* Основное приложение */}
         <Route element={<AppLayout />}>
           <Route path={RoutePaths.LANDING} element={<LandingPage />} />
+
           <Route
             path={RoutePaths.DISCOVER}
             element={
-              <ProtectedRoute>
+              <RoleRoute allowedRoles={['user', 'admin']}>
                 <DiscoverPage />
-              </ProtectedRoute>
+              </RoleRoute>
             }
           />
           <Route
             path={RoutePaths.MATCHES}
             element={
-              <ProtectedRoute>
+              <RoleRoute allowedRoles={['user', 'admin']}>
                 <MatchesPage />
-              </ProtectedRoute>
+              </RoleRoute>
             }
           />
           <Route
             path={RoutePaths.PROFILE}
             element={
-              <ProtectedRoute>
+              <RoleRoute allowedRoles={['user', 'admin']}>
                 <ProfilePage />
-              </ProtectedRoute>
+              </RoleRoute>
             }
           />
           <Route
             path={RoutePaths.SETTINGS}
             element={
-              <ProtectedRoute>
+              <RoleRoute allowedRoles={['user', 'admin']}>
                 <SettingsPage />
-              </ProtectedRoute>
+              </RoleRoute>
             }
           />
           <Route
@@ -92,22 +93,20 @@ export const AppRouter = () => {
               </RoleRoute>
             }
           />
-
           <Route
-            path="/chat/:id"
+            path={`${RoutePaths.CHATS}/:id`}
             element={
-              <ProtectedRoute>
+              <RoleRoute allowedRoles={['user', 'admin']}>
                 <ChatPage />
-              </ProtectedRoute>
+              </RoleRoute>
             }
           />
-
           <Route
             path={RoutePaths.REPORT}
             element={
-              <ProtectedRoute>
+              <RoleRoute allowedRoles={['user', 'admin']}>
                 <ReportPage />
-              </ProtectedRoute>
+              </RoleRoute>
             }
           />
         </Route>

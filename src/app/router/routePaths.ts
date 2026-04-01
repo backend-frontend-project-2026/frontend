@@ -1,6 +1,8 @@
 export const RoutePaths = {
   LANDING: '/',
   AUTH: '/auth',
+  LOGIN: '/login',
+  REGISTER: '/register',
   DISCOVER: '/discover',
   MATCHES: '/matches',
   CHATS: '/chats',

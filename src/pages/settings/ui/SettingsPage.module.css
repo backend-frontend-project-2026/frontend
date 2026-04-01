@@ -213,6 +213,32 @@
   transform: scale(0.97);
 }
 
+.pageWrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px 24px;
+}
+
+.logout {
+  background: transparent;
+  border: 1px solid #ff4d4f;
+  color: #ff4d4f;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.logout:hover {
+  background: #ff4d4f;
+  color: white;
+}
+
 /* ДЕСКТОП */
 @media (min-width: 768px) {
   .container {

@@ -1,16 +1,20 @@
-import { Navigate } from 'react-router-dom';
-import { RoutePaths } from '@/app/router/routePaths';
+import React from 'react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const isAuth = localStorage.getItem('isAuth') === 'true';
+  const token = localStorage.getItem('token');
 
-  if (!isAuth) {
-    return <Navigate to={RoutePaths.AUTH} />;
+  if (!token) {
+    return (
+      <div>
+        <h2>Доступ запрещен</h2>
+        <p>Вы должны быть авторизованы для просмотра этой страницы.</p>
+      </div>
+    );
   }
 
-  return children;
+  return <>{children}</>;
 };

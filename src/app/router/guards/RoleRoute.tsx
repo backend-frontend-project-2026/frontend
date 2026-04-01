@@ -1,18 +1,27 @@
-import { Navigate } from 'react-router-dom';
-import { RoutePaths } from '@/app/router/routePaths';
-import { ProtectedRoute } from '@/app/router/guards/ProtectedRoute';
+import { isAuthenticated, getStoredUser } from '@/shared/api/auth/session';
 
 interface RoleRouteProps {
   children: React.ReactNode;
   allowedRoles: string[];
 }
 
+const NoAccess = () => (
+  <div style={{ padding: 40, textAlign: 'center' }}>
+    <h1>Доступ запрещён</h1>
+    <p>У вас нет прав для просмотра этой страницы</p>
+  </div>
+);
 export const RoleRoute = ({ children, allowedRoles }: RoleRouteProps) => {
-  const userRole = localStorage.getItem('userRole') ?? null;
+  const user = getStoredUser();
+  const role = user?.role || null;
 
-  if (!userRole || !allowedRoles.includes(userRole)) {
-    return <Navigate to={RoutePaths.LANDING} />;
+  if (!isAuthenticated()) {
+    return <NoAccess />;
   }
 
-  return <ProtectedRoute>{children}</ProtectedRoute>;
+  if (!role || !allowedRoles.includes(role)) {
+    return <NoAccess />;
+  }
+
+  return <>{children}</>;
 };

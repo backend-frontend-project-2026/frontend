@@ -330,7 +330,8 @@ export const AppRouter = () => {
       <Routes>
         {/* Auth и онбординг */}
         <Route element={<AuthLayout />}>
-          <Route path={RoutePaths.AUTH} element={<AuthPage />} />
+          <Route path={RoutePaths.LOGIN} element={<AuthPage mode="login" />} />
+          <Route path={RoutePaths.REGISTER} element={<AuthPage mode="register" />} />
           <Route path={RoutePaths.VERIFY_EMAIL} element={<VerifyEmailPage />} />
           <Route path={RoutePaths.VERIFY_CODE} element={<VerifyCodePage />} />
           <Route path={RoutePaths.SUCCESS} element={<SuccessPage />} />
@@ -411,7 +412,7 @@ export const AppRouter = () => {
           />
 
           <Route
-            path="/chat/:id"
+            path={`${RoutePaths.CHATS}/:id`}
             element={
               <ProtectedRoute>
                 <ChatPage />

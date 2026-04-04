@@ -66,12 +66,19 @@
   margin: 0 0 12px;
 }
 
-@media (max-width: 680px) {
+@media (max-width: 768px) {
   .pageWrapper {
     flex-direction: column;
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .left {
+    width: 100%;
+    min-width: 0;
   }
 
   .right {
-    width: 100%;
+    display: none;
   }
 }

@@ -68,9 +68,19 @@
   margin-bottom: 0;
 }
 
-@media (max-width: 680px) {
+@media (max-width: 768px) {
   .page {
     flex-direction: column;
-    padding: 24px 16px;
+    padding: 16px;
+    gap: 16px;
+    min-height: calc(100vh - 64px);
+  }
+
+  .left {
+    width: 100%;
+  }
+
+  .right {
+    display: none;
   }
 }

@@ -1,5 +1,3 @@
-import { Navigate } from 'react-router-dom';
-import { RoutePaths } from '@/app/router/routePaths';
 import { isAuthenticated } from '@/shared/api/auth/session';
 
 interface ProtectedRouteProps {
@@ -8,8 +6,13 @@ interface ProtectedRouteProps {
 
 export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   if (!isAuthenticated()) {
-    return <Navigate to={RoutePaths.AUTH} />;
+    return (
+      <div style={{ padding: 40, textAlign: 'center' }}>
+        <h1>🚫 Доступ запрещён</h1>
+        <p>Вы не авторизованы</p>
+      </div>
+    );
   }
 
-  return children;
+  return <>{children}</>;
 };

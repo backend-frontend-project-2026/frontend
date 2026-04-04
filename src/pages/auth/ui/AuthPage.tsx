@@ -10,7 +10,7 @@ import styles from './AuthPage.module.css';
 
 const { Title, Text } = Typography;
 
-type AuthMode = 'login' | 'register';
+export type AuthMode = 'login' | 'register';
 
 interface LoginFormValues {
   email: string;
@@ -25,10 +25,14 @@ interface RegisterFormValues {
   confirmPassword: string;
 }
 
-const AuthPage = () => {
+interface AuthPageProps {
+  mode?: AuthMode; // пропс для передачи начального режима
+}
+
+const AuthPage = ({ mode: initialMode }: AuthPageProps) => {
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
-  const [mode, setMode] = useState<AuthMode>('login');
+  const [mode, setMode] = useState<AuthMode>(initialMode ?? 'login');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loginForm] = Form.useForm<LoginFormValues>();
   const [registerForm] = Form.useForm<RegisterFormValues>();

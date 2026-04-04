@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { clearAuthSession } from '@/shared/api/auth/session';
+import { RoutePaths } from '@/app/router/routePaths';
 import styles from './SettingsPage.module.css';
 
 const habitsOptions = ['Тишина', 'Не курю', 'Аккуратно'];
 const interestsOptions = ['Учёба', 'Спорт', 'Кино', 'Музыка'];
 
 const SettingsPage: React.FC = () => {
+  const navigate = useNavigate();
   const [photos, setPhotos] = useState<(File | null)[]>([null, null, null]);
   const [name, setName] = useState('');
   const [age, setAge] = useState<number | ''>('');
@@ -13,6 +17,11 @@ const SettingsPage: React.FC = () => {
   const [habits, setHabits] = useState<string[]>([]);
   const [interests, setInterests] = useState<string[]>([]);
   const [bio, setBio] = useState('');
+
+  const handleLogout = () => {
+    clearAuthSession();
+    navigate(RoutePaths.LANDING); // или RoutePaths.LOGIN
+  };
 
   const toggleOption = (
     option: string,
@@ -32,6 +41,12 @@ const SettingsPage: React.FC = () => {
 
   return (
     <div className={styles.container}>
+      {/* Кнопка выхода */}
+      <div className={styles.logoutButtonWrapper}>
+        <button onClick={handleLogout} className={styles.logoutButton}>
+          Выйти
+        </button>
+      </div>
       {/* ЛЕВАЯ ЧАСТЬ */}
       <div className={styles.profileForm}>
         <div className={styles.photos}>

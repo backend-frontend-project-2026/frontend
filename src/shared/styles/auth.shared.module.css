@@ -66,7 +66,7 @@
   margin: 0 0 12px;
 }
 
-@media (--mobile) {
+@media (max-width: 768px) {
   .pageWrapper {
     flex-direction: column;
     padding: 16px;

@@ -68,7 +68,7 @@
   margin-bottom: 0;
 }
 
-@media (--mobile) {
+@media (max-width: 768px) {
   .page {
     flex-direction: column;
     padding: 16px;

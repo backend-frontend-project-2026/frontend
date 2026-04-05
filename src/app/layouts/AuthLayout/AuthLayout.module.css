@@ -38,7 +38,7 @@
   flex-direction: column;
 }
 
-@media (--mobile) {
+@media (max-width: 768px) {
   .headerInner {
     padding: 0 16px;
   }

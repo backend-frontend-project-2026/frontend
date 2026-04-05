@@ -21,7 +21,7 @@
   border-color: var(--color-accent);
 }
 
-@media (max-width: 768px) {
+@media (--mobile) {
   .container {
     width: 100%;
     justify-content: center;

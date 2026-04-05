@@ -8,7 +8,7 @@
   margin-bottom: 12px;
 }
 
-@media (max-width: 768px) {
+@media (--mobile) {
   .submitButton {
     width: 100%;
   }

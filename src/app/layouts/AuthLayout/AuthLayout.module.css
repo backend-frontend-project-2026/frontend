@@ -1,3 +1,4 @@
+@import '@/shared/styles/breakpoints.css';
 .layout {
   display: flex;
   flex-direction: column;
@@ -38,7 +39,7 @@
   flex-direction: column;
 }
 
-@media (max-width: 768px) {
+@media (--mobile) {
   .headerInner {
     padding: 0 16px;
   }

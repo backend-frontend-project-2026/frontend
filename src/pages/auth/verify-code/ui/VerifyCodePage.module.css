@@ -1,3 +1,4 @@
+@import '@/shared/styles/breakpoints.css';
 .codeHint {
   font-size: 13px;
   color: var(--color-text-secondary);
@@ -8,7 +9,7 @@
   margin-bottom: 12px;
 }
 
-@media (max-width: 768px) {
+@media (--mobile) {
   .submitButton {
     width: 100%;
   }

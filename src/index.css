@@ -45,6 +45,7 @@ body,
 }
 
 body {
+  overflow-x: hidden;
   font-family:
     Inter,
     -apple-system,

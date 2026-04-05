@@ -1,3 +1,4 @@
+@import '@/shared/styles/breakpoints.css';
 .footer {
   background: var(--color-white);
   border-top: 1px solid var(--color-divider);
@@ -49,4 +50,18 @@
   font-size: 13px;
   color: var(--color-text-secondary);
   white-space: nowrap;
+}
+
+@media (--mobile) {
+  .footerInner {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+  }
+  .footerLinks {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
 }

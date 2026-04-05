@@ -330,6 +330,7 @@ export const AppRouter = () => {
       <Routes>
         {/* Auth и онбординг */}
         <Route element={<AuthLayout />}>
+          <Route path={RoutePaths.AUTH} element={<Navigate to={RoutePaths.LOGIN} replace />} />
           <Route path={RoutePaths.LOGIN} element={<AuthPage mode="login" />} />
           <Route path={RoutePaths.REGISTER} element={<AuthPage mode="register" />} />
           <Route path={RoutePaths.VERIFY_EMAIL} element={<VerifyEmailPage />} />

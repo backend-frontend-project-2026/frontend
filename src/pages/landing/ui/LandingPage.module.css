@@ -1,3 +1,4 @@
+@import '@/shared/styles/breakpoints.css';
 .page {
   width: 100%;
 }
@@ -272,7 +273,7 @@
   /* Адаптив hero */
   .hero {
     flex-direction: column;
-    padding: 24px 16px 16px;
+    padding: 16px 16px;
     gap: 0;
     width: 100%;
     box-sizing: border-box;
@@ -287,5 +288,25 @@
   .buttons {
     flex-wrap: nowrap;
     gap: 8px;
+  }
+
+  .mobileSteps {
+    padding: 16px 0;
+    width: 100%;
+  }
+
+  .mobileStepsTitle {
+    padding: 0 16px;
+  }
+
+  .step {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 8px;
+  }
+
+  .safetyBlock {
+    width: 100%;
+    box-sizing: border-box;
   }
 }

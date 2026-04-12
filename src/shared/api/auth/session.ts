@@ -4,6 +4,7 @@ const ACCESS_TOKEN_KEY = 'accessToken';
 const TOKEN_TYPE_KEY = 'tokenType';
 const AUTH_USER_KEY = 'authUser';
 const USER_ROLE_KEY = 'userRole';
+const ONBOARDING_KEY = 'onboardingCompleted';
 
 interface JwtPayload {
   exp?: number;
@@ -58,6 +59,19 @@ export function clearAuthSession(): void {
   localStorage.removeItem(TOKEN_TYPE_KEY);
   localStorage.removeItem(AUTH_USER_KEY);
   localStorage.removeItem(USER_ROLE_KEY);
+  clearOnboardingCompleted();
+}
+
+export function setOnboardingCompleted(): void {
+  localStorage.setItem(ONBOARDING_KEY, 'true');
+}
+
+export function isOnboardingCompleted(): boolean {
+  return localStorage.getItem(ONBOARDING_KEY) === 'true';
+}
+
+export function clearOnboardingCompleted(): void {
+  localStorage.removeItem(ONBOARDING_KEY);
 }
 
 export function getAccessToken(): string | null {

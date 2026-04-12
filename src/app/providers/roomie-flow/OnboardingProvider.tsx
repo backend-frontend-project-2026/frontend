@@ -5,13 +5,14 @@ import type {
   InterestsFormValue,
   LivingPreferencesFormValue,
 } from '@/features/onboarding';
+import { setOnboardingCompleted, isOnboardingCompleted } from '@/shared/api/auth/session';
 import { OnboardingContext } from './onboarding-context';
 import type { OnboardingContextValue, OnboardingDraft } from './types';
 import { INITIAL_ONBOARDING_DRAFT } from './constants';
 
 export function OnboardingProvider({ children }: PropsWithChildren) {
   const [draft, setDraft] = useState<OnboardingDraft>(INITIAL_ONBOARDING_DRAFT);
-  const [completed, setCompleted] = useState(false);
+  const [completed, setCompleted] = useState(isOnboardingCompleted);
 
   const updateBasicInfo = useCallback((value: BasicInfoFormValue) => {
     setDraft((current) => ({ ...current, basicInfo: value }));
@@ -30,10 +31,12 @@ export function OnboardingProvider({ children }: PropsWithChildren) {
   }, []);
 
   const finishOnboarding = useCallback(() => {
+    setOnboardingCompleted();
     setCompleted(true);
   }, []);
 
   const skipOnboarding = useCallback(() => {
+    setOnboardingCompleted();
     setCompleted(true);
   }, []);
 

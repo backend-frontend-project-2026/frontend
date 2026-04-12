@@ -413,6 +413,15 @@ export const AppRouter = () => {
           />
 
           <Route
+            path={RoutePaths.CHATS}
+            element={
+              <ProtectedRoute>
+                <ChatPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
             path={`${RoutePaths.CHATS}/:id`}
             element={
               <ProtectedRoute>

@@ -1,4 +1,6 @@
+import { Navigate } from 'react-router-dom';
 import { isAuthenticated } from '@/shared/api/auth/session';
+import { RoutePaths } from '@/app/router/routePaths';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -6,12 +8,7 @@ interface ProtectedRouteProps {
 
 export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   if (!isAuthenticated()) {
-    return (
-      <div style={{ padding: 40, textAlign: 'center' }}>
-        <h1>🚫 Доступ запрещён</h1>
-        <p>Вы не авторизованы</p>
-      </div>
-    );
+    return <Navigate to={RoutePaths.LOGIN} replace />;
   }
 
   return <>{children}</>;

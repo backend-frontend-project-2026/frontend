@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { Card, Typography } from 'antd';
+import { Card, Typography, message } from 'antd';
 import RoundedButton from '@/shared/ui/RoundedButton/RoundedButton';
 import { RoutePaths } from '@/app/router/routePaths';
 import shared from '@/shared/styles/auth.shared.module.css';
@@ -10,6 +11,35 @@ const { Title, Text, Paragraph } = Typography;
 const VerifyEmailPage = () => {
   const location = useLocation();
   const email = location.state?.email ?? 'your@email.com';
+
+  const [resending, setResending] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
+
+  const handleResend = async () => {
+    if (cooldown > 0) return;
+
+    try {
+      setResending(true);
+      // TODO: заменить на API когда бэкенд добавит эндпоинт
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      message.success('Письмо отправлено повторно');
+
+      setCooldown(60);
+      const interval = setInterval(() => {
+        setCooldown((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } catch {
+      message.error('Не удалось отправить письмо');
+    } finally {
+      setResending(false);
+    }
+  };
 
   return (
     <div className={shared.pageWrapper}>
@@ -27,14 +57,22 @@ const VerifyEmailPage = () => {
           <RoundedButton
             block
             size="large"
-            onClick={() => window.open('https://mail.google.com')}
+            href="https://mail.google.com"
+            target="_blank"
             className={styles.buttonPrimary}
           >
             Открыть почту
           </RoundedButton>
 
-          <RoundedButton block size="large" className={styles.buttonSecondary}>
-            Отправить ещё раз
+          <RoundedButton
+            block
+            size="large"
+            onClick={handleResend}
+            loading={resending}
+            disabled={cooldown > 0}
+            className={styles.buttonSecondary}
+          >
+            {cooldown > 0 ? `Отправить ещё раз (${cooldown}с)` : 'Отправить ещё раз'}
           </RoundedButton>
 
           <div className={shared.linkRow}>

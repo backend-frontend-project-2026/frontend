@@ -346,7 +346,7 @@
   line-height: 1.2;
 }
 
-.onboarding-page--step-4 .onboarding-page__actions--step-4 {
+.onboarding-page--step-4 .step-4-actions {
   display: flex;
   gap: 10px;
   padding-top: 2px;
@@ -380,20 +380,22 @@
   font-size: inherit;
   line-height: inherit;
   font-weight: inherit;
+  color: inherit;
+  text-decoration: none;
   white-space: nowrap;
 }
 
-.rm-shell--step-4 .rm-shell__footer-links span:first-child {
+.rm-shell--step-4 .rm-shell__footer-links > :first-child {
   display: none;
 }
 
-.rm-shell--step-4 .rm-shell__footer-links span:nth-child(3) {
+.rm-shell--step-4 .rm-shell__footer-links > :nth-child(3) {
   font-size: inherit;
   line-height: inherit;
   letter-spacing: inherit;
 }
 
-.rm-shell--step-4 .rm-shell__footer-links span:nth-child(3)::before {
+.rm-shell--step-4 .rm-shell__footer-links > :nth-child(3)::before {
   content: none;
 }
 
@@ -715,7 +717,7 @@
     display: none;
   }
 
-  .onboarding-page--step-4 .onboarding-page__actions--step-4 {
+  .onboarding-page--step-4 .step-4-actions {
     display: flex;
     gap: 10px;
     padding-top: 0;
@@ -789,20 +791,22 @@
     font-size: inherit;
     line-height: inherit;
     font-weight: inherit;
+    color: inherit;
+    text-decoration: none;
     white-space: nowrap;
   }
 
-  .rm-shell--step-4 .rm-shell__footer-links span:first-child {
+  .rm-shell--step-4 .rm-shell__footer-links > :first-child {
     display: inline;
   }
 
-  .rm-shell--step-4 .rm-shell__footer-links span:nth-child(3) {
+  .rm-shell--step-4 .rm-shell__footer-links > :nth-child(3) {
     font-size: inherit;
     line-height: inherit;
     letter-spacing: inherit;
   }
 
-  .rm-shell--step-4 .rm-shell__footer-links span:nth-child(3)::before {
+  .rm-shell--step-4 .rm-shell__footer-links > :nth-child(3)::before {
     content: none;
   }
 
@@ -1035,7 +1039,7 @@
   }
 
   .onboarding-page--step-4 .step-4-inner-actions,
-  .onboarding-page--step-4 .onboarding-page__actions--step-4 {
+  .onboarding-page--step-4 .step-4-actions {
     margin-top: 8px;
     gap: 14px;
     padding-top: 0;

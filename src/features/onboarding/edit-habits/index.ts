@@ -1,1 +1,2 @@
-export * from './EditHabits';
+export { EditHabits } from './EditHabits';
+export type { HabitsFormValue } from './types';

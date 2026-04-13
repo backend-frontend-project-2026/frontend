@@ -1,56 +1,51 @@
-import { useMemo, useState, type FormEvent, type KeyboardEvent } from 'react';
-import { Button, Input, Tag } from 'antd';
+import { useEffect, useMemo, useState, type FormEvent, type KeyboardEvent } from 'react';
+import { Button, Input, Tag, Typography } from 'antd';
 import '../onboarding-form.css';
+import { DESKTOP_PREVIEW_TEXT, normalizeTag, PRESET_INTERESTS } from './lib/interestsConfig';
+import type { InterestsErrors, InterestsFormValue } from './types';
+import { DEFAULT_INTERESTS_FORM_VALUE } from './constants';
 
-export type InterestsFormValue = {
-  interests: string[];
-  compatibilityNote: string;
-};
-
-type InterestsErrors = {
-  interests?: string;
-};
+const { Title } = Typography;
 
 type EditInterestsProps = {
   initialValue?: Partial<InterestsFormValue>;
   onBack?: () => void;
   onNext: (value: InterestsFormValue) => void;
+  onChange?: (value: InterestsFormValue) => void;
+  onSkip?: () => void;
   formId?: string;
   hideHeader?: boolean;
   hideActions?: boolean;
 };
 
-const defaultValue: InterestsFormValue = {
-  interests: [],
-  compatibilityNote: '',
-};
-
-const presetInterests = ['Учёба', 'Спорт', 'Кино', 'Музыка', 'Игры', 'Кулинария'];
-const desktopPreviewText = 'Люблю порядок и спокойные вечера. Ищу соседку на весенний семестр.';
-
-function normalizeTag(value: string) {
-  return value
-    .trim()
-    .replace(/^["“”']+|["“”']+$/g, '')
-    .replace(/\s+/g, ' ');
-}
-
 export function EditInterests({
   initialValue,
   onBack,
   onNext,
+  onChange,
+  onSkip,
   formId,
   hideHeader = false,
   hideActions = false,
 }: EditInterestsProps) {
-  const mergedInitialValue = useMemo(() => ({ ...defaultValue, ...initialValue }), [initialValue]);
-
+  const mergedInitialValue = useMemo(
+    () => ({ ...DEFAULT_INTERESTS_FORM_VALUE, ...initialValue }),
+    [initialValue]
+  );
   const [selectedInterests, setSelectedInterests] = useState<string[]>(
     mergedInitialValue.interests.length > 0 ? mergedInitialValue.interests : []
   );
-  const [customTag, setCustomTag] = useState('');
+  const [customTag, setCustomTag] = useState(mergedInitialValue.customTagDraft);
   const [bio, setBio] = useState(mergedInitialValue.compatibilityNote);
   const [errors, setErrors] = useState<InterestsErrors>({});
+
+  useEffect(() => {
+    onChange?.({
+      interests: selectedInterests,
+      compatibilityNote: bio,
+      customTagDraft: customTag,
+    });
+  }, [selectedInterests, bio, customTag, onChange]);
 
   const hasBio = Boolean(bio.trim());
   const isStepEmpty = selectedInterests.length === 0 && !hasBio;
@@ -92,11 +87,15 @@ export function EditInterests({
     }
   }
 
-  function validate(interests: string[]) {
+  function validate(interests: string[], compatibilityNote: string) {
     const nextErrors: InterestsErrors = {};
 
     if (interests.length < 3) {
       nextErrors.interests = 'Нужно выбрать хотя бы 3 интереса.';
+    }
+
+    if (!compatibilityNote.trim()) {
+      nextErrors.compatibilityNote = 'Добавь короткое био.';
     }
 
     return nextErrors;
@@ -107,7 +106,7 @@ export function EditInterests({
 
     const withCustomTag = appendCustomTag();
     const finalInterests = Array.isArray(withCustomTag) ? withCustomTag : selectedInterests;
-    const nextErrors = validate(finalInterests);
+    const nextErrors = validate(finalInterests, bio);
 
     setErrors(nextErrors);
 
@@ -117,7 +116,8 @@ export function EditInterests({
 
     onNext({
       interests: finalInterests,
-      compatibilityNote: bio.trim() || desktopPreviewText,
+      compatibilityNote: bio.trim(),
+      customTagDraft: '',
     });
   }
 
@@ -131,7 +131,9 @@ export function EditInterests({
       {!hideHeader ? (
         <div className="onboarding-feature-copy">
           <p className="onboarding-feature-eyebrow">Шаг 4</p>
-          <h3 className="onboarding-feature-title">Интересы</h3>
+          <Title level={3} className="onboarding-feature-title">
+            Интересы
+          </Title>
           <p className="onboarding-feature-description">
             Последний шаг для тегов и короткой заметки.
           </p>
@@ -140,7 +142,9 @@ export function EditInterests({
 
       {isStepEmpty ? (
         <div className="onboarding-form-state">
-          <h4 className="onboarding-form-state__title">Шаг ещё пустой</h4>
+          <Title level={4} className="onboarding-form-state__title">
+            Шаг ещё пустой
+          </Title>
           <p className="onboarding-form-state__text">
             Добавь интересы и короткую заметку о себе, чтобы анкета не выглядела пустой.
           </p>
@@ -149,7 +153,9 @@ export function EditInterests({
 
       {isStepIncomplete ? (
         <div className="onboarding-form-state onboarding-form-state--warning">
-          <h4 className="onboarding-form-state__title">Интересов пока мало</h4>
+          <Title level={4} className="onboarding-form-state__title">
+            Интересов пока мало
+          </Title>
           <p className="onboarding-form-state__text">
             Для этого шага лучше выбрать хотя бы 3 интереса и заполнить краткое био.
           </p>
@@ -158,15 +164,15 @@ export function EditInterests({
 
       <section className="step-4-section">
         <div className="step-4-section__head">
-          <h4 className="step-4-section__title">
+          <Title level={4} className="step-4-section__title">
             Интересы
             <span className="step-4-section__title-extra"> (теги)</span>
-          </h4>
+          </Title>
           {errors.interests ? <small className="rm-form-error">{errors.interests}</small> : null}
         </div>
 
         <div className="step-4-tags-track">
-          {presetInterests.map((interest) => {
+          {PRESET_INTERESTS.map((interest) => {
             const selected = selectedInterests.includes(interest);
 
             return (
@@ -196,6 +202,10 @@ export function EditInterests({
         />
       </label>
 
+      {errors.compatibilityNote ? (
+        <small className="rm-form-error">{errors.compatibilityNote}</small>
+      ) : null}
+
       <label className="step-4-bio-field">
         <span className="step-4-field-label">Короткое био (2–3 строки)</span>
         <Input.TextArea
@@ -205,15 +215,26 @@ export function EditInterests({
           onChange={(event) => setBio(event.target.value)}
           placeholder=""
         />
-        <span className="step-4-bio-preview">{bio.trim() || desktopPreviewText}</span>
+        <span className="step-4-bio-preview">{bio.trim() || DESKTOP_PREVIEW_TEXT}</span>
       </label>
 
       {!hideActions ? (
-        <div className="step-4-inner-actions onboarding-page__actions--step-4">
+        <div className="step-4-inner-actions step-4-actions">
           <Button htmlType="button" className="rm-nav-button rm-nav-button--ghost" onClick={onBack}>
             <span>Назад</span>
             <span className="rm-nav-button__icon rm-nav-button__icon--dark">↗</span>
           </Button>
+
+          {onSkip ? (
+            <Button
+              htmlType="button"
+              className="rm-nav-button rm-nav-button--ghost"
+              onClick={onSkip}
+            >
+              <span>Пропустить пока</span>
+              <span className="rm-nav-button__icon rm-nav-button__icon--dark">↗</span>
+            </Button>
+          ) : null}
 
           <Button htmlType="submit" className="rm-nav-button rm-nav-button--primary">
             <span>Готово</span>

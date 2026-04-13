@@ -1,30 +1,18 @@
-import { useMemo, useState, type FormEvent } from 'react';
-import { Button, Input, Radio } from 'antd';
-import type { User } from '../../../entities/user';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { Button, Input, Radio, Typography } from 'antd';
+import type { HabitsErrors, HabitsFormValue } from './types';
 import '../onboarding-form.css';
+import { formatQuietInterval, parseQuietInterval } from './lib/quietInterval';
+import { DEFAULT_HABITS_FORM_VALUE } from './constants';
 
-export type HabitsFormValue = {
-  sleepSchedule: User['habits']['sleepSchedule'] | '';
-  cleanliness: User['habits']['cleanliness'] | '';
-  noiseLevel: User['habits']['noiseLevel'] | '';
-  guestFrequency: User['habits']['guestFrequency'] | '';
-  smokingPreference: User['habits']['smokingPreference'] | '';
-  alcoholPreference: User['habits']['alcoholPreference'] | '';
-  roomOrderPreference: User['habits']['roomOrderPreference'] | '';
-  petPreference: User['habits']['petPreference'] | '';
-  hasQuietHours: boolean;
-  quietFrom: string;
-  quietTo: string;
-  isSmokingAllowed: boolean;
-  hasPets: boolean;
-};
-
-type HabitsErrors = Partial<Record<keyof HabitsFormValue, string>>;
+const { Title } = Typography;
 
 type EditHabitsProps = {
   initialValue?: Partial<HabitsFormValue>;
   onBack?: () => void;
   onNext: (value: HabitsFormValue) => void;
+  onChange?: (value: HabitsFormValue) => void;
+  onSkip?: () => void;
   formId?: string;
   hideHeader?: boolean;
   hideActions?: boolean;
@@ -35,43 +23,6 @@ type HabitPillProps = {
   label: string;
   compact?: boolean;
 };
-
-const defaultValue: HabitsFormValue = {
-  sleepSchedule: '',
-  cleanliness: '',
-  noiseLevel: '',
-  guestFrequency: '',
-  smokingPreference: '',
-  alcoholPreference: '',
-  roomOrderPreference: '',
-  petPreference: '',
-  hasQuietHours: true,
-  quietFrom: '',
-  quietTo: '',
-  isSmokingAllowed: false,
-  hasPets: false,
-};
-
-function formatQuietInterval(from: string, to: string) {
-  if (!from && !to) {
-    return '';
-  }
-
-  return `${from} — ${to}`;
-}
-
-function parseQuietInterval(value: string) {
-  const match = value.match(/(\d{1,2}:\d{2}).*?(\d{1,2}:\d{2})/);
-
-  if (!match) {
-    return null;
-  }
-
-  return {
-    from: match[1],
-    to: match[2],
-  };
-}
 
 function HabitPill({ value, label, compact = false }: HabitPillProps) {
   return (
@@ -91,17 +42,30 @@ export function EditHabits({
   initialValue,
   onBack,
   onNext,
+  onChange,
+  onSkip,
   formId,
   hideHeader = false,
   hideActions = false,
 }: EditHabitsProps) {
-  const mergedInitialValue = useMemo(() => ({ ...defaultValue, ...initialValue }), [initialValue]);
+  const mergedInitialValue = useMemo(
+    () => ({ ...DEFAULT_HABITS_FORM_VALUE, ...initialValue }),
+    [initialValue]
+  );
 
   const [formValue, setFormValue] = useState<HabitsFormValue>(mergedInitialValue);
   const [errors, setErrors] = useState<HabitsErrors>({});
   const [quietInterval, setQuietInterval] = useState(
-    formatQuietInterval(mergedInitialValue.quietFrom, mergedInitialValue.quietTo)
+    mergedInitialValue.quietIntervalDraft ||
+      formatQuietInterval(mergedInitialValue.quietFrom, mergedInitialValue.quietTo)
   );
+
+  useEffect(() => {
+    onChange?.({
+      ...formValue,
+      quietIntervalDraft: quietInterval,
+    });
+  }, [formValue, quietInterval, onChange]);
 
   const selectedCount = [
     formValue.sleepSchedule,
@@ -191,8 +155,14 @@ export function EditHabits({
           ...formValue,
           quietFrom: parsedInterval.from,
           quietTo: parsedInterval.to,
+          quietIntervalDraft: quietInterval,
         }
-      : formValue;
+      : {
+          ...formValue,
+          quietFrom: '',
+          quietTo: '',
+          quietIntervalDraft: quietInterval,
+        };
 
     const nextErrors = validate(nextValue, quietInterval);
     setErrors(nextErrors);
@@ -214,7 +184,9 @@ export function EditHabits({
       {!hideHeader ? (
         <div className="onboarding-feature-copy">
           <p className="onboarding-feature-eyebrow">Шаг 2</p>
-          <h3 className="onboarding-feature-title">Привычки</h3>
+          <Title level={3} className="onboarding-feature-title">
+            Привычки
+          </Title>
           <p className="onboarding-feature-description">
             Ритм жизни, бытовые привычки и общие условия совместного проживания.
           </p>
@@ -223,7 +195,9 @@ export function EditHabits({
 
       {isStepEmpty ? (
         <div className="onboarding-form-state">
-          <h4 className="onboarding-form-state__title">Шаг ещё пустой</h4>
+          <Title level={4} className="onboarding-form-state__title">
+            Шаг ещё пустой
+          </Title>
           <p className="onboarding-form-state__text">
             Выбери бытовые привычки, чтобы анкета была совместимой по ритму жизни.
           </p>
@@ -232,7 +206,9 @@ export function EditHabits({
 
       {isStepIncomplete ? (
         <div className="onboarding-form-state onboarding-form-state--warning">
-          <h4 className="onboarding-form-state__title">Не все привычки заполнены</h4>
+          <Title level={4} className="onboarding-form-state__title">
+            Не все привычки заполнены
+          </Title>
           <p className="onboarding-form-state__text">
             На этом шаге лучше выбрать все ключевые параметры: сон, курение, алкоголь, гости и
             порядок.
@@ -241,7 +217,9 @@ export function EditHabits({
       ) : null}
 
       <section className="step-2-group">
-        <h4 className="step-2-group__title">Режим</h4>
+        <Title level={4} className="step-2-group__title">
+          Режим
+        </Title>
         <Radio.Group
           className="step-2-pills step-2-pills--sleep"
           value={formValue.sleepSchedule}
@@ -256,7 +234,9 @@ export function EditHabits({
       </section>
 
       <section className="step-2-group">
-        <h4 className="step-2-group__title">Курение</h4>
+        <Title level={4} className="step-2-group__title">
+          Курение
+        </Title>
         <Radio.Group
           className="step-2-pills step-2-pills--smoking"
           value={formValue.smokingPreference}
@@ -274,7 +254,9 @@ export function EditHabits({
       </section>
 
       <section className="step-2-group">
-        <h4 className="step-2-group__title">Алкоголь</h4>
+        <Title level={4} className="step-2-group__title">
+          Алкоголь
+        </Title>
         <Radio.Group
           className="step-2-pills step-2-pills--smoking"
           value={formValue.alcoholPreference}
@@ -291,7 +273,9 @@ export function EditHabits({
       </section>
 
       <section className="step-2-group">
-        <h4 className="step-2-group__title">Шум / Чистота / Гости</h4>
+        <Title level={4} className="step-2-group__title">
+          Шум / Чистота / Гости
+        </Title>
 
         <div className="step-2-inline-list">
           <div className="step-2-inline-row">
@@ -343,7 +327,9 @@ export function EditHabits({
       </section>
 
       <section className="step-2-group">
-        <h4 className="step-2-group__title">Порядок в комнате</h4>
+        <Title level={4} className="step-2-group__title">
+          Порядок в комнате
+        </Title>
         <Radio.Group
           className="step-2-pills step-2-pills--pets"
           value={formValue.roomOrderPreference}
@@ -359,7 +345,9 @@ export function EditHabits({
       </section>
 
       <section className="step-2-group">
-        <h4 className="step-2-group__title">Животные</h4>
+        <Title level={4} className="step-2-group__title">
+          Животные
+        </Title>
         <Radio.Group
           className="step-2-pills step-2-pills--pets"
           value={formValue.petPreference}
@@ -376,13 +364,19 @@ export function EditHabits({
       </section>
 
       <section className="step-2-group">
-        <h4 className="step-2-group__title">Тихие часы</h4>
+        <Title level={4} className="step-2-group__title">
+          Тихие часы
+        </Title>
         <label className="step-2-interval-field">
           <span className="step-2-inline-label">Интервал</span>
           <Input
             className="step-2-interval-input"
             value={quietInterval}
-            onChange={(event) => setQuietInterval(event.target.value)}
+            onChange={(event) => {
+              const nextInterval = event.target.value;
+              setQuietInterval(nextInterval);
+              setField('quietIntervalDraft', nextInterval);
+            }}
             placeholder="23:00 — 08:00"
             autoComplete="off"
           />
@@ -391,7 +385,7 @@ export function EditHabits({
       </section>
 
       {!hideActions ? (
-        <div className="onboarding-feature-actions onboarding-page__actions--step-2">
+        <div className="onboarding-feature-actions step-2-actions">
           <Button
             htmlType="button"
             className="rm-nav-button rm-nav-button--ghost"
@@ -401,6 +395,17 @@ export function EditHabits({
             <span>Назад</span>
             <span className="rm-nav-button__icon rm-nav-button__icon--dark">↗</span>
           </Button>
+
+          {onSkip ? (
+            <Button
+              htmlType="button"
+              className="rm-nav-button rm-nav-button--ghost"
+              onClick={onSkip}
+            >
+              <span>Пропустить пока</span>
+              <span className="rm-nav-button__icon rm-nav-button__icon--dark">↗</span>
+            </Button>
+          ) : null}
 
           <Button htmlType="submit" className="rm-nav-button rm-nav-button--primary">
             <span>Далее</span>

@@ -82,5 +82,6 @@ export function saveOnboardingState(state: PersistedOnboardingState) {
   try {
     window.localStorage.setItem(ONBOARDING_STORAGE_KEY, JSON.stringify(state));
   } catch {
+    // localStorage может быть недоступен, в этом случае просто не сохраняем состояние
   }
 }

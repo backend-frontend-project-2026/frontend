@@ -4,8 +4,10 @@ export type DiscoverActionState = {
   superLikedUserIds: string[];
 };
 
-export const initialDiscoverActionState: DiscoverActionState = {
+export const INITIAL_DISCOVER_ACTION_STATE: DiscoverActionState = {
   dismissedUserIds: [],
   likedUserIds: [],
   superLikedUserIds: [],
 };
+
+export const initialDiscoverActionState = INITIAL_DISCOVER_ACTION_STATE;

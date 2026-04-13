@@ -1,64 +1,87 @@
-import { useCallback, useMemo, useState, type PropsWithChildren } from 'react';
+import { useCallback, useEffect, useMemo, useState, type PropsWithChildren } from 'react';
 import type {
-  BasicInfoFormValue,
-  HabitsFormValue,
-  InterestsFormValue,
-  LivingPreferencesFormValue,
+    BasicInfoFormValue,
+    HabitsFormValue,
+    InterestsFormValue,
+    LivingPreferencesFormValue,
 } from '@/features/onboarding';
 import { OnboardingContext } from './onboarding-context';
-import type { OnboardingContextValue, OnboardingDraft } from './types';
-import { INITIAL_ONBOARDING_DRAFT } from './constants';
+import type { OnboardingContextValue, OnboardingDraft, OnboardingStatus, OnboardingStep } from './types';
+import { loadOnboardingState, saveOnboardingState } from './lib/onboardingStorage';
 
 export function OnboardingProvider({ children }: PropsWithChildren) {
-  const [draft, setDraft] = useState<OnboardingDraft>(INITIAL_ONBOARDING_DRAFT);
-  const [completed, setCompleted] = useState(false);
+    const [persistedState] = useState(() => loadOnboardingState());
+    const [draft, setDraft] = useState<OnboardingDraft>(persistedState.draft);
+    const [status, setStatus] = useState<OnboardingStatus>(persistedState.status);
+    const [currentStep, setCurrentStepState] = useState<OnboardingStep>(persistedState.currentStep);
 
-  const updateBasicInfo = useCallback((value: BasicInfoFormValue) => {
-    setDraft((current) => ({ ...current, basicInfo: value }));
-  }, []);
+    useEffect(() => {
+        saveOnboardingState({
+            status,
+            currentStep,
+            draft,
+        });
+    }, [status, currentStep, draft]);
 
-  const updateHabits = useCallback((value: HabitsFormValue) => {
-    setDraft((current) => ({ ...current, habits: value }));
-  }, []);
+    const setCurrentStep = useCallback((step: OnboardingStep) => {
+        setCurrentStepState(step);
+    }, []);
 
-  const updateLiving = useCallback((value: LivingPreferencesFormValue) => {
-    setDraft((current) => ({ ...current, living: value }));
-  }, []);
+    const updateBasicInfo = useCallback((value: BasicInfoFormValue) => {
+        setDraft((current) => ({ ...current, basicInfo: value }));
+    }, []);
 
-  const updateInterests = useCallback((value: InterestsFormValue) => {
-    setDraft((current) => ({ ...current, interests: value }));
-  }, []);
+    const updateHabits = useCallback((value: HabitsFormValue) => {
+        setDraft((current) => ({ ...current, habits: value }));
+    }, []);
 
-  const finishOnboarding = useCallback(() => {
-    setCompleted(true);
-  }, []);
+    const updateLiving = useCallback((value: LivingPreferencesFormValue) => {
+        setDraft((current) => ({ ...current, living: value }));
+    }, []);
 
-  const skipOnboarding = useCallback(() => {
-    setCompleted(true);
-  }, []);
+    const updateInterests = useCallback((value: InterestsFormValue) => {
+        setDraft((current) => ({ ...current, interests: value }));
+    }, []);
 
-  const value = useMemo<OnboardingContextValue>(
-    () => ({
-      completed,
-      draft,
-      updateBasicInfo,
-      updateHabits,
-      updateLiving,
-      updateInterests,
-      finishOnboarding,
-      skipOnboarding,
-    }),
-    [
-      completed,
-      draft,
-      updateBasicInfo,
-      updateHabits,
-      updateLiving,
-      updateInterests,
-      finishOnboarding,
-      skipOnboarding,
-    ]
-  );
+    const finishOnboarding = useCallback(() => {
+        setStatus('completed');
+        setCurrentStepState(4);
+    }, []);
 
-  return <OnboardingContext.Provider value={value}>{children}</OnboardingContext.Provider>;
+    const skipOnboarding = useCallback(() => {
+        setStatus('skipped');
+    }, []);
+
+    const completed = status === 'completed';
+
+    const value = useMemo<OnboardingContextValue>(
+      () => ({
+          status,
+          completed,
+          currentStep,
+          draft,
+          setCurrentStep,
+          updateBasicInfo,
+          updateHabits,
+          updateLiving,
+          updateInterests,
+          finishOnboarding,
+          skipOnboarding,
+      }),
+      [
+          status,
+          completed,
+          currentStep,
+          draft,
+          setCurrentStep,
+          updateBasicInfo,
+          updateHabits,
+          updateLiving,
+          updateInterests,
+          finishOnboarding,
+          skipOnboarding,
+      ]
+    );
+
+    return <OnboardingContext.Provider value={value}>{children}</OnboardingContext.Provider>;
 }

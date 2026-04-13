@@ -41,6 +41,7 @@ const VerifyCodePage = () => {
       // TODO: заменить на API когда бэкенд добавит эндпоинт
       await new Promise((resolve) => setTimeout(resolve, 1000));
       message.success('Код отправлен повторно');
+      setCode('');
       setSeconds(60);
       setIsRunning(true);
     } catch {
@@ -94,7 +95,7 @@ const VerifyCodePage = () => {
             >
               Отправить ещё раз{seconds > 0 ? ` (${seconds}с)` : ''}
             </Button>
-            <Link to={RoutePaths.AUTH}>Изменить почту</Link>
+            <Link to={RoutePaths.LOGIN}>Изменить почту</Link>
           </div>
         </Card>
       </div>

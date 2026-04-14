@@ -5,6 +5,7 @@ import RoundedButton from '@/shared/ui/RoundedButton/RoundedButton';
 import { RoutePaths } from '@/app/router/routePaths';
 import shared from '@/shared/styles/auth.shared.module.css';
 import styles from './VerifyEmailPage.module.css';
+import { useCountdown } from '@/shared/hooks/useCountdown';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -13,7 +14,8 @@ const VerifyEmailPage = () => {
   const email = location.state?.email ?? 'your@email.com';
 
   const [resending, setResending] = useState(false);
-  const [cooldown, setCooldown] = useState(0);
+
+  const { seconds: cooldown, start } = useCountdown(60);
 
   const handleResend = async () => {
     if (cooldown > 0) return;
@@ -24,16 +26,7 @@ const VerifyEmailPage = () => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       message.success('Письмо отправлено повторно');
 
-      setCooldown(60);
-      const interval = setInterval(() => {
-        setCooldown((prev) => {
-          if (prev <= 1) {
-            clearInterval(interval);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
+      start();
     } catch {
       message.error('Не удалось отправить письмо');
     } finally {

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styles from './ChatPage.module.css';
 import { Input, Button } from 'antd';
+import { RoutePaths } from '@/app/router/routePaths';
 
 type Message = {
   id: number;
@@ -41,9 +42,6 @@ const ChatsPage = () => {
 
   const activeChatId = Number(id);
   const activeChat = chats.find((c) => c.id === activeChatId);
-  if (!activeChat) {
-    return <div>Чат не найден</div>;
-  }
 
   const sendMessage = () => {
     if (!input.trim() || !activeChat) return;
@@ -75,7 +73,7 @@ const ChatsPage = () => {
             <div
               key={chat.id}
               className={`${styles.chatItem} ${chat.id === activeChatId ? styles.active : ''}`}
-              onClick={() => navigate(`/chat/${chat.id}`)}
+              onClick={() => navigate(`${RoutePaths.CHATS}/${chat.id}`)}
             >
               <div className={styles.chatItem__avatar} />
               <div>

@@ -4,11 +4,11 @@ import type { DiscoverContextValue } from './types';
 export const DiscoverContext = createContext<DiscoverContextValue | null>(null);
 
 export function useDiscoverFlow() {
-    const context = useContext(DiscoverContext);
+  const context = useContext(DiscoverContext);
 
-    if (!context) {
-        throw new Error('useDiscoverFlow must be used inside DiscoverProvider');
-    }
+  if (!context) {
+    throw new Error('useDiscoverFlow must be used inside DiscoverProvider');
+  }
 
-    return context;
+  return context;
 }

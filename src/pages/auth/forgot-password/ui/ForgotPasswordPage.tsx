@@ -24,9 +24,7 @@ const ForgotPasswordPage = () => {
       <div className={shared.left}>
         <Card variant="outlined">
           <Title level={2}>Восстановление пароля</Title>
-          <Paragraph type="secondary">
-            Введи почту — отправим ссылку для сброса.
-          </Paragraph>
+          <Paragraph type="secondary">Введи почту — отправим ссылку для сброса.</Paragraph>
 
           <Form form={form} onFinish={handleSubmit} layout="vertical" requiredMark={false}>
             <Form.Item

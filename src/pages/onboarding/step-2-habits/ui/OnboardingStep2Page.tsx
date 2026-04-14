@@ -20,14 +20,11 @@ export function OnboardingStep2Page({
   onSkip,
   onNext,
 }: OnboardingStep2PageProps) {
-  const formKey = JSON.stringify(value ?? {});
-
   return (
     <section className="onboarding-page onboarding-page--step-2">
       <OnboardingProgress currentStep={2} />
 
       <EditHabits
-        key={formKey}
         formId={FORM_ID}
         initialValue={value}
         onBack={onBack}

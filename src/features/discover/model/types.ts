@@ -9,5 +9,3 @@ export const INITIAL_DISCOVER_ACTION_STATE: DiscoverActionState = {
   likedUserIds: [],
   superLikedUserIds: [],
 };
-
-export const initialDiscoverActionState = INITIAL_DISCOVER_ACTION_STATE;

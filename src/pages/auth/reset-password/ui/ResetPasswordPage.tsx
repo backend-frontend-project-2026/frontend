@@ -38,11 +38,7 @@ const ResetPasswordPage = () => {
                 { min: 8, message: 'Минимум 8 символов' },
               ]}
             >
-              <Input.Password
-                placeholder="Новый пароль"
-                className={styles.input}
-                size="large"
-              />
+              <Input.Password placeholder="Новый пароль" className={styles.input} size="large" />
             </Form.Item>
 
             <Form.Item
@@ -60,11 +56,7 @@ const ResetPasswordPage = () => {
                 }),
               ]}
             >
-              <Input.Password
-                placeholder="Повтори пароль"
-                className={styles.input}
-                size="large"
-              />
+              <Input.Password placeholder="Повтори пароль" className={styles.input} size="large" />
             </Form.Item>
           </div>
 

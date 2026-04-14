@@ -55,8 +55,7 @@ const LandingPage = () => {
 
           {/* Мобильный подзаголовок */}
           <p className={styles.mobileSubtitle}>
-            Внутренний Tinder для студентов: анкета, фильтры,
-            лайки и чат. Без лишнего шума.
+            Внутренний Tinder для студентов: анкета, фильтры, лайки и чат. Без лишнего шума.
           </p>
 
           {/* Бейджи — только десктоп */}
@@ -84,9 +83,7 @@ const LandingPage = () => {
                     width: 8,
                     height: 8,
                     borderRadius: '50%',
-                    background: active
-                      ? 'var(--color-success)'
-                      : 'var(--color-text-secondary)',
+                    background: active ? 'var(--color-success)' : 'var(--color-text-secondary)',
                     display: 'inline-block',
                     flexShrink: 0,
                   }}
@@ -164,8 +161,7 @@ const LandingPage = () => {
         <div className={styles.safetyBlock}>
           <p className={styles.safetyTitle}>Безопасность</p>
           <p className={styles.safetyText}>
-            Пожаловаться • Заблокировать • Настроить тихие часы
-            • Скрыть контакты до мэтча
+            Пожаловаться • Заблокировать • Настроить тихие часы • Скрыть контакты до мэтча
           </p>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Card, Typography } from 'antd';
+import { useNavigate, Link } from 'react-router-dom';
+import { Card, Typography, Button, message } from 'antd';
 import OTPInput from '@/shared/ui/OTPInput/OTPInput';
 import RoundedButton from '@/shared/ui/RoundedButton/RoundedButton';
 import { RoutePaths } from '@/app/router/routePaths';
@@ -14,6 +14,8 @@ const VerifyCodePage = () => {
   const [code, setCode] = useState('');
   const [seconds, setSeconds] = useState(60);
   const [isRunning, setIsRunning] = useState(true);
+  const [resending, setResending] = useState(false);
+  const [verifying, setVerifying] = useState(false);
 
   useEffect(() => {
     if (!isRunning) return;
@@ -31,10 +33,36 @@ const VerifyCodePage = () => {
     return () => clearInterval(timer);
   }, [isRunning]);
 
-  const handleResend = () => {
+  const handleResend = async () => {
     if (seconds > 0) return;
-    setSeconds(60);
-    setIsRunning(true);
+
+    try {
+      setResending(true);
+      // TODO: заменить на API когда бэкенд добавит эндпоинт
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      message.success('Код отправлен повторно');
+      setCode('');
+      setSeconds(60);
+      setIsRunning(true);
+    } catch {
+      message.error('Не удалось отправить код');
+    } finally {
+      setResending(false);
+    }
+  };
+
+  const handleVerify = async () => {
+    try {
+      setVerifying(true);
+      // TODO: заменить на API когда бэкенд добавит эндпоинт
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      message.success('Email подтверждён');
+      navigate(RoutePaths.ONBOARDING);
+    } catch {
+      message.error('Неверный код. Попробуйте ещё раз');
+    } finally {
+      setVerifying(false);
+    }
   };
 
   return (
@@ -51,16 +79,23 @@ const VerifyCodePage = () => {
             block
             size="large"
             disabled={code.length < 6}
+            loading={verifying}
+            onClick={handleVerify}
             className={styles.submitButton}
           >
             Подтвердить
           </RoundedButton>
 
           <div className={shared.linkRow}>
-            <span className={seconds > 0 ? shared.disabled : ''} onClick={handleResend}>
+            <Button
+              type="link"
+              disabled={seconds > 0 || resending}
+              onClick={handleResend}
+              style={{ padding: 0 }}
+            >
               Отправить ещё раз{seconds > 0 ? ` (${seconds}с)` : ''}
-            </span>
-            <span onClick={() => navigate(RoutePaths.AUTH)}>Изменить почту</span>
+            </Button>
+            <Link to={RoutePaths.LOGIN}>Изменить почту</Link>
           </div>
         </Card>
       </div>

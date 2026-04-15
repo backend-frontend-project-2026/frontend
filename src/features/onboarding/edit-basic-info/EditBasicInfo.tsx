@@ -1,65 +1,39 @@
 import { useEffect, useMemo, useState, type FormEvent, useRef } from 'react';
-import { Button, Input, Radio, Upload, type RadioChangeEvent } from 'antd';
-import type { User } from '../../../entities/user';
+import { Button, Input, Radio, Typography, Upload, type RadioChangeEvent } from 'antd';
+import type { BasicInfoErrors, BasicInfoFormValue } from './types';
 import './edit-basic-info.css';
+import { DEFAULT_BASIC_INFO_FORM_VALUE } from './constants';
+import { readFileAsDataUrl, revokeObjectUrl } from './lib/basicInfoHelpers';
 
-export type BasicInfoFormValue = {
-  name: string;
-  age: string;
-  gender: User['gender'] | '';
-  university: string;
-  faculty: string;
-  course: string;
-  location: string;
-  bio: string;
-  avatar: string;
-  photos: string[];
-};
 const { TextArea } = Input;
-
-type BasicInfoErrors = Partial<Record<keyof BasicInfoFormValue, string>>;
+const { Title } = Typography;
 
 type EditBasicInfoProps = {
   initialValue?: Partial<BasicInfoFormValue>;
   onBack?: () => void;
   onNext: (value: BasicInfoFormValue) => void;
+  onChange?: (value: BasicInfoFormValue) => void;
+  onSkip?: () => void;
   formId?: string;
   hideHeader?: boolean;
   hideActions?: boolean;
 };
 
-const defaultValue: BasicInfoFormValue = {
-  name: '',
-  age: '',
-  gender: '',
-  university: '',
-  faculty: '',
-  course: '',
-  location: '',
-  bio: '',
-  avatar: '',
-  photos: [],
-};
-
-function revokeObjectUrl(url: string) {
-  if (url.startsWith('blob:')) {
-    URL.revokeObjectURL(url);
-  }
-}
-
 export function EditBasicInfo({
   initialValue,
   onBack,
   onNext,
+  onChange,
+  onSkip,
   formId,
   hideHeader = false,
   hideActions = false,
 }: EditBasicInfoProps) {
   const mergedInitialValue = useMemo(
     () => ({
-      ...defaultValue,
+      ...DEFAULT_BASIC_INFO_FORM_VALUE,
       ...initialValue,
-      photos: initialValue?.photos ?? defaultValue.photos,
+      photos: initialValue?.photos ?? DEFAULT_BASIC_INFO_FORM_VALUE.photos,
     }),
     [initialValue]
   );
@@ -79,6 +53,9 @@ export function EditBasicInfo({
       objectUrlsRef.current.forEach(revokeObjectUrl);
     };
   }, []);
+  useEffect(() => {
+    onChange?.(formValue);
+  }, [formValue, onChange]);
 
   const filledMainFields = [
     formValue.name,
@@ -163,6 +140,10 @@ export function EditBasicInfo({
       nextErrors.bio = 'Био должно быть хотя бы 12 символов.';
     }
 
+    if (!value.avatar.trim() && value.photos.length === 0) {
+      nextErrors.avatar = 'Добавь хотя бы одно фото.';
+    }
+
     return nextErrors;
   }
 
@@ -200,21 +181,27 @@ export function EditBasicInfo({
       {!hideHeader ? (
         <div className="rm-form-head">
           <p className="rm-form-step">Шаг 1</p>
-          <h3 className="rm-form-title">Профиль</h3>
+          <Title level={3} className="rm-form-title">
+            Профиль
+          </Title>
           <p className="rm-form-description">Базовая информация для анкеты и discover.</p>
         </div>
       ) : null}
 
       {isStepEmpty ? (
         <div className="onboarding-form-state">
-          <h4 className="onboarding-form-state__title">Черновик пока пустой</h4>
+          <Title level={4} className="onboarding-form-state__title">
+            Черновик пока пустой
+          </Title>
           <p className="onboarding-form-state__text">Добавь имя, пол, вуз и хотя бы одно фото.</p>
         </div>
       ) : null}
 
       {isStepIncomplete ? (
         <div className="onboarding-form-state onboarding-form-state--warning">
-          <h4 className="onboarding-form-state__title">Анкета заполнена не до конца</h4>
+          <Title level={4} className="onboarding-form-state__title">
+            Анкета заполнена не до конца
+          </Title>
           <p className="onboarding-form-state__text">
             На этом шаге ещё не хватает части базовой информации или фото для профиля.
           </p>
@@ -223,7 +210,9 @@ export function EditBasicInfo({
 
       <section className="rm-form-section">
         <div className="rm-form-section__head">
-          <h4 className="rm-form-section__title">Пол</h4>
+          <Title level={4} className="rm-form-section__title">
+            Пол
+          </Title>
           <p className="rm-form-helper">Нужен для анкеты и фильтров</p>
         </div>
 
@@ -339,20 +328,27 @@ export function EditBasicInfo({
 
       <section className="rm-form-section">
         <div className="rm-form-section__head">
-          <h4 className="rm-form-section__title">Фото</h4>
+          <Title level={4} className="rm-form-section__title">
+            Фото
+          </Title>
           <p className="rm-form-helper">Аватар и дополнительные фото для профиля</p>
         </div>
+
+        {errors.avatar ? <small className="rm-form-error">{errors.avatar}</small> : null}
 
         <div className="rm-form-upload-row">
           <Upload
             accept="image/*"
             showUploadList={false}
             beforeUpload={(file) => {
-              if (formValue.avatar) {
-                revokeObjectUrl(formValue.avatar);
-              }
+              void readFileAsDataUrl(file).then((nextAvatar) => {
+                if (formValue.avatar) {
+                  revokeObjectUrl(formValue.avatar);
+                }
 
-              setField('avatar', URL.createObjectURL(file));
+                setField('avatar', nextAvatar);
+              });
+
               return false;
             }}
           >
@@ -366,20 +362,19 @@ export function EditBasicInfo({
             multiple
             showUploadList={false}
             beforeUpload={(file) => {
-              const nextPhoto = URL.createObjectURL(file);
+              void readFileAsDataUrl(file).then((nextPhoto) => {
+                setFormValue((current) => {
+                  const remainingSlots = Math.max(0, 6 - current.photos.length);
 
-              setFormValue((current) => {
-                const remainingSlots = Math.max(0, 6 - current.photos.length);
+                  if (remainingSlots === 0) {
+                    return current;
+                  }
 
-                if (remainingSlots === 0) {
-                  revokeObjectUrl(nextPhoto);
-                  return current;
-                }
-
-                return {
-                  ...current,
-                  photos: [...current.photos, nextPhoto].slice(0, 6),
-                };
+                  return {
+                    ...current,
+                    photos: [...current.photos, nextPhoto].slice(0, 6),
+                  };
+                });
               });
 
               return false;
@@ -456,6 +451,17 @@ export function EditBasicInfo({
             <span>Назад</span>
             <span className="rm-nav-button__icon rm-nav-button__icon--dark">↗</span>
           </Button>
+
+          {onSkip ? (
+            <Button
+              htmlType="button"
+              className="rm-nav-button rm-nav-button--ghost"
+              onClick={onSkip}
+            >
+              <span>Пропустить пока</span>
+              <span className="rm-nav-button__icon rm-nav-button__icon--dark">↗</span>
+            </Button>
+          ) : null}
 
           <Button htmlType="submit" className="rm-nav-button rm-nav-button--primary">
             <span>Далее</span>

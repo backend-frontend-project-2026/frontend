@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState, type PropsWithChildren } from 'react';
+import { useCallback, useEffect, useMemo, useState, type PropsWithChildren } from 'react';
 import type {
   BasicInfoFormValue,
   HabitsFormValue,
@@ -7,12 +7,37 @@ import type {
 } from '@/features/onboarding';
 import { setOnboardingCompleted, isOnboardingCompleted } from '@/shared/api/auth/session';
 import { OnboardingContext } from './onboarding-context';
-import type { OnboardingContextValue, OnboardingDraft } from './types';
-import { INITIAL_ONBOARDING_DRAFT } from './constants';
+import type {
+  OnboardingContextValue,
+  OnboardingDraft,
+  OnboardingStatus,
+  OnboardingStep,
+} from './types';
+import { loadOnboardingState, saveOnboardingState } from './lib/onboardingStorage';
 
 export function OnboardingProvider({ children }: PropsWithChildren) {
-  const [draft, setDraft] = useState<OnboardingDraft>(INITIAL_ONBOARDING_DRAFT);
-  const [completed, setCompleted] = useState(isOnboardingCompleted);
+  const [persistedState] = useState(() => loadOnboardingState());
+  const [draft, setDraft] = useState<OnboardingDraft>(persistedState.draft);
+  const [status, setStatus] = useState<OnboardingStatus>(() => {
+    if (persistedState.status !== 'in_progress') {
+      return persistedState.status;
+    }
+
+    return isOnboardingCompleted() ? 'completed' : persistedState.status;
+  });
+  const [currentStep, setCurrentStepState] = useState<OnboardingStep>(persistedState.currentStep);
+
+  useEffect(() => {
+    saveOnboardingState({
+      status,
+      currentStep,
+      draft,
+    });
+  }, [status, currentStep, draft]);
+
+  const setCurrentStep = useCallback((step: OnboardingStep) => {
+    setCurrentStepState(step);
+  }, []);
 
   const updateBasicInfo = useCallback((value: BasicInfoFormValue) => {
     setDraft((current) => ({ ...current, basicInfo: value }));
@@ -32,18 +57,24 @@ export function OnboardingProvider({ children }: PropsWithChildren) {
 
   const finishOnboarding = useCallback(() => {
     setOnboardingCompleted();
-    setCompleted(true);
+    setStatus('completed');
+    setCurrentStepState(4);
   }, []);
 
   const skipOnboarding = useCallback(() => {
     setOnboardingCompleted();
-    setCompleted(true);
+    setStatus('skipped');
   }, []);
+
+  const completed = status !== 'in_progress';
 
   const value = useMemo<OnboardingContextValue>(
     () => ({
+      status,
       completed,
+      currentStep,
       draft,
+      setCurrentStep,
       updateBasicInfo,
       updateHabits,
       updateLiving,
@@ -52,8 +83,11 @@ export function OnboardingProvider({ children }: PropsWithChildren) {
       skipOnboarding,
     }),
     [
+      status,
       completed,
+      currentStep,
       draft,
+      setCurrentStep,
       updateBasicInfo,
       updateHabits,
       updateLiving,

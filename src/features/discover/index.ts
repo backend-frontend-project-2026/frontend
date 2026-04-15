@@ -3,5 +3,5 @@ export { applyFiltersToUsers, createEmptyDiscoverFilters, hasActiveFilters } fro
 export { LikeProfileButton, likeProfile } from './like-profile';
 export { SkipProfileButton, skipProfile } from './skip-profile';
 export { SuperLikeProfileButton, superLikeProfile } from './superlike-profile';
-export { initialDiscoverActionState } from './model/types';
+export { INITIAL_DISCOVER_ACTION_STATE } from './model/types';
 export type { DiscoverActionState } from './model/types';

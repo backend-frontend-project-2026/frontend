@@ -1,5 +1,6 @@
-import { useNavigate, Link } from 'react-router-dom';
-import { Card, Typography, Input, Form } from 'antd';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Card, Typography, Input, Form, message } from 'antd';
 import RoundedButton from '@/shared/ui/RoundedButton/RoundedButton';
 import { RoutePaths } from '@/app/router/routePaths';
 import shared from '@/shared/styles/auth.shared.module.css';
@@ -12,44 +13,83 @@ interface FormValues {
 }
 
 const ForgotPasswordPage = () => {
-  const navigate = useNavigate();
   const [form] = Form.useForm<FormValues>();
+  const [loading, setLoading] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [submittedEmail, setSubmittedEmail] = useState('');
 
-  const handleSubmit = (values: FormValues) => {
-    navigate(RoutePaths.VERIFY_EMAIL, { state: { email: values.email } });
+  const handleSubmit = async (values: FormValues) => {
+    try {
+      setLoading(true);
+      // TODO: заменить на API когда бэкенд добавит эндпоинт
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      setSubmittedEmail(values.email);
+      setSent(true);
+    } catch {
+      message.error('Не удалось отправить письмо. Попробуйте позже.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className={shared.pageWrapper}>
       <div className={shared.left}>
-        <Card variant="outlined">
-          <Title level={2}>Восстановление пароля</Title>
-          <Paragraph type="secondary">Введи почту — отправим ссылку для сброса.</Paragraph>
+        {sent ? (
+          <Card variant="outlined">
+            <Title level={2}>Письмо отправлено</Title>
+            <Paragraph type="secondary">
+              Мы отправили ссылку для сброса пароля на {submittedEmail}.
+              <br />
+              Перейди по ней — ссылка действует 30 минут.
+            </Paragraph>
 
-          <Form form={form} onFinish={handleSubmit} layout="vertical" requiredMark={false}>
-            <Form.Item
-              name="email"
-              rules={[
-                { required: true, message: 'Введите почту' },
-                { type: 'email', message: 'Неверный формат почты' },
-              ]}
-            >
-              <Input placeholder="student@university.ru" className={styles.input} size="large" />
-            </Form.Item>
+            <div className={shared.hint}>Если письма нет — проверь «Спам».</div>
 
-            <Form.Item>
-              <RoundedButton htmlType="submit" block size="large">
-                Отправить
-              </RoundedButton>
-            </Form.Item>
-          </Form>
+            <RoundedButton block size="large" href="https://mail.google.com" target="_blank">
+              Открыть почту
+            </RoundedButton>
 
-          <div className={shared.linkRow}>
-            <Text type="secondary">
-              Вспомнил(а) пароль? <Link to={RoutePaths.AUTH}>Войти</Link>
-            </Text>
-          </div>
-        </Card>
+            <div className={shared.linkRow}>
+              <Text type="secondary">
+                Вспомнил(а) пароль? <Link to={RoutePaths.LOGIN}>Войти</Link>
+              </Text>
+            </div>
+          </Card>
+        ) : (
+          <Card variant="outlined">
+            <Title level={2}>Восстановление пароля</Title>
+            <Paragraph type="secondary">Введи почту — отправим ссылку для сброса.</Paragraph>
+
+            <Form form={form} onFinish={handleSubmit} layout="vertical" requiredMark={false}>
+              <Form.Item
+                name="email"
+                rules={[
+                  { required: true, message: 'Введите почту' },
+                  { type: 'email', message: 'Неверный формат почты' },
+                ]}
+              >
+                <Input
+                  placeholder="student@university.ru"
+                  className={styles.input}
+                  size="large"
+                />
+              </Form.Item>
+
+              <Form.Item>
+                <RoundedButton htmlType="submit" block size="large" loading={loading}>
+                  Отправить
+                </RoundedButton>
+              </Form.Item>
+            </Form>
+
+            <div className={shared.linkRow}>
+              <Text type="secondary">
+                Вспомнил(а) пароль? <Link to={RoutePaths.AUTH}>Войти</Link>
+              </Text>
+            </div>
+          </Card>
+        )}
       </div>
 
       <div className={shared.right}>

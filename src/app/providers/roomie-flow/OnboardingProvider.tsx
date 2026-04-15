@@ -5,6 +5,7 @@ import type {
   InterestsFormValue,
   LivingPreferencesFormValue,
 } from '@/features/onboarding';
+import { setOnboardingCompleted, isOnboardingCompleted } from '@/shared/api/auth/session';
 import { OnboardingContext } from './onboarding-context';
 import type {
   OnboardingContextValue,
@@ -17,7 +18,13 @@ import { loadOnboardingState, saveOnboardingState } from './lib/onboardingStorag
 export function OnboardingProvider({ children }: PropsWithChildren) {
   const [persistedState] = useState(() => loadOnboardingState());
   const [draft, setDraft] = useState<OnboardingDraft>(persistedState.draft);
-  const [status, setStatus] = useState<OnboardingStatus>(persistedState.status);
+  const [status, setStatus] = useState<OnboardingStatus>(() => {
+    if (persistedState.status !== 'in_progress') {
+      return persistedState.status;
+    }
+
+    return isOnboardingCompleted() ? 'completed' : persistedState.status;
+  });
   const [currentStep, setCurrentStepState] = useState<OnboardingStep>(persistedState.currentStep);
 
   useEffect(() => {
@@ -49,15 +56,17 @@ export function OnboardingProvider({ children }: PropsWithChildren) {
   }, []);
 
   const finishOnboarding = useCallback(() => {
+    setOnboardingCompleted();
     setStatus('completed');
     setCurrentStepState(4);
   }, []);
 
   const skipOnboarding = useCallback(() => {
+    setOnboardingCompleted();
     setStatus('skipped');
   }, []);
 
-  const completed = status === 'completed';
+  const completed = status !== 'in_progress';
 
   const value = useMemo<OnboardingContextValue>(
     () => ({

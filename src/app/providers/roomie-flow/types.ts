@@ -46,7 +46,7 @@ export type DiscoverContextValue = {
 };
 
 export type ProfileContextValue = {
-  profileUser: User;
+  profileUser: User | null;
   openProfile: (user: User) => void;
   selectProfileById: (userId?: string) => void;
   clearSelectedUser: () => void;

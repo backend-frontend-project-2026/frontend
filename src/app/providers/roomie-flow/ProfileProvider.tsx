@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState, type PropsWithChildren } from 'react';
-import { MOCK_DETAILED_USER, MOCK_DISCOVER_USERS, type User } from '@/entities/user';
+import { MOCK_DISCOVER_USERS, type User } from '@/entities/user';
 import { useDiscoverFlow } from './discover-context';
 import { ProfileContext } from './profile-context';
 import type { ProfileContextValue } from './types';
@@ -9,29 +9,28 @@ export function ProfileProvider({ children }: PropsWithChildren) {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   const profileUser = useMemo(
-    () => selectedUser ?? currentDiscoverUser ?? MOCK_DETAILED_USER,
-    [selectedUser, currentDiscoverUser]
+    () => selectedUser, [selectedUser]
   );
 
   const openProfile = useCallback((user: User) => {
-    setSelectedUser(user.id === MOCK_DETAILED_USER.id ? MOCK_DETAILED_USER : user);
+    setSelectedUser(user);
   }, []);
 
   const selectProfileById = useCallback(
     (userId?: string) => {
       if (!userId) {
-        setSelectedUser(currentDiscoverUser ?? MOCK_DETAILED_USER);
+        setSelectedUser(currentDiscoverUser ?? null);
         return;
       }
 
       const foundUser = MOCK_DISCOVER_USERS.find((user) => user.id === userId);
 
       if (!foundUser) {
-        setSelectedUser(currentDiscoverUser ?? MOCK_DETAILED_USER);
+        setSelectedUser(null); // ✅ честный not-found
         return;
       }
 
-      setSelectedUser(foundUser.id === MOCK_DETAILED_USER.id ? MOCK_DETAILED_USER : foundUser);
+      setSelectedUser(foundUser);
     },
     [currentDiscoverUser]
   );

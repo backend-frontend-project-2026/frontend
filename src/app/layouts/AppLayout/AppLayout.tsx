@@ -1,5 +1,4 @@
 import { Link, NavLink, Outlet } from 'react-router-dom';
-import { Input } from 'antd';
 import { RoutePaths } from '@/app/router/routePaths';
 import AppFooter from '@/shared/ui/AppFooter/AppFooter';
 import styles from './AppLayout.module.css';
@@ -33,7 +32,7 @@ const AppLayout = () => {
             ))}
           </nav>
           <div className={styles.actions}>
-            <Input placeholder="Поиск по мэтчам/чатам..." className={styles.search} />
+            {/* TODO: поиск реализован внутри ChatPage */}
             <div className={styles.avatar} />
           </div>
         </div>

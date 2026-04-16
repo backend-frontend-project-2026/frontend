@@ -371,8 +371,19 @@
 .onboarding-feature-actions,
 .rm-form-actions {
   display: flex;
-  gap: 10px;
+  flex-direction: column;
+  gap: 8px;
   margin-top: 2px;
+}
+
+.rm-actions-row {
+  display: flex;
+  gap: 10px;
+}
+
+.rm-nav-button--skip {
+  align-self: flex-start;
+  width: calc(50% - 5px);
 }
 
 .onboarding-primary-button,
@@ -533,6 +544,6 @@
 @media (width <= 720px) {
   .onboarding-feature-actions,
   .rm-form-actions {
-    flex-direction: row;
+    flex-direction: column;
   }
 }

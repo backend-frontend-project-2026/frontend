@@ -219,27 +219,33 @@ export function EditInterests({
       </label>
 
       {!hideActions ? (
-        <div className="step-4-inner-actions step-4-actions">
-          <Button htmlType="button" className="rm-nav-button rm-nav-button--ghost" onClick={onBack}>
-            <span>Назад</span>
-            <span className="rm-nav-button__icon rm-nav-button__icon--dark">↗</span>
-          </Button>
+        <div className="onboarding-feature-actions step-4-actions">
+          <div className="rm-actions-row">
+            <Button
+              htmlType="button"
+              className="rm-nav-button rm-nav-button--ghost"
+              onClick={onBack}
+            >
+              <span>Назад</span>
+              <span className="rm-nav-button__icon rm-nav-button__icon--dark">↗</span>
+            </Button>
+
+            <Button htmlType="submit" className="rm-nav-button rm-nav-button--primary">
+              <span>Готово</span>
+              <span className="rm-nav-button__icon rm-nav-button__icon--lime">↗</span>
+            </Button>
+          </div>
 
           {onSkip ? (
             <Button
               htmlType="button"
-              className="rm-nav-button rm-nav-button--ghost"
+              className="rm-nav-button rm-nav-button--ghost rm-nav-button--skip"
               onClick={onSkip}
             >
               <span>Пропустить пока</span>
               <span className="rm-nav-button__icon rm-nav-button__icon--dark">↗</span>
             </Button>
           ) : null}
-
-          <Button htmlType="submit" className="rm-nav-button rm-nav-button--primary">
-            <span>Готово</span>
-            <span className="rm-nav-button__icon rm-nav-button__icon--lime">↗</span>
-          </Button>
         </div>
       ) : null}
 

@@ -1,0 +1,133 @@
+.onboarding-page--summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 10px 8px;
+}
+
+.onboarding-summary-card {
+  gap: 14px;
+  padding: 10px;
+  border: 1px solid #d9dcdf;
+  border-radius: 18px;
+  background: rgb(252 252 252 / 90%);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.onboarding-summary-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #e0e1e4;
+  border-radius: 18px;
+  background: #fff;
+}
+
+.onboarding-summary-section__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.onboarding-summary-section__title {
+  margin: 0;
+  color: #17181b;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.onboarding-summary-section__text {
+  margin: 4px 0 0;
+  color: #8f8d92;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.onboarding-summary-edit,
+.onboarding-summary-edit.ant-btn,
+.onboarding-summary-edit.ant-btn:hover,
+.onboarding-summary-edit.ant-btn:focus,
+.onboarding-summary-edit.ant-btn:active {
+  flex: 0 0 auto;
+  min-height: 40px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: none !important;
+}
+
+.onboarding-summary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.onboarding-summary-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 8px;
+  border-top: 1px solid #f0f1f3;
+}
+
+.onboarding-summary-row:first-child {
+  padding-top: 0;
+  border-top: none;
+}
+
+.onboarding-summary-row__label {
+  color: #9a999e;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.onboarding-summary-row__value {
+  color: #202226;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.onboarding-summary-text {
+  white-space: pre-line;
+}
+
+.onboarding-summary-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.onboarding-summary-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: #d8f23e;
+  color: #222328;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.onboarding-summary-note {
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgb(216 242 62 / 20%);
+  color: #2b2c31;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.onboarding-summary-edit .rm-nav-button__icon {
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
+}

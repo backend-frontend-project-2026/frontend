@@ -1,7 +1,12 @@
-import { EditBasicInfo, type BasicInfoFormValue } from '../../../../features/onboarding';
+import {
+  EditBasicInfo,
+  isBasicInfoStepComplete,
+  type BasicInfoFormValue,
+} from '../../../../features/onboarding';
 import { OnboardingProgress } from '../../../../widgets/onboarding-progress';
 import '../../onboarding-pages.css';
 import './onboarding-step-1-page.css';
+import { useOnboardingLeaveGuard } from '../../lib/useOnboardingLeaveGuard';
 
 type OnboardingStep1PageProps = {
   value?: Partial<BasicInfoFormValue>;
@@ -20,6 +25,8 @@ export function OnboardingStep1Page({
   onSkip,
   onNext,
 }: OnboardingStep1PageProps) {
+  const shouldWarnOnLeave = !isBasicInfoStepComplete(value);
+  const confirmLeave = useOnboardingLeaveGuard(shouldWarnOnLeave);
   return (
     <section className="onboarding-page onboarding-page--step-1">
       <OnboardingProgress currentStep={1} />
@@ -27,9 +34,9 @@ export function OnboardingStep1Page({
       <EditBasicInfo
         formId={FORM_ID}
         initialValue={value}
-        onBack={onBack}
+        onBack={onBack ? () => confirmLeave(onBack) : undefined}
         onChange={onChange}
-        onSkip={onSkip}
+        onSkip={onSkip ? () => confirmLeave(onSkip) : undefined}
         onNext={onNext}
         hideHeader
         hideActions={false}

@@ -1,10 +1,12 @@
 import {
   EditLivingPreferences,
+  isLivingStepComplete,
   type LivingPreferencesFormValue,
 } from '../../../../features/onboarding';
 import { OnboardingProgress } from '../../../../widgets/onboarding-progress';
 import '../../onboarding-pages.css';
 import './onboarding-step-3-page.css';
+import { useOnboardingLeaveGuard } from '../../lib/useOnboardingLeaveGuard';
 
 type OnboardingStep3PageProps = {
   value?: Partial<LivingPreferencesFormValue>;
@@ -23,6 +25,8 @@ export function OnboardingStep3Page({
   onSkip,
   onNext,
 }: OnboardingStep3PageProps) {
+  const shouldWarnOnLeave = !isLivingStepComplete(value);
+  const confirmLeave = useOnboardingLeaveGuard(shouldWarnOnLeave);
   return (
     <section className="onboarding-page onboarding-page--step-3">
       <OnboardingProgress currentStep={3} />
@@ -30,9 +34,9 @@ export function OnboardingStep3Page({
       <EditLivingPreferences
         formId={FORM_ID}
         initialValue={value}
-        onBack={onBack}
+        onBack={() => confirmLeave(onBack)}
         onChange={onChange}
-        onSkip={onSkip}
+        onSkip={onSkip ? () => confirmLeave(onSkip) : undefined}
         onNext={onNext}
         hideHeader
         hideActions={false}

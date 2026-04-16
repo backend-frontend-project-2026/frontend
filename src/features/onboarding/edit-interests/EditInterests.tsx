@@ -237,7 +237,7 @@ export function EditInterests({
           ) : null}
 
           <Button htmlType="submit" className="rm-nav-button rm-nav-button--primary">
-            <span>Готово</span>
+            <span>Проверить анкету</span>
             <span className="rm-nav-button__icon rm-nav-button__icon--lime">↗</span>
           </Button>
         </div>

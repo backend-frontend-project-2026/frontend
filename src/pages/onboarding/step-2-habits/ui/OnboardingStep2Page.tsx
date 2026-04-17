@@ -1,7 +1,12 @@
-import { EditHabits, type HabitsFormValue } from '../../../../features/onboarding';
+import {
+  EditHabits,
+  isHabitsStepComplete,
+  type HabitsFormValue,
+} from '../../../../features/onboarding';
 import { OnboardingProgress } from '../../../../widgets/onboarding-progress';
 import '../../onboarding-pages.css';
 import './onboarding-step-2-page.css';
+import { useOnboardingLeaveGuard } from '../../lib/useOnboardingLeaveGuard';
 
 type OnboardingStep2PageProps = {
   value?: Partial<HabitsFormValue>;
@@ -20,6 +25,8 @@ export function OnboardingStep2Page({
   onSkip,
   onNext,
 }: OnboardingStep2PageProps) {
+  const shouldWarnOnLeave = !isHabitsStepComplete(value);
+  const confirmLeave = useOnboardingLeaveGuard(shouldWarnOnLeave);
   return (
     <section className="onboarding-page onboarding-page--step-2">
       <OnboardingProgress currentStep={2} />
@@ -27,9 +34,9 @@ export function OnboardingStep2Page({
       <EditHabits
         formId={FORM_ID}
         initialValue={value}
-        onBack={onBack}
+        onBack={() => confirmLeave(onBack)}
         onChange={onChange}
-        onSkip={onSkip}
+        onSkip={onSkip ? () => confirmLeave(onSkip) : undefined}
         onNext={onNext}
         hideHeader
         hideActions={false}

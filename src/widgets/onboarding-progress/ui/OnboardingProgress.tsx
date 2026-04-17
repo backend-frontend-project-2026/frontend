@@ -1,33 +1,29 @@
 import './onboarding-progress.css';
+import { Typography } from 'antd';
+import type { OnboardingProgressStep, OnboardingStepId } from '../types';
+import { DEFAULT_ONBOARDING_PROGRESS_STEPS } from '../constants';
 
-export type OnboardingStepId = 1 | 2 | 3 | 4;
-
-export type OnboardingProgressStep = {
-  id: OnboardingStepId;
-  label: string;
-};
+const { Title } = Typography;
 
 type OnboardingProgressProps = {
   currentStep: OnboardingStepId;
   steps?: OnboardingProgressStep[];
 };
 
-const defaultSteps: OnboardingProgressStep[] = [
-  { id: 1, label: 'Профиль' },
-  { id: 2, label: 'Привычки' },
-  { id: 3, label: 'Условия' },
-  { id: 4, label: 'Интересы' },
-];
-
-export function OnboardingProgress({ currentStep, steps = defaultSteps }: OnboardingProgressProps) {
+export function OnboardingProgress({
+  currentStep,
+  steps = DEFAULT_ONBOARDING_PROGRESS_STEPS,
+}: OnboardingProgressProps) {
   const currentLabel = steps.find((step) => step.id === currentStep)?.label ?? '';
-  const progressPercent = (currentStep / steps.length) * 100;
+  const progressFillClassName = `rm-progress__bar-fill rm-progress__bar-fill--step-${currentStep}`;
 
   return (
     <section className="rm-progress" aria-label="Прогресс онбординга">
       <div className="rm-progress__top">
         <div className="rm-progress__heading">
-          <h2 className="rm-progress__title">Онбординг</h2>
+          <Title level={2} className="rm-progress__title">
+            Онбординг
+          </Title>
           <span className="rm-progress__count">
             {currentStep}/{steps.length}
           </span>
@@ -39,7 +35,7 @@ export function OnboardingProgress({ currentStep, steps = defaultSteps }: Onboar
       </div>
 
       <div className="rm-progress__bar" aria-hidden="true">
-        <span className="rm-progress__bar-fill" style={{ width: `${progressPercent}%` }} />
+        <span className={progressFillClassName} />
       </div>
 
       <ol className="rm-progress__chips">

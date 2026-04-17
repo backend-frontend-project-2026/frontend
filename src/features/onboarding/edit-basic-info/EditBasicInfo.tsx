@@ -3,7 +3,7 @@ import { Button, Input, Radio, Typography, Upload, type RadioChangeEvent } from 
 import type { BasicInfoErrors, BasicInfoFormValue } from './types';
 import './edit-basic-info.css';
 import { DEFAULT_BASIC_INFO_FORM_VALUE } from './constants';
-import { readFileAsDataUrl, revokeObjectUrl } from './lib/basicInfoHelpers';
+import { readFileAsDataUrl, revokeObjectUrl, validateImageFile } from './lib/basicInfoHelpers';
 
 const { TextArea } = Input;
 const { Title } = Typography;
@@ -93,11 +93,33 @@ export function EditBasicInfo({
   }
 
   function clearAvatar() {
-    if (formValue.avatar) {
-      revokeObjectUrl(formValue.avatar);
-    }
+    setFormValue((current) => {
+      if (current.avatar) {
+        revokeObjectUrl(current.avatar);
+      }
 
-    setField('avatar', '');
+      return {
+        ...current,
+        avatar: '',
+      };
+    });
+
+    setErrors((current) => ({
+      ...current,
+      avatar: undefined,
+    }));
+  }
+
+  function setUploadError(message: string) {
+    setErrors((current) => ({ ...current, photos: message }));
+  }
+
+  function clearUploadErrors() {
+    setErrors((current) => ({
+      ...current,
+      avatar: undefined,
+      photos: undefined,
+    }));
   }
 
   function validate(value: BasicInfoFormValue) {
@@ -338,16 +360,29 @@ export function EditBasicInfo({
 
         <div className="rm-form-upload-row">
           <Upload
-            accept="image/*"
+            accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
             showUploadList={false}
             beforeUpload={(file) => {
-              void readFileAsDataUrl(file).then((nextAvatar) => {
-                if (formValue.avatar) {
-                  revokeObjectUrl(formValue.avatar);
-                }
+              const validationError = validateImageFile(file);
 
-                setField('avatar', nextAvatar);
-              });
+              if (validationError) {
+                setUploadError(validationError);
+                return false;
+              }
+
+              void readFileAsDataUrl(file)
+                .then((nextAvatar) => {
+                  clearUploadErrors();
+
+                  if (formValue.avatar) {
+                    revokeObjectUrl(formValue.avatar);
+                  }
+
+                  setField('avatar', nextAvatar);
+                })
+                .catch(() => {
+                  setUploadError('Не удалось прочитать изображение. Попробуй другой файл.');
+                });
 
               return false;
             }}
@@ -358,24 +393,37 @@ export function EditBasicInfo({
           </Upload>
 
           <Upload
-            accept="image/*"
+            accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
             multiple
             showUploadList={false}
             beforeUpload={(file) => {
-              void readFileAsDataUrl(file).then((nextPhoto) => {
-                setFormValue((current) => {
-                  const remainingSlots = Math.max(0, 6 - current.photos.length);
+              const validationError = validateImageFile(file);
 
-                  if (remainingSlots === 0) {
-                    return current;
-                  }
+              if (validationError) {
+                setUploadError(validationError);
+                return false;
+              }
 
-                  return {
-                    ...current,
-                    photos: [...current.photos, nextPhoto].slice(0, 6),
-                  };
+              void readFileAsDataUrl(file)
+                .then((nextPhoto) => {
+                  clearUploadErrors();
+
+                  setFormValue((current) => {
+                    const remainingSlots = Math.max(0, 6 - current.photos.length);
+
+                    if (remainingSlots === 0) {
+                      return current;
+                    }
+
+                    return {
+                      ...current,
+                      photos: [...current.photos, nextPhoto].slice(0, 6),
+                    };
+                  });
+                })
+                .catch(() => {
+                  setUploadError('Не удалось прочитать изображение. Попробуй другой файл.');
                 });
-              });
 
               return false;
             }}
@@ -388,6 +436,8 @@ export function EditBasicInfo({
             </Button>
           </Upload>
         </div>
+
+        {errors.photos ? <small className="rm-form-error">{errors.photos}</small> : null}
 
         {hasMedia ? (
           <div className="rm-form-gallery">

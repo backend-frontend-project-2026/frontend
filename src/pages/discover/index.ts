@@ -1,2 +1,2 @@
 export * from './ui/DiscoverPage';
-export * from './model';
+export * from './lib/emptyState';

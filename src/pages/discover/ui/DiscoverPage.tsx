@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button, Input } from 'antd';
+import { Button, Input, Typography } from 'antd';
 import type { User, UserFilters } from '../../../entities/user';
 import {
   LikeProfileButton,
@@ -8,8 +8,36 @@ import {
 } from '../../../features/discover';
 import { BottomNav } from '../../../widgets/bottom-nav';
 import { ProfileCard } from '../../../widgets/profile-card';
-import { getDiscoverEmptyState } from '../model';
+import { getDiscoverEmptyState } from '../lib/emptyState';
 import './discover-page.css';
+
+import {
+  formatSidebarBudget,
+  formatSidebarMoveInDate,
+  getCleanlinessLabel,
+  getGuestLabel,
+  getInitialSidebarCleanliness,
+  getInitialSidebarGuestFrequency,
+  getInitialSidebarNoise,
+  getInitialSidebarSmoking,
+  getNextCleanlinessValue,
+  getNextGuestValue,
+  getNextNoiseValue,
+  getNextSmokingValue,
+  getNoiseLabel,
+  getSidebarChips,
+  getSmokingLabel,
+  parseBudgetInput,
+} from '../lib/discoverPageGetters';
+
+import type {
+  SidebarCleanlinessValue,
+  SidebarGuestValue,
+  SidebarNoiseValue,
+  SidebarSmokingValue,
+} from '../lib/types';
+
+const { Title } = Typography;
 
 type DiscoverPageProps = {
   users: User[];
@@ -37,163 +65,15 @@ function DiscoverEmptyState({ title, text, buttonText, onButtonClick }: Discover
   return (
     <div className="discover-empty">
       <div className="discover-empty__icon">◎</div>
-      <h3 className="discover-empty__title">{title}</h3>
+      <Title level={3} className="discover-empty__title">
+        {title}
+      </Title>
       <p className="discover-empty__text">{text}</p>
       <Button type="default" className="discover-empty__button" onClick={onButtonClick}>
         {buttonText}
       </Button>
     </div>
   );
-}
-
-function getSidebarChips(user: User | null): string[] {
-  if (!user) {
-    return ['Тишина', 'Не курю', 'Аккуратно', 'Гости редко'];
-  }
-
-  const chips: string[] = [];
-
-  chips.push(user.habits.noiseLevel === 'quiet' ? 'Тишина' : 'Норм шум');
-
-  chips.push(user.habits.smokingPreference === 'no' ? 'Не курю' : 'Курение ок');
-
-  chips.push(user.habits.cleanliness === 'high' ? 'Аккуратно' : 'Средне');
-
-  chips.push(
-    user.habits.guestFrequency === 'rarely' || user.habits.guestFrequency === 'never'
-      ? 'Гости редко'
-      : 'Гости иногда'
-  );
-
-  return chips;
-}
-
-function formatSidebarBudget(filters?: UserFilters) {
-  const min = filters?.budgetMin;
-  const max = filters?.budgetMax;
-
-  if (typeof min === 'number' && typeof max === 'number') {
-    return `${min}–${max} тыс ₽`;
-  }
-
-  if (typeof min === 'number') {
-    return `от ${min} тыс ₽`;
-  }
-
-  if (typeof max === 'number') {
-    return `до ${max} тыс ₽`;
-  }
-
-  return '20–35 тыс ₽';
-}
-
-function formatSidebarMoveInDate(filters?: UserFilters) {
-  if (filters?.moveInDate && filters.moveInDate.trim()) {
-    return filters.moveInDate;
-  }
-
-  return 'любая';
-}
-
-type SidebarNoiseValue = 'quiet' | 'normal' | 'loud' | '';
-type SidebarSmokingValue = 'no' | 'outside' | 'yes' | '';
-type SidebarCleanlinessValue = 'high' | 'medium' | 'low' | '';
-type SidebarGuestValue = 'rarely' | 'sometimes' | 'often' | '';
-
-function getInitialSidebarNoise(filters?: UserFilters): SidebarNoiseValue {
-  if (filters?.noiseLevel === 'quiet') return 'quiet';
-  if (filters?.noiseLevel === 'moderate') return 'normal';
-  if (filters?.noiseLevel === 'social') return 'loud';
-  if (filters?.quietOnly) return 'quiet';
-  return '';
-}
-
-function getInitialSidebarSmoking(filters?: UserFilters): SidebarSmokingValue {
-  if (filters?.smokingPreference === 'no') return 'no';
-  if (filters?.smokingPreference === 'outside_only') return 'outside';
-  if (filters?.smokingPreference === 'yes') return 'yes';
-  return '';
-}
-
-function getNoiseLabel(value: SidebarNoiseValue) {
-  if (value === 'quiet') return 'Тишина';
-  if (value === 'normal') return 'Норм шум';
-  if (value === 'loud') return 'Шумно';
-  return 'Шум';
-}
-
-function getSmokingLabel(value: SidebarSmokingValue) {
-  if (value === 'no') return 'Не курю';
-  if (value === 'outside') return 'Только на улице';
-  if (value === 'yes') return 'Курение ок';
-  return 'Курение';
-}
-
-function getNextNoiseValue(value: SidebarNoiseValue): SidebarNoiseValue {
-  if (value === '') return 'quiet';
-  if (value === 'quiet') return 'normal';
-  if (value === 'normal') return 'loud';
-  return '';
-}
-
-function getNextSmokingValue(value: SidebarSmokingValue): SidebarSmokingValue {
-  if (value === '') return 'no';
-  if (value === 'no') return 'outside';
-  if (value === 'outside') return 'yes';
-  return '';
-}
-
-function parseBudgetInput(value: string) {
-  const values = value.match(/\d+/g) ?? [];
-  const min = values[0] ? Number(values[0]) : undefined;
-  const max = values[1] ? Number(values[1]) : undefined;
-
-  return {
-    min: Number.isNaN(min) ? undefined : min,
-    max: Number.isNaN(max) ? undefined : max,
-  };
-}
-
-function getInitialSidebarCleanliness(filters?: UserFilters): SidebarCleanlinessValue {
-  if (filters?.cleanliness === 'high') return 'high';
-  if (filters?.cleanliness === 'medium') return 'medium';
-  if (filters?.cleanliness === 'low') return 'low';
-  return '';
-}
-
-function getInitialSidebarGuestFrequency(filters?: UserFilters): SidebarGuestValue {
-  if (filters?.guestFrequency === 'rarely') return 'rarely';
-  if (filters?.guestFrequency === 'sometimes') return 'sometimes';
-  if (filters?.guestFrequency === 'often') return 'often';
-  return '';
-}
-
-function getCleanlinessLabel(value: SidebarCleanlinessValue) {
-  if (value === 'high') return 'Аккуратно';
-  if (value === 'medium') return 'Средне';
-  if (value === 'low') return 'Не важно';
-  return 'Чистота';
-}
-
-function getGuestLabel(value: SidebarGuestValue) {
-  if (value === 'rarely') return 'Гости редко';
-  if (value === 'sometimes') return 'Гости иногда';
-  if (value === 'often') return 'Гости часто';
-  return 'Гости';
-}
-
-function getNextCleanlinessValue(value: SidebarCleanlinessValue): SidebarCleanlinessValue {
-  if (value === '') return 'high';
-  if (value === 'high') return 'medium';
-  if (value === 'medium') return 'low';
-  return '';
-}
-
-function getNextGuestValue(value: SidebarGuestValue): SidebarGuestValue {
-  if (value === '') return 'rarely';
-  if (value === 'rarely') return 'sometimes';
-  if (value === 'sometimes') return 'often';
-  return '';
 }
 
 export default function DiscoverPage({
@@ -303,7 +183,9 @@ export default function DiscoverPage({
     <section className="discover-page">
       <div className="discover-page__mobile">
         <div className="discover-mobile__top">
-          <h1 className="discover-mobile__title">Поиск</h1>
+          <Title level={1} className="discover-mobile__title">
+            Поиск
+          </Title>
 
           <Button type="default" className="discover-mobile__filters" onClick={onOpenFilters}>
             <span>Фильтры</span>
@@ -374,7 +256,9 @@ export default function DiscoverPage({
       <div className="discover-page__desktop">
         <aside className="discover-panel">
           <div className="discover-panel__head">
-            <h2 className="discover-panel__title">Фильтры</h2>
+            <Title level={2} className="discover-panel__title">
+              Фильтры
+            </Title>
 
             <Button type="default" className="discover-panel__more-filters" onClick={onOpenFilters}>
               <span>Все фильтры</span>
@@ -495,7 +379,9 @@ export default function DiscoverPage({
 
         <div className="discover-feed">
           <div className="discover-feed__head">
-            <h2 className="discover-feed__title">Поиск</h2>
+            <Title level={2} className="discover-feed__title">
+              Поиск
+            </Title>
             <span className="discover-feed__count">{users.length} анкет в подборке</span>
           </div>
 

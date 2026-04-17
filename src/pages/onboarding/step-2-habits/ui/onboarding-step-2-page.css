@@ -1,9 +1,9 @@
 .onboarding-page--step-2 .onboarding-feature-card--habits {
   gap: 12px;
   padding: 12px 12px 10px;
-  border: 1px solid #d9dcdf;
+  border: 1px solid var(--color-summary-card-border);
   border-radius: 18px;
-  background: rgb(252 252 252 / 90%);
+  background: var(--color-summary-card-bg);
   box-shadow: none;
   backdrop-filter: none;
 }
@@ -16,7 +16,7 @@
 
 .onboarding-page--step-2 .step-2-group__title {
   margin: 0;
-  color: #17181b;
+  color: var(--color-summary-title);
   font-size: 12px;
   font-weight: 700;
   line-height: 1.2;
@@ -35,7 +35,7 @@
 }
 
 .onboarding-page--step-2 .step-2-inline-label {
-  color: #9a999e;
+  color: var(--color-summary-label);
   font-size: 11px;
   font-weight: 500;
   line-height: 1.1;
@@ -54,11 +54,11 @@
   gap: 7px;
   min-height: 28px;
   padding: 0 12px;
-  border: 1px solid #d9d9dc;
+  border: 1px solid var(--color-onboarding-pill-border);
   border-radius: 999px;
-  background: #fff;
+  background: var(--color-white);
   box-shadow: none;
-  color: #222328;
+  color: var(--color-summary-tag-text);
   font-size: 11px;
   font-weight: 600;
   white-space: nowrap;
@@ -83,7 +83,7 @@
 .onboarding-page--step-2 .step-2-pill-radio.ant-radio-wrapper:hover,
 .onboarding-page--step-2 .step-2-pill-radio.ant-radio-wrapper:focus,
 .onboarding-page--step-2 .step-2-pill-radio.ant-radio-wrapper:active {
-  color: #222328;
+  color: var(--color-summary-tag-text);
 }
 
 .onboarding-page--step-2 .step-2-pill--compact {
@@ -99,7 +99,7 @@
 .onboarding-page--step-2 .step-2-pill-radio.ant-radio-wrapper-checked:focus,
 .onboarding-page--step-2 .step-2-pill-radio.ant-radio-wrapper-checked:active {
   border-color: transparent;
-  background: #d8f23e;
+  background: var(--color-summary-tag-bg);
   box-shadow: none;
 }
 
@@ -107,7 +107,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #939296;
+  background: var(--color-onboarding-dot);
   flex: 0 0 auto;
 }
 
@@ -140,7 +140,7 @@
   }
 
   .onboarding-page--step-2 .step-2-inline-label {
-    color: #90949c;
+    color: var(--color-onboarding-label-desktop);
     font-size: 10px;
     font-weight: 500;
   }
@@ -153,10 +153,10 @@
     gap: 5px;
     min-height: 24px;
     padding: 0 11px;
-    border: 1px solid #dadde1;
+    border: 1px solid var(--color-onboarding-pill-border-md);
     border-radius: 999px;
-    background: rgb(255 255 255 / 96%);
-    color: #23252a;
+    background: var(--color-onboarding-input-bg-md);
+    color: var(--color-onboarding-pill-text-md);
     font-size: 10px;
     font-weight: 600;
   }
@@ -173,7 +173,7 @@
 
   .onboarding-page--step-2 .step-2-pill.is-selected {
     border-color: transparent;
-    background: #d8f23e;
+    background: var(--color-summary-tag-bg);
   }
 
   .onboarding-page--step-2 .step-2-pill__dot {
@@ -195,9 +195,9 @@
     max-width: 100%;
     min-height: 410px;
     padding: 14px;
-    border: 1px solid #dde2e7;
+    border: 1px solid var(--color-onboarding-card-border-desktop);
     border-radius: 22px;
-    background: rgb(255 255 255 / 84%);
+    background: var(--color-onboarding-card-bg-desktop);
     box-shadow: none;
   }
 }
@@ -221,7 +221,7 @@
   }
 
   .onboarding-page--step-2 .step-2-inline-label {
-    color: #7f8792;
+    color: var(--color-onboarding-label-lg);
     font-size: 14px;
     font-weight: 600;
     line-height: 1.2;
@@ -235,10 +235,10 @@
     gap: 8px;
     min-height: 40px;
     padding: 0 16px;
-    border: 1px solid #dadde1;
+    border: 1px solid var(--color-onboarding-pill-border-md);
     border-radius: 999px;
-    background: rgb(255 255 255 / 96%);
-    color: #23252a;
+    background: var(--color-onboarding-input-bg-md);
+    color: var(--color-onboarding-pill-text-md);
     font-size: 14px;
     font-weight: 600;
   }

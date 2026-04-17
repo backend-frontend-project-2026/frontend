@@ -1,9 +1,9 @@
 .onboarding-page--step-3 .onboarding-feature-card--living {
   gap: 14px;
   padding: 10px;
-  border: 1px solid #d9dcdf;
+  border: 1px solid var(--color-summary-card-border);
   border-radius: 18px;
-  background: rgb(252 252 252 / 90%);
+  background: var(--color-summary-card-bg);
   box-shadow: none;
   backdrop-filter: none;
 }
@@ -26,7 +26,7 @@
 
 .onboarding-page--step-3 .step-3-label {
   padding-left: 1px;
-  color: #8f8d92;
+  color: var(--color-summary-text);
   font-size: 10px;
   font-weight: 500;
   line-height: 1.2;
@@ -38,7 +38,7 @@
 
 .onboarding-page--step-3 .step-3-section-title {
   margin: 0;
-  color: #17181b;
+  color: var(--color-summary-title);
   font-size: 17px;
   font-weight: 700;
   line-height: 1.1;
@@ -62,7 +62,7 @@
   border: none;
   padding: 0;
   background: transparent;
-  color: #2b2c31;
+  color: var(--color-summary-note-text);
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
@@ -87,16 +87,16 @@
 .onboarding-page--step-3 .step-3-condition-checkbox.ant-checkbox-wrapper:hover,
 .onboarding-page--step-3 .step-3-condition-checkbox.ant-checkbox-wrapper:focus,
 .onboarding-page--step-3 .step-3-condition-checkbox.ant-checkbox-wrapper:active {
-  color: #2b2c31;
+  color: var(--color-summary-note-text);
 }
 
 .onboarding-page--step-3 .step-3-condition__box {
   width: 15px;
   height: 15px;
-  border: 1px solid #dedee0;
+  border: 1px solid var(--color-onboarding-checkbox-border);
   border-radius: 4px;
-  background: #fafafa;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 70%);
+  background: var(--color-onboarding-checkbox-bg);
+  box-shadow: var(--color-onboarding-checkbox-shadow);
   flex: 0 0 auto;
 }
 
@@ -104,8 +104,8 @@
 .onboarding-page--step-3
   .step-3-condition-checkbox.ant-checkbox-wrapper-checked
   .step-3-condition__box {
-  border-color: #d8f23e;
-  background: #d8f23e;
+  border-color: var(--color-summary-tag-bg);
+  background: var(--color-summary-tag-bg);
   box-shadow: none;
 }
 
@@ -132,7 +132,7 @@
 
   .onboarding-page--step-3 .step-3-label {
     padding-left: 0;
-    color: #90949c;
+    color: var(--color-onboarding-label-desktop);
     font-size: 11px;
     font-weight: 500;
   }
@@ -152,7 +152,7 @@
     width: 100%;
     height: 5px;
     border-radius: 999px;
-    background: #dadde1;
+    background: var(--color-onboarding-input-border-md);
     overflow: hidden;
   }
 
@@ -163,7 +163,7 @@
     width: 56%;
     height: 100%;
     border-radius: 999px;
-    background: #e6efb9;
+    background: var(--color-onboarding-budget-fill);
   }
 
   .onboarding-page--step-3 .step-3-group:nth-of-type(2) .step-3-input,
@@ -214,10 +214,10 @@
     min-height: 66px;
     resize: none;
     padding: 10px 12px;
-    border: 1px solid #dfe3e7;
+    border: 1px solid var(--color-onboarding-textarea-border);
     border-radius: 14px;
-    background: #fff;
-    color: #202226;
+    background: var(--color-white);
+    color: var(--color-summary-value);
     font-size: 12px;
     outline: none;
     box-shadow: none;
@@ -229,7 +229,7 @@
   .onboarding-page--step-3 .step-3-ideal-textarea.ant-input:focus-within,
   .onboarding-page--step-3 .step-3-ideal-textarea.ant-input.ant-input-focused {
     border-color: #dfe3e7;
-    background: #fff;
+    background: var(--color-white);
     box-shadow: none;
     outline: none;
   }
@@ -254,7 +254,7 @@
   }
 
   .onboarding-page--step-3 .step-3-label {
-    color: #7f8792;
+    color: var(--color-onboarding-label-lg);
     font-size: 14px;
     font-weight: 600;
     line-height: 1.2;
@@ -306,12 +306,10 @@
     width: 100%;
     min-height: 104px;
     padding: 16px 18px;
-    border: 1px solid #d8dde3;
+    border: 1px solid var(--color-onboarding-input-border-lg);
     border-radius: 18px;
-    background: linear-gradient(180deg, #ffffff 0%, #fbfcfd 100%);
-    box-shadow:
-      0 10px 24px rgb(175 181 190 / 14%),
-      inset 0 1px 0 rgb(255 255 255 / 88%);
+    background: var(--color-onboarding-input-gradient);
+    box-shadow: var(--color-onboarding-shadow-lg), var(--color-onboarding-shadow-inset);
     font-size: 15px;
     line-height: 1.5;
     resize: none;
@@ -323,10 +321,8 @@
   .onboarding-page--step-3 .step-3-ideal-textarea.ant-input:focus-within,
   .onboarding-page--step-3 .step-3-ideal-textarea.ant-input.ant-input-focused {
     border-color: #d8dde3;
-    background: linear-gradient(180deg, #ffffff 0%, #fbfcfd 100%);
-    box-shadow:
-      0 10px 24px rgb(175 181 190 / 14%),
-      inset 0 1px 0 rgb(255 255 255 / 88%);
+    background: var(--color-onboarding-input-gradient);
+    box-shadow: var(--color-onboarding-shadow-lg), var(--color-onboarding-shadow-inset);
     outline: none;
   }
 

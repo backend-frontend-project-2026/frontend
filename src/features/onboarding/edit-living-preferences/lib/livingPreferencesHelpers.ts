@@ -77,15 +77,35 @@ export function parseStayDuration(value: string): User['stayDuration'] | '' {
     return '3-6 months';
   }
 
-  if (
-    normalized.includes('6 месяцев') ||
-    normalized.includes('6–12') ||
-    normalized.includes('6-12')
-  ) {
+  if (normalized.includes('6–12') || normalized.includes('6-12')) {
     return '6-12 months';
   }
 
-  return '';
+  const monthMatch = normalized.match(/\d+/);
+
+  if (!monthMatch) {
+    return '';
+  }
+
+  const months = Number(monthMatch[0]);
+
+  if (Number.isNaN(months) || months <= 0) {
+    return '';
+  }
+
+  if (months <= 3) {
+    return '1-3 months';
+  }
+
+  if (months <= 6) {
+    return '3-6 months';
+  }
+
+  if (months <= 12) {
+    return '6-12 months';
+  }
+
+  return '12+ months';
 }
 
 export function getSelectedConditionsFromNotes(value: string) {

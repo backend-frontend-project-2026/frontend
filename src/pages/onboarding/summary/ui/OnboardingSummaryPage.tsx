@@ -5,8 +5,8 @@ import type {
   HabitsFormValue,
   InterestsFormValue,
   LivingPreferencesFormValue,
-} from '../../../../features/onboarding';
-import { OnboardingProgress } from '../../../../widgets/onboarding-progress';
+} from '@/features/onboarding';
+import { OnboardingProgress } from '@/widgets/onboarding-progress';
 import '../../onboarding-pages.css';
 import './onboarding-summary-page.css';
 

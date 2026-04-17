@@ -12,9 +12,9 @@
   width: 100%;
   max-width: 420px;
   padding: 18px 16px;
-  border: 1px solid #d9dcdf;
+  border: 1px solid var(--color-summary-card-border);
   border-radius: 18px;
-  background: rgb(252 252 252 / 90%);
+  background: var(--color-summary-card-bg);
   box-shadow: none;
   text-align: center;
   backdrop-filter: none;
@@ -27,8 +27,8 @@
   width: 68px;
   height: 68px;
   border-radius: 50%;
-  background: #d8f23e;
-  color: #17181b;
+  background: var(--color-summary-tag-bg);
+  color: var(--color-summary-title);
   font-size: 30px;
   font-weight: 700;
   line-height: 1;
@@ -40,7 +40,7 @@
 
 .onboarding-success-text {
   margin: 0;
-  color: #8f8d92;
+  color: var(--color-summary-text);
   font-size: 12px;
   line-height: 1.45;
 }

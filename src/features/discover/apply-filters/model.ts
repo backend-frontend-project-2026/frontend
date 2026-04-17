@@ -1,25 +1,15 @@
 import type { User, UserFilters } from '../../../entities/user';
+import { includesNormalizedText, normalizeText } from '../../../shared/utils/texts';
 
-function normalize(value: string | undefined): string {
-  return (value ?? '').trim().toLowerCase();
+function matchesTextFilter(userValue: string, filterValue?: string): boolean {
+  return !filterValue || includesNormalizedText(userValue, filterValue);
 }
 
-function includesText(source: string, search: string): boolean {
-  return normalize(source).includes(normalize(search));
-}
-
-export function createEmptyDiscoverFilters(): UserFilters {
-  return {};
-}
-
-export function hasActiveFilters(filters: UserFilters): boolean {
-  return Object.entries(filters).some(([, value]) => {
-    if (Array.isArray(value)) {
-      return value.length > 0;
-    }
-
-    return value !== undefined && value !== '' && value !== false && value !== 'any';
-  });
+function matchesSelectFilter<T extends string>(
+  filterValue: T | 'any' | undefined,
+  userValue: T
+): boolean {
+  return !filterValue || filterValue === 'any' || userValue === filterValue;
 }
 
 export function applyFiltersToUsers(users: User[], filters: UserFilters): User[] {
@@ -37,7 +27,7 @@ export function applyFiltersToUsers(users: User[], filters: UserFilters): User[]
         ...user.interests,
       ].join(' ');
 
-      if (!includesText(searchable, filters.search)) {
+      if (!includesNormalizedText(searchable, filters.search)) {
         return false;
       }
     }
@@ -50,27 +40,27 @@ export function applyFiltersToUsers(users: User[], filters: UserFilters): User[]
       return false;
     }
 
-    if (filters.faculty && !includesText(user.faculty, filters.faculty)) {
+    if (!matchesTextFilter(user.faculty, filters.faculty)) {
       return false;
     }
 
-    if (filters.course && !includesText(user.course, filters.course)) {
+    if (!matchesTextFilter(user.course, filters.course)) {
       return false;
     }
 
-    if (filters.university && !includesText(user.university, filters.university)) {
+    if (!matchesTextFilter(user.university, filters.university)) {
       return false;
     }
 
-    if (filters.district && !includesText(user.district, filters.district)) {
+    if (!matchesTextFilter(user.district, filters.district)) {
       return false;
     }
 
-    if (filters.location && !includesText(user.location, filters.location)) {
+    if (!matchesTextFilter(user.location, filters.location)) {
       return false;
     }
 
-    if (filters.rentalCriteria && !includesText(user.rentalCriteria, filters.rentalCriteria)) {
+    if (!matchesTextFilter(user.rentalCriteria, filters.rentalCriteria)) {
       return false;
     }
 
@@ -82,47 +72,27 @@ export function applyFiltersToUsers(users: User[], filters: UserFilters): User[]
       return false;
     }
 
-    if (filters.moveInDate && !includesText(user.moveInDate, filters.moveInDate)) {
+    if (!matchesTextFilter(user.moveInDate, filters.moveInDate)) {
       return false;
     }
 
-    if (
-      filters.stayDuration &&
-      filters.stayDuration !== 'any' &&
-      user.stayDuration !== filters.stayDuration
-    ) {
+    if (!matchesSelectFilter(filters.stayDuration, user.stayDuration)) {
       return false;
     }
 
-    if (
-      filters.smokingPreference &&
-      filters.smokingPreference !== 'any' &&
-      user.habits.smokingPreference !== filters.smokingPreference
-    ) {
+    if (!matchesSelectFilter(filters.smokingPreference, user.habits.smokingPreference)) {
       return false;
     }
 
-    if (
-      filters.alcoholPreference &&
-      filters.alcoholPreference !== 'any' &&
-      user.habits.alcoholPreference !== filters.alcoholPreference
-    ) {
+    if (!matchesSelectFilter(filters.alcoholPreference, user.habits.alcoholPreference)) {
       return false;
     }
 
-    if (
-      filters.petPreference &&
-      filters.petPreference !== 'any' &&
-      user.habits.petPreference !== filters.petPreference
-    ) {
+    if (!matchesSelectFilter(filters.petPreference, user.habits.petPreference)) {
       return false;
     }
 
-    if (
-      filters.roomOrderPreference &&
-      filters.roomOrderPreference !== 'any' &&
-      user.habits.roomOrderPreference !== filters.roomOrderPreference
-    ) {
+    if (!matchesSelectFilter(filters.roomOrderPreference, user.habits.roomOrderPreference)) {
       return false;
     }
 
@@ -130,54 +100,34 @@ export function applyFiltersToUsers(users: User[], filters: UserFilters): User[]
       return false;
     }
 
-    if (
-      filters.noiseLevel &&
-      filters.noiseLevel !== 'any' &&
-      user.habits.noiseLevel !== filters.noiseLevel
-    ) {
+    if (!matchesSelectFilter(filters.noiseLevel, user.habits.noiseLevel)) {
       return false;
     }
 
-    if (
-      filters.sleepSchedule &&
-      filters.sleepSchedule !== 'any' &&
-      user.habits.sleepSchedule !== filters.sleepSchedule
-    ) {
+    if (!matchesSelectFilter(filters.sleepSchedule, user.habits.sleepSchedule)) {
       return false;
     }
 
-    if (
-      filters.cleanliness &&
-      filters.cleanliness !== 'any' &&
-      user.habits.cleanliness !== filters.cleanliness
-    ) {
+    if (!matchesSelectFilter(filters.cleanliness, user.habits.cleanliness)) {
       return false;
     }
 
-    if (
-      filters.guestFrequency &&
-      filters.guestFrequency !== 'any' &&
-      user.habits.guestFrequency !== filters.guestFrequency
-    ) {
+    if (!matchesSelectFilter(filters.guestFrequency, user.habits.guestFrequency)) {
       return false;
     }
 
-    if (
-      filters.housingType &&
-      filters.housingType !== 'any' &&
-      user.housingType !== filters.housingType
-    ) {
+    if (!matchesSelectFilter(filters.housingType, user.housingType)) {
       return false;
     }
 
-    if (filters.gender && filters.gender !== 'any' && user.gender !== filters.gender) {
+    if (!matchesSelectFilter(filters.gender, user.gender)) {
       return false;
     }
 
     if (filters.interests?.length) {
-      const userInterests = user.interests.map((interest) => normalize(interest));
+      const userInterests = user.interests.map((interest) => normalizeText(interest));
       const hasMatchedInterest = filters.interests.some((interest) =>
-        userInterests.includes(normalize(interest))
+        userInterests.includes(normalizeText(interest))
       );
 
       if (!hasMatchedInterest) {

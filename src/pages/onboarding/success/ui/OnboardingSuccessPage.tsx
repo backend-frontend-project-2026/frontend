@@ -9,11 +9,13 @@ type OnboardingSuccessPageProps = {
   onContinue: () => void;
 };
 
+const AUTO_REDIRECT_DELAY_MS = 5000;
+
 export function OnboardingSuccessPage({ onContinue }: OnboardingSuccessPageProps) {
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
       onContinue();
-    }, 1800);
+    }, AUTO_REDIRECT_DELAY_MS);
 
     return () => {
       window.clearTimeout(timeoutId);
@@ -32,10 +34,14 @@ export function OnboardingSuccessPage({ onContinue }: OnboardingSuccessPageProps
           <Title level={3} className="rm-form-title">
             Онбординг успешно завершён
           </Title>
-          <p className="rm-form-description">Анкета сохранена. Сейчас откроется discover.</p>
+          <p className="rm-form-description">
+            Анкета сохранена. Через несколько секунд откроется discover.
+          </p>
         </div>
 
-        <p className="onboarding-success-text">Можно подождать пару секунд или перейти сразу.</p>
+        <p className="onboarding-success-text">
+          Можно подождать несколько секунд или перейти сразу.
+        </p>
 
         <Button
           htmlType="button"

@@ -1,7 +1,21 @@
-import { Button, ConfigProvider } from 'antd';
+import { Button, ConfigProvider, Typography } from 'antd';
 import type { User } from '../../../entities/user';
 import { BottomNav } from '../../../widgets/bottom-nav';
 import './user-profile-page.css';
+
+import {
+  getAlcoholLabel,
+  getCleanlinessLabel,
+  getGuestsLabel,
+  getMoveInShort,
+  getNoiseLabel,
+  getQuietHoursLine,
+  getRoomOrderLabel,
+  getSmokingLabel,
+  getStayShort,
+} from '../lib/userProfileGetters';
+
+const { Title } = Typography;
 
 type UserProfilePageProps = {
   user: User;
@@ -62,73 +76,6 @@ function CandidateChip({ label, accent = false }: { label: string; accent?: bool
       <span>{label}</span>
     </span>
   );
-}
-
-function getNoiseLabel(user: User): string {
-  if (user.habits.noiseLevel === 'quiet') return 'Тишина';
-  if (user.habits.noiseLevel === 'moderate') return 'Норм';
-  return 'Шумно';
-}
-
-function getSmokingLabel(user: User): string {
-  if (user.habits.smokingPreference === 'no') return 'Не курю';
-  if (user.habits.smokingPreference === 'outside_only') return 'Только на улице';
-  return 'Курю';
-}
-
-function getAlcoholLabel(user: User): string {
-  if (user.habits.alcoholPreference === 'no') return 'Не пью';
-  if (user.habits.alcoholPreference === 'rarely') return 'Редко';
-  if (user.habits.alcoholPreference === 'socially') return 'Иногда';
-  return 'Алкоголь ок';
-}
-
-function getRoomOrderLabel(user: User): string {
-  if (user.habits.roomOrderPreference === 'strict') return 'Любит порядок';
-  if (user.habits.roomOrderPreference === 'balanced') return 'Баланс по быту';
-  return 'Гибко к быту';
-}
-
-function getCleanlinessLabel(user: User): string {
-  if (user.habits.cleanliness === 'high') return 'Аккуратно';
-  if (user.habits.cleanliness === 'medium') return 'Средне';
-  return 'Не важно';
-}
-
-function getGuestsLabel(user: User): string {
-  if (user.habits.guestFrequency === 'never') return 'Без гостей';
-  if (user.habits.guestFrequency === 'rarely') return 'Гости редко';
-  if (user.habits.guestFrequency === 'sometimes') return 'Гости иногда';
-  return 'Гости часто';
-}
-
-function getQuietHoursLine(user: User) {
-  if (user.habits.quietTime) {
-    return `${user.habits.quietTime.from} – ${user.habits.quietTime.to}`;
-  }
-
-  return user.hasQuietHours ? 'Есть' : 'Нет';
-}
-
-function getMoveInShort(value: string) {
-  if (value.toLowerCase().includes('март')) return 'март';
-  if (value.toLowerCase().includes('сент')) return 'сент.';
-  return value.replace(/^с\s+/i, '');
-}
-
-function getStayShort(value: User['stayDuration']) {
-  switch (value) {
-    case '1-3 months':
-      return '1–3 мес';
-    case '3-6 months':
-      return '3–6 мес';
-    case '6-12 months':
-      return '6–12 мес';
-    case '12+ months':
-      return '12+ мес';
-    default:
-      return value;
-  }
 }
 
 export function UserProfilePage({
@@ -195,7 +142,9 @@ export function UserProfilePage({
                 </Button>
               </div>
 
-              <h1 className="candidate-mobile__title">Анкета</h1>
+              <Title level={1} className="candidate-mobile__title">
+                Анкета
+              </Title>
             </div>
 
             <Button
@@ -218,7 +167,7 @@ export function UserProfilePage({
                     alt=""
                     className="candidate-mobile__photo"
                     onError={(event) => {
-                      event.currentTarget.style.display = 'none';
+                      event.currentTarget.classList.add('is-hidden');
                     }}
                   />
                 ) : null}
@@ -227,7 +176,9 @@ export function UserProfilePage({
 
             {galleryPhotos.length > 1 ? (
               <section className="candidate-mobile__section">
-                <h3 className="candidate-mobile__section-title">Фото</h3>
+                <Title level={3} className="candidate-mobile__section-title">
+                  Фото
+                </Title>
                 <div className="candidate-mobile__gallery">
                   {galleryPhotos.map((photo, index) => (
                     <div key={`${photo}-${index}`} className="candidate-mobile__gallery-thumb">
@@ -239,9 +190,9 @@ export function UserProfilePage({
             ) : null}
 
             <div className="candidate-mobile__summary">
-              <h2 className="candidate-mobile__name">
+              <Title level={2} className="candidate-mobile__name">
                 {user.name}, {user.age}
-              </h2>
+              </Title>
 
               <p className="candidate-mobile__meta">
                 {user.university} • {user.faculty} • {user.course} •{' '}
@@ -251,7 +202,9 @@ export function UserProfilePage({
             </div>
 
             <section className="candidate-mobile__section">
-              <h3 className="candidate-mobile__section-title">Привычки</h3>
+              <Title level={3} className="candidate-mobile__section-title">
+                Привычки
+              </Title>
               <div className="candidate-mobile__chips-row">
                 {habitChips.map((chip) => (
                   <CandidateChip key={chip} label={chip} />
@@ -260,7 +213,9 @@ export function UserProfilePage({
             </section>
 
             <section className="candidate-mobile__section">
-              <h3 className="candidate-mobile__section-title">Условия</h3>
+              <Title level={3} className="candidate-mobile__section-title">
+                Условия
+              </Title>
               <div className="candidate-mobile__chips-row">
                 {conditionChips.map((chip) => (
                   <CandidateChip key={chip} label={chip} />
@@ -269,7 +224,9 @@ export function UserProfilePage({
             </section>
 
             <section className="candidate-mobile__section">
-              <h3 className="candidate-mobile__section-title">Интересы</h3>
+              <Title level={3} className="candidate-mobile__section-title">
+                Интересы
+              </Title>
               <div className="candidate-mobile__chips-row">
                 {interestChips.map((chip) => (
                   <CandidateChip key={chip} label={chip} />
@@ -278,19 +235,25 @@ export function UserProfilePage({
             </section>
 
             <section className="candidate-mobile__about">
-              <h3 className="candidate-mobile__section-title">Обо мне</h3>
+              <Title level={3} className="candidate-mobile__section-title">
+                Обо мне
+              </Title>
               <p className="candidate-mobile__about-text">{user.bio}</p>
             </section>
 
             <section className="candidate-mobile__about">
-              <h3 className="candidate-mobile__section-title">Идеальный сосед</h3>
+              <Title level={3} className="candidate-mobile__section-title">
+                Идеальный сосед
+              </Title>
               <p className="candidate-mobile__about-text">
                 {user.idealRoommateDescription || 'Не указано'}
               </p>
             </section>
 
             <section className="candidate-mobile__about">
-              <h3 className="candidate-mobile__section-title">Критерии для съёма</h3>
+              <Title level={3} className="candidate-mobile__section-title">
+                Критерии для съёма
+              </Title>
               <p className="candidate-mobile__about-text">{user.rentalCriteria || 'Не указано'}</p>
             </section>
 
@@ -329,7 +292,7 @@ export function UserProfilePage({
                   alt=""
                   className="candidate-desktop__photo"
                   onError={(event) => {
-                    event.currentTarget.style.display = 'none';
+                    event.currentTarget.classList.add('is-hidden');
                   }}
                 />
               ) : null}
@@ -346,9 +309,9 @@ export function UserProfilePage({
             ) : null}
 
             <div className="candidate-desktop__left-body">
-              <h2 className="candidate-desktop__name">
+              <Title level={2} className="candidate-desktop__name">
                 {user.name}, {user.age}
-              </h2>
+              </Title>
 
               <p className="candidate-desktop__meta">
                 {user.university} • {user.faculty} • {user.course} •{' '}
@@ -374,7 +337,9 @@ export function UserProfilePage({
 
           <div className="candidate-desktop__right-card">
             <section className="candidate-desktop__section">
-              <h3 className="candidate-desktop__section-title">Привычки</h3>
+              <Title level={3} className="candidate-desktop__section-title">
+                Привычки
+              </Title>
 
               <div className="candidate-desktop__chips">
                 {habitChips.map((chip) => (
@@ -384,12 +349,16 @@ export function UserProfilePage({
             </section>
 
             <section className="candidate-desktop__section">
-              <h3 className="candidate-desktop__section-title">Условия</h3>
+              <Title level={3} className="candidate-desktop__section-title">
+                Условия
+              </Title>
               <p className="candidate-desktop__line">{desktopConditionLine}</p>
             </section>
 
             <section className="candidate-desktop__section">
-              <h3 className="candidate-desktop__section-title">Интересы</h3>
+              <Title level={3} className="candidate-desktop__section-title">
+                Интересы
+              </Title>
               <div className="candidate-desktop__chips">
                 {interestChips.map((chip) => (
                   <CandidateChip key={chip} label={chip} />
@@ -398,24 +367,32 @@ export function UserProfilePage({
             </section>
 
             <section className="candidate-desktop__section">
-              <h3 className="candidate-desktop__section-title">Тихие часы</h3>
+              <Title level={3} className="candidate-desktop__section-title">
+                Тихие часы
+              </Title>
               <p className="candidate-desktop__line">{quietHoursLine}</p>
             </section>
 
             <section className="candidate-desktop__section">
-              <h3 className="candidate-desktop__section-title">Короткое био</h3>
+              <Title level={3} className="candidate-desktop__section-title">
+                Короткое био
+              </Title>
               <p className="candidate-desktop__bio">{user.bio}</p>
             </section>
 
             <section className="candidate-desktop__section">
-              <h3 className="candidate-desktop__section-title">Идеальный сосед</h3>
+              <Title level={3} className="candidate-desktop__section-title">
+                Идеальный сосед
+              </Title>
               <p className="candidate-desktop__bio">
                 {user.idealRoommateDescription || 'Не указано'}
               </p>
             </section>
 
             <section className="candidate-desktop__section">
-              <h3 className="candidate-desktop__section-title">Критерии для съёма</h3>
+              <Title level={3} className="candidate-desktop__section-title">
+                Критерии для съёма
+              </Title>
               <p className="candidate-desktop__bio">{user.rentalCriteria || 'Не указано'}</p>
             </section>
           </div>

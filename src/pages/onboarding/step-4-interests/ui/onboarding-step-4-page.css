@@ -1,6 +1,6 @@
 .onboarding-page--step-4 .rm-progress__bar-fill {
   width: 100% !important;
-  background: #d8f23e;
+  background: var(--color-summary-tag-bg);
 }
 
 .onboarding-page--step-4 .step-4-section {
@@ -17,7 +17,7 @@
 
 .onboarding-page--step-4 .step-4-section__title {
   margin: 0;
-  color: #17181b;
+  color: var(--color-summary-title);
   font-size: 12px;
   font-weight: 700;
   line-height: 1.2;
@@ -47,11 +47,11 @@
   gap: 7px;
   min-height: 28px;
   padding: 0 12px;
-  border: 1px solid #d9d9dc;
+  border: 1px solid var(--color-onboarding-pill-border);
   border-radius: 999px;
-  background: #fff;
+  background: var(--color-white);
   box-shadow: none;
-  color: #222328;
+  color: var(--color-summary-tag-text);
   font-size: 11px;
   font-weight: 600;
   white-space: nowrap;
@@ -68,17 +68,17 @@
 .onboarding-page--step-4 .step-4-tag-checkable.ant-tag:active,
 .onboarding-page--step-4 .step-4-tag-checkable.ant-tag:focus,
 .onboarding-page--step-4 .step-4-tag-checkable.ant-tag:focus-visible {
-  color: #222328;
+  color: var(--color-summary-tag-text);
   border-color: #d9d9dc;
-  background: #fff;
+  background: var(--color-white);
   box-shadow: none;
 }
 
 .onboarding-page--step-4
   .step-4-tag-checkable.ant-tag-checkable:not(.ant-tag-checkable-checked):hover {
-  color: #222328;
+  color: var(--color-summary-tag-text);
   border-color: #d9d9dc;
-  background: #fff;
+  background: var(--color-white);
 }
 
 .onboarding-page--step-4 .step-4-tag.is-selected,
@@ -88,20 +88,20 @@
 .onboarding-page--step-4 .step-4-tag-checkable.ant-tag-checkable-checked:focus,
 .onboarding-page--step-4 .step-4-tag-checkable.ant-tag-checkable-checked:focus-visible {
   border-color: transparent;
-  background: #d8f23e;
-  color: #222328;
+  background: var(--color-summary-tag-bg);
+  color: var(--color-summary-tag-text);
 }
 
 .onboarding-page--step-4 .step-4-tag__dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #939296;
+  background: var(--color-onboarding-dot);
   flex: 0 0 auto;
 }
 
 .onboarding-page--step-4 .step-4-field-label {
-  color: #9a999e;
+  color: var(--color-summary-label);
   font-size: 11px;
   font-weight: 500;
   line-height: 1.1;
@@ -123,7 +123,7 @@
 
 .onboarding-page--step-4 .step-4-mobile-note {
   margin: 0;
-  color: #afb3bc;
+  color: var(--color-onboarding-mobile-note);
   font-size: 10px;
   font-weight: 500;
   line-height: 1.2;
@@ -131,9 +131,9 @@
 .onboarding-page--step-4 .onboarding-feature-card--interests {
   gap: 12px;
   padding: 10px;
-  border: 1px solid #d9dcdf;
+  border: 1px solid var(--color-summary-card-border);
   border-radius: 18px;
-  background: rgb(252 252 252 / 90%);
+  background: var(--color-summary-card-bg);
   box-shadow: none;
   backdrop-filter: none;
 }
@@ -145,9 +145,9 @@
     max-width: 100%;
     min-height: 392px;
     padding: 14px;
-    border: 1px solid #dde2e7;
+    border: 1px solid var(--color-onboarding-card-border-desktop);
     border-radius: 22px;
-    background: rgb(255 255 255 / 84%);
+    background: var(--color-onboarding-card-bg-desktop);
     box-shadow: none;
   }
 
@@ -179,10 +179,10 @@
     gap: 5px;
     min-height: 24px;
     padding: 0 11px;
-    border: 1px solid #dadde1;
+    border: 1px solid var(--color-onboarding-pill-border-md);
     border-radius: 999px;
-    background: rgb(255 255 255 / 96%);
-    color: #23252a;
+    background: var(--color-onboarding-input-bg-md);
+    color: var(--color-onboarding-pill-text-md);
     font-size: 10px;
     font-weight: 600;
   }
@@ -193,13 +193,13 @@
   .onboarding-page--step-4 .step-4-tag-checkable.ant-tag:focus,
   .onboarding-page--step-4 .step-4-tag-checkable.ant-tag:focus-visible {
     border-color: #dadde1;
-    background: rgb(255 255 255 / 96%);
-    color: #23252a;
+    background: var(--color-onboarding-input-bg-md);
+    color: var(--color-onboarding-pill-text-md);
   }
 
   .onboarding-page--step-4 .step-4-tag.is-selected {
     border-color: transparent;
-    background: #d8f23e;
+    background: var(--color-summary-tag-bg);
   }
 
   .onboarding-page--step-4 .step-4-tag.is-selected,
@@ -209,8 +209,8 @@
   .onboarding-page--step-4 .step-4-tag-checkable.ant-tag-checkable-checked:focus,
   .onboarding-page--step-4 .step-4-tag-checkable.ant-tag-checkable-checked:focus-visible {
     border-color: transparent;
-    background: #d8f23e;
-    color: #23252a;
+    background: var(--color-summary-tag-bg);
+    color: var(--color-onboarding-pill-text-md);
   }
 
   .onboarding-page--step-4 .step-4-tag__dot {
@@ -231,7 +231,7 @@
   }
 
   .onboarding-page--step-4 .step-4-field-label {
-    color: #90949c;
+    color: var(--color-onboarding-label-desktop);
     font-size: 11px;
     font-weight: 500;
   }
@@ -241,10 +241,10 @@
     min-height: 86px;
     resize: none;
     padding: 12px 14px;
-    border: 1px solid #dfe3e7;
+    border: 1px solid var(--color-onboarding-textarea-border);
     border-radius: 14px;
-    background: #fff;
-    color: #202226;
+    background: var(--color-white);
+    color: var(--color-summary-value);
     font-size: 12px;
     outline: none;
     box-shadow: none;
@@ -256,7 +256,7 @@
   .onboarding-page--step-4 .step-4-bio-textarea.ant-input:focus-within,
   .onboarding-page--step-4 .step-4-bio-textarea.ant-input.ant-input-focused {
     border-color: #dfe3e7;
-    background: #fff;
+    background: var(--color-white);
     box-shadow: none;
     outline: none;
   }
@@ -296,10 +296,10 @@
     gap: 8px;
     min-height: 40px;
     padding: 0 16px;
-    border: 1px solid #e6e6e6;
+    border: 1px solid var(--color-divider);
     border-radius: 999px;
-    background: #ffffff;
-    color: #0b0c0e;
+    background: var(--color-white);
+    color: var(--color-black-text);
     font-size: 14px;
     font-weight: 600;
   }
@@ -310,8 +310,8 @@
   .onboarding-page--step-4 .step-4-tag-checkable.ant-tag:focus,
   .onboarding-page--step-4 .step-4-tag-checkable.ant-tag:focus-visible {
     border-color: #e6e6e6;
-    background: #ffffff;
-    color: #0b0c0e;
+    background: var(--color-white);
+    color: var(--color-black-text);
   }
 
   .onboarding-page--step-4 .step-4-tag.is-selected,
@@ -321,14 +321,14 @@
   .onboarding-page--step-4 .step-4-tag-checkable.ant-tag-checkable-checked:focus,
   .onboarding-page--step-4 .step-4-tag-checkable.ant-tag-checkable-checked:focus-visible {
     border-color: transparent;
-    background: #d8f23e;
-    color: #0b0c0e;
+    background: var(--color-summary-tag-bg);
+    color: var(--color-black-text);
   }
 
   .onboarding-page--step-4 .step-4-tag__dot {
     width: 7px;
     height: 7px;
-    background: #8b8b8b;
+    background: var(--color-text-secondary);
   }
 
   .onboarding-page--step-4 .step-4-bio-field {
@@ -338,7 +338,7 @@
   }
 
   .onboarding-page--step-4 .step-4-field-label {
-    color: #7f8792;
+    color: var(--color-onboarding-label-lg);
     font-size: 14px;
     font-weight: 600;
     line-height: 1.2;
@@ -348,13 +348,11 @@
     width: 100%;
     min-height: 112px;
     padding: 16px 18px;
-    border: 1px solid #d8dde3;
+    border: 1px solid var(--color-onboarding-input-border-lg);
     border-radius: 18px;
     background: linear-gradient(180deg, #ffffff 0%, #fbfcfd 100%);
-    box-shadow:
-      0 10px 24px rgb(175 181 190 / 14%),
-      inset 0 1px 0 rgb(255 255 255 / 88%);
-    color: #202226;
+    box-shadow: var(--color-onboarding-shadow-lg), var(--color-onboarding-shadow-inset);
+    color: var(--color-summary-value);
     font-size: 15px;
     line-height: 1.5;
     resize: none;
@@ -367,10 +365,8 @@
   .onboarding-page--step-4 .step-4-bio-textarea.ant-input:focus-within,
   .onboarding-page--step-4 .step-4-bio-textarea.ant-input.ant-input-focused {
     border-color: #d8dde3;
-    background: linear-gradient(180deg, #ffffff 0%, #fbfcfd 100%);
-    box-shadow:
-      0 10px 24px rgb(175 181 190 / 14%),
-      inset 0 1px 0 rgb(255 255 255 / 88%);
+    background: var(--color-onboarding-input-gradient);
+    box-shadow: var(--color-onboarding-shadow-lg), var(--color-onboarding-shadow-inset);
     outline: none;
   }
 

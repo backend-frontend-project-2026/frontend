@@ -52,6 +52,22 @@
   background: #dfff4f;
 }
 
+.rm-progress__bar-fill--step-1 {
+  width: 25%;
+}
+
+.rm-progress__bar-fill--step-2 {
+  width: 50%;
+}
+
+.rm-progress__bar-fill--step-3 {
+  width: 75%;
+}
+
+.rm-progress__bar-fill--step-4 {
+  width: 100%;
+}
+
 .rm-progress__chips {
   display: flex;
   gap: 6px;

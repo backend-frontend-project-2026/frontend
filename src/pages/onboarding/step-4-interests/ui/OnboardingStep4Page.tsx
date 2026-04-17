@@ -1,7 +1,12 @@
-import { EditInterests, type InterestsFormValue } from '../../../../features/onboarding';
+import {
+  EditInterests,
+  isInterestsStepComplete,
+  type InterestsFormValue,
+} from '../../../../features/onboarding';
 import '../../onboarding-pages.css';
 import { OnboardingProgress } from '../../../../widgets/onboarding-progress';
 import './onboarding-step-4-page.css';
+import { useOnboardingLeaveGuard } from '../../lib/useOnboardingLeaveGuard';
 
 type OnboardingStep4PageProps = {
   value?: Partial<InterestsFormValue>;
@@ -20,6 +25,8 @@ export function OnboardingStep4Page({
   onSkip,
   onComplete,
 }: OnboardingStep4PageProps) {
+  const shouldWarnOnLeave = !isInterestsStepComplete(value);
+  const confirmLeave = useOnboardingLeaveGuard(shouldWarnOnLeave);
   return (
     <section className="onboarding-page onboarding-page--step-4">
       <OnboardingProgress currentStep={4} />
@@ -27,9 +34,9 @@ export function OnboardingStep4Page({
       <EditInterests
         formId={FORM_ID}
         initialValue={value}
-        onBack={onBack}
+        onBack={() => confirmLeave(onBack)}
         onChange={onChange}
-        onSkip={onSkip}
+        onSkip={onSkip ? () => confirmLeave(onSkip) : undefined}
         onNext={onComplete}
         hideHeader
         hideActions={false}

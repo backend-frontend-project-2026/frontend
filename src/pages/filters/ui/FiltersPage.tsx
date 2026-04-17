@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Button, Input, Switch } from 'antd';
+import { Button, Input, Switch, Typography } from 'antd';
 import type { User, UserFilters } from '../../../entities/user';
 import {
   applyFiltersToUsers,
@@ -9,6 +9,42 @@ import {
 } from '../../../features/discover';
 import './filters-page.css';
 
+import {
+  formatStayDuration,
+  getInitialAlcohol,
+  getInitialDesktopNoise,
+  getInitialDesktopPets,
+  getInitialDesktopSmoking,
+  getInitialGender,
+  getInitialHousingType,
+  getInitialMobileNoise,
+  getInitialRoomOrder,
+  getInitialSleepSchedule,
+  normalizeBudgetValue,
+  parseStayDurationValue,
+  STAY_DURATION_PROMPT_TEXT,
+} from '../lib/filtersPageGetters';
+
+import type {
+  AlcoholValue,
+  DesktopNoiseValue,
+  DesktopPetsValue,
+  DesktopSmokingValue,
+  MobileNoiseValue,
+  RoomOrderValue,
+  SleepScheduleValue,
+  StayDurationValue,
+} from '../lib/types';
+
+import {
+  DEFAULT_BUDGET_MAX,
+  DEFAULT_BUDGET_MIN,
+  DEFAULT_MOVE_IN_DATE,
+  DEFAULT_STAY_DURATION,
+} from '../lib/defaultFilters';
+
+const { Title } = Typography;
+
 type FiltersPageProps = {
   initialFilters?: UserFilters;
   currentUserUniversity?: string;
@@ -17,84 +53,6 @@ type FiltersPageProps = {
   onBack?: () => void;
   onApply?: (filters: UserFilters) => void;
 };
-
-type MobileNoiseValue = 'quiet' | 'normal' | 'loud' | '';
-type DesktopSmokingValue = 'no' | 'yes' | 'outside' | '';
-type DesktopNoiseValue = 'quiet' | 'normal' | 'loud' | '';
-type DesktopPetsValue = 'ok' | 'not-ok' | '';
-type SleepScheduleValue = 'early_bird' | 'night_owl' | 'flexible' | '';
-type StayDurationValue = '' | 'any' | '1-3 months' | '3-6 months' | '6-12 months' | '12+ months';
-type AlcoholValue = 'no' | 'rarely' | 'socially' | 'yes' | '';
-type RoomOrderValue = 'strict' | 'balanced' | 'flexible' | '';
-
-const DEFAULT_BUDGET_MIN = '';
-const DEFAULT_BUDGET_MAX = '';
-const DEFAULT_MOVE_IN_DATE = '';
-const DEFAULT_STAY_DURATION: StayDurationValue = '';
-
-const STAY_DURATION_PROMPT_TEXT = [
-  'Выбери срок аренды:',
-  '1 — 1–3 месяца',
-  '2 — 3–6 месяцев',
-  '3 — 6–12 месяцев',
-  '4 — 12+ месяцев',
-].join('\n');
-
-function normalizeBudgetValue(value: string, fallback: string) {
-  const digitsOnly = value.replace(/[^\d]/g, '');
-
-  if (!digitsOnly) {
-    return fallback;
-  }
-
-  return String(Math.max(0, Number(digitsOnly)));
-}
-
-function parseStayDurationValue(value: string): StayDurationValue | null {
-  const normalized = value.trim().toLowerCase();
-
-  if (
-    normalized === '1' ||
-    normalized === '1-3 months' ||
-    normalized === '1–3 месяца' ||
-    normalized === '1-3 месяца'
-  ) {
-    return '1-3 months';
-  }
-
-  if (
-    normalized === '2' ||
-    normalized === '3-6 months' ||
-    normalized === '3–6 месяцев' ||
-    normalized === '3-6 месяцев'
-  ) {
-    return '3-6 months';
-  }
-
-  if (
-    normalized === '3' ||
-    normalized === '6-12 months' ||
-    normalized === '6–12 месяцев' ||
-    normalized === '6-12 месяцев' ||
-    normalized === '6 месяцев'
-  ) {
-    return '6-12 months';
-  }
-
-  if (normalized === '4' || normalized === '12+ months' || normalized === '12+ месяцев') {
-    return '12+ months';
-  }
-
-  return null;
-}
-
-function formatStayDuration(value: StayDurationValue) {
-  if (value === '1-3 months') return '1–3 месяца';
-  if (value === '3-6 months') return '3–6 месяцев';
-  if (value === '6-12 months') return '6–12 месяцев';
-  if (value === '12+ months') return '12+ месяцев';
-  return '';
-}
 
 function FilterChip({
   label,
@@ -157,65 +115,6 @@ function FilterToggle({
       />
     </div>
   );
-}
-
-function getInitialMobileNoise(filters?: UserFilters): MobileNoiseValue {
-  if (filters?.noiseLevel === 'quiet') return 'quiet';
-  if (filters?.noiseLevel === 'moderate') return 'normal';
-  if (filters?.noiseLevel === 'social') return 'loud';
-  if (filters?.quietOnly) return 'quiet';
-  return '';
-}
-
-function getInitialDesktopSmoking(filters?: UserFilters): DesktopSmokingValue {
-  if (filters?.smokingPreference === 'no') return 'no';
-  if (filters?.smokingPreference === 'outside_only') return 'outside';
-  if (filters?.smokingPreference === 'yes') return 'yes';
-  return '';
-}
-
-function getInitialDesktopNoise(filters?: UserFilters): DesktopNoiseValue {
-  if (filters?.noiseLevel === 'quiet') return 'quiet';
-  if (filters?.noiseLevel === 'moderate') return 'normal';
-  if (filters?.noiseLevel === 'social') return 'loud';
-  if (filters?.quietOnly) return 'quiet';
-  return '';
-}
-
-function getInitialDesktopPets(filters?: UserFilters): DesktopPetsValue {
-  if (filters?.petPreference === 'pet_friendly') return 'ok';
-  if (filters?.petPreference === 'no_pets') return 'not-ok';
-  return '';
-}
-
-function getInitialSleepSchedule(filters?: UserFilters): SleepScheduleValue {
-  if (filters?.sleepSchedule === 'early_bird') return 'early_bird';
-  if (filters?.sleepSchedule === 'night_owl') return 'night_owl';
-  if (filters?.sleepSchedule === 'flexible') return 'flexible';
-  return '';
-}
-
-function getInitialHousingType(filters?: UserFilters) {
-  return filters?.housingType ?? 'any';
-}
-
-function getInitialGender(filters?: UserFilters) {
-  return filters?.gender ?? 'any';
-}
-
-function getInitialAlcohol(filters?: UserFilters): AlcoholValue {
-  if (filters?.alcoholPreference === 'no') return 'no';
-  if (filters?.alcoholPreference === 'rarely') return 'rarely';
-  if (filters?.alcoholPreference === 'socially') return 'socially';
-  if (filters?.alcoholPreference === 'yes') return 'yes';
-  return '';
-}
-
-function getInitialRoomOrder(filters?: UserFilters): RoomOrderValue {
-  if (filters?.roomOrderPreference === 'strict') return 'strict';
-  if (filters?.roomOrderPreference === 'balanced') return 'balanced';
-  if (filters?.roomOrderPreference === 'flexible') return 'flexible';
-  return '';
 }
 
 export function FiltersPage({
@@ -542,7 +441,9 @@ export function FiltersPage({
     <section className="filters-page">
       <div className="filters-page__mobile">
         <div className="filters-mobile__top">
-          <h1 className="filters-mobile__title">Фильтры</h1>
+          <Title level={1} className="filters-mobile__title">
+            Фильтры
+          </Title>
 
           <Button
             type="text"
@@ -626,9 +527,9 @@ export function FiltersPage({
               <span className="filters-field__label">Курс</span>
               <Input
                 className="filters-field__input"
-                value={faculty}
-                onChange={(event) => setFaculty(event.target.value)}
-                placeholder="Институт ИТИС"
+                value={course}
+                onChange={(event) => setCourse(event.target.value)}
+                placeholder="2 курс"
               />
             </label>
           </section>
@@ -670,7 +571,9 @@ export function FiltersPage({
           </section>
 
           <section className="filters-block">
-            <h2 className="filters-block__title">Уточнения</h2>
+            <Title level={2} className="filters-block__title">
+              Уточнения
+            </Title>
 
             <div className="filters-mobile__toggles">
               {currentUserUniversity ? (
@@ -772,7 +675,9 @@ export function FiltersPage({
           </section>
 
           <section className="filters-block">
-            <h2 className="filters-block__title">Тишина / Чистота</h2>
+            <Title level={2} className="filters-block__title">
+              Тишина / Чистота
+            </Title>
 
             <div className="filters-mobile__chips">
               <FilterChip
@@ -794,7 +699,9 @@ export function FiltersPage({
           </section>
 
           <section className="filters-block">
-            <h2 className="filters-block__title">Режим сна</h2>
+            <Title level={2} className="filters-block__title">
+              Режим сна
+            </Title>
 
             <div className="filters-mobile__chips">
               <FilterChip
@@ -816,7 +723,9 @@ export function FiltersPage({
           </section>
 
           <section className="filters-block">
-            <h2 className="filters-block__title">Алкоголь</h2>
+            <Title level={2} className="filters-block__title">
+              Алкоголь
+            </Title>
 
             <div className="filters-mobile__chips">
               <FilterChip
@@ -830,7 +739,7 @@ export function FiltersPage({
                 onClick={() => setAlcoholPreference('rarely')}
               />
               <FilterChip
-                label="Соц."
+                label="В компании"
                 selected={alcoholPreference === 'socially'}
                 onClick={() => setAlcoholPreference('socially')}
               />
@@ -843,7 +752,9 @@ export function FiltersPage({
           </section>
 
           <section className="filters-block">
-            <h2 className="filters-block__title">Порядок в комнате</h2>
+            <Title level={2} className="filters-block__title">
+              Порядок в комнате
+            </Title>
 
             <div className="filters-mobile__chips">
               <FilterChip
@@ -867,28 +778,36 @@ export function FiltersPage({
 
         {showNoPreviewData ? (
           <section className="filters-preview-state">
-            <h3 className="filters-preview-state__title">Нет данных для предпросмотра</h3>
+            <Title level={3} className="filters-preview-state__title">
+              Нет данных для предпросмотра
+            </Title>
             <p className="filters-preview-state__text">
               Локальная подборка пока пустая. Фильтры всё равно можно настроить и применить.
             </p>
           </section>
         ) : showEmptyPreview ? (
           <section className="filters-preview-state filters-preview-state--warning">
-            <h3 className="filters-preview-state__title">Ничего не найдено</h3>
+            <Title level={3} className="filters-preview-state__title">
+              Ничего не найдено
+            </Title>
             <p className="filters-preview-state__text">
               По текущим фильтрам нет подходящих анкет. Измени параметры перед применением.
             </p>
           </section>
         ) : showIdlePreview ? (
           <section className="filters-preview-state">
-            <h3 className="filters-preview-state__title">Предпросмотр фильтров</h3>
+            <Title level={3} className="filters-preview-state__title">
+              Предпросмотр фильтров
+            </Title>
             <p className="filters-preview-state__text">
               Измени параметры, и здесь появится локальный результат до применения.
             </p>
           </section>
         ) : (
           <section className="filters-preview-state">
-            <h3 className="filters-preview-state__title">Предпросмотр</h3>
+            <Title level={3} className="filters-preview-state__title">
+              Предпросмотр
+            </Title>
             <p className="filters-preview-state__text">Подходит анкет: {previewCount}</p>
           </section>
         )}
@@ -922,7 +841,9 @@ export function FiltersPage({
 
       <div className="filters-page__desktop">
         <div className="filters-desktop__head">
-          <h1 className="filters-desktop__title">Фильтры</h1>
+          <Title level={1} className="filters-desktop__title">
+            Фильтры
+          </Title>
           <p className="filters-desktop__subtitle">
             Настрой подбор под себя — можно сбросить в любой момент.
           </p>
@@ -1089,7 +1010,9 @@ export function FiltersPage({
           </section>
 
           <section className="filters-desktop__section">
-            <h2 className="filters-desktop__section-title">Курение</h2>
+            <Title level={2} className="filters-desktop__section-title">
+              Курение
+            </Title>
             <div className="filters-desktop__chips">
               <FilterChip
                 compact
@@ -1113,7 +1036,9 @@ export function FiltersPage({
           </section>
 
           <section className="filters-desktop__section">
-            <h2 className="filters-desktop__section-title">Алкоголь</h2>
+            <Title level={2} className="filters-desktop__section-title">
+              Алкоголь
+            </Title>
             <div className="filters-desktop__chips">
               <FilterChip
                 compact
@@ -1129,7 +1054,7 @@ export function FiltersPage({
               />
               <FilterChip
                 compact
-                label="Соц."
+                label="В компании"
                 selected={alcoholPreference === 'socially'}
                 onClick={() => setAlcoholPreference('socially')}
               />
@@ -1143,7 +1068,9 @@ export function FiltersPage({
           </section>
 
           <section className="filters-desktop__section">
-            <h2 className="filters-desktop__section-title">Шум</h2>
+            <Title level={2} className="filters-desktop__section-title">
+              Шум
+            </Title>
             <div className="filters-desktop__chips">
               <FilterChip
                 compact
@@ -1167,7 +1094,9 @@ export function FiltersPage({
           </section>
 
           <section className="filters-desktop__section">
-            <h2 className="filters-desktop__section-title">Режим сна</h2>
+            <Title level={2} className="filters-desktop__section-title">
+              Режим сна
+            </Title>
             <div className="filters-desktop__chips">
               <FilterChip
                 compact
@@ -1191,7 +1120,9 @@ export function FiltersPage({
           </section>
 
           <section className="filters-desktop__section">
-            <h2 className="filters-desktop__section-title">Порядок в комнате</h2>
+            <Title level={2} className="filters-desktop__section-title">
+              Порядок в комнате
+            </Title>
             <div className="filters-desktop__chips">
               <FilterChip
                 compact
@@ -1215,7 +1146,9 @@ export function FiltersPage({
           </section>
 
           <section className="filters-desktop__section">
-            <h2 className="filters-desktop__section-title">Животные</h2>
+            <Title level={2} className="filters-desktop__section-title">
+              Животные
+            </Title>
             <div className="filters-desktop__chips">
               <FilterChip
                 compact
@@ -1233,7 +1166,9 @@ export function FiltersPage({
           </section>
 
           <section className="filters-desktop__section">
-            <h2 className="filters-desktop__section-title">Тихие часы</h2>
+            <Title level={2} className="filters-desktop__section-title">
+              Тихие часы
+            </Title>
             <FilterToggle
               label="Только с тихими часами"
               checked={quietOnly}
@@ -1244,28 +1179,36 @@ export function FiltersPage({
 
         {showNoPreviewData ? (
           <section className="filters-preview-state">
-            <h3 className="filters-preview-state__title">Нет данных для предпросмотра</h3>
+            <Title level={3} className="filters-preview-state__title">
+              Нет данных для предпросмотра
+            </Title>
             <p className="filters-preview-state__text">
               Локальная подборка пока пустая. Фильтры всё равно можно настроить и применить.
             </p>
           </section>
         ) : showEmptyPreview ? (
           <section className="filters-preview-state filters-preview-state--warning">
-            <h3 className="filters-preview-state__title">Ничего не найдено</h3>
+            <Title level={3} className="filters-preview-state__title">
+              Ничего не найдено
+            </Title>
             <p className="filters-preview-state__text">
               По текущим фильтрам нет подходящих анкет. Измени параметры перед применением.
             </p>
           </section>
         ) : showIdlePreview ? (
           <section className="filters-preview-state">
-            <h3 className="filters-preview-state__title">Предпросмотр фильтров</h3>
+            <Title level={3} className="filters-preview-state__title">
+              Предпросмотр фильтров
+            </Title>
             <p className="filters-preview-state__text">
               Измени параметры, и здесь появится локальный результат до применения.
             </p>
           </section>
         ) : (
           <section className="filters-preview-state">
-            <h3 className="filters-preview-state__title">Предпросмотр</h3>
+            <Title level={3} className="filters-preview-state__title">
+              Предпросмотр
+            </Title>
             <p className="filters-preview-state__text">Подходит анкет: {previewCount}</p>
           </section>
         )}

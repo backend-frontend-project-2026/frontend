@@ -96,7 +96,7 @@ function getResumeOnboardingPath(draft: ResumeDraft, currentStep: 1 | 2 | 3 | 4)
 
 function OnboardingStep1Route() {
   const navigate = useNavigate();
-  const { completed, draft, setCurrentStep, updateBasicInfo, skipOnboarding } = useRoomieFlow();
+  const { completed, draft, setCurrentStep, updateBasicInfo } = useRoomieFlow();
 
   React.useEffect(() => {
     setCurrentStep(1);
@@ -109,12 +109,7 @@ function OnboardingStep1Route() {
   return (
     <OnboardingStep1Page
       value={draft.basicInfo}
-      onBack={() => navigate(RoutePaths.LANDING)}
       onChange={updateBasicInfo}
-      onSkip={() => {
-        skipOnboarding();
-        navigate(RoutePaths.LANDING);
-      }}
       onNext={(value) => {
         updateBasicInfo(value);
         navigate(RoutePaths.ONBOARDING_STEP_2);
@@ -125,7 +120,7 @@ function OnboardingStep1Route() {
 
 function OnboardingStep2Route() {
   const navigate = useNavigate();
-  const { completed, draft, setCurrentStep, updateHabits, skipOnboarding } = useRoomieFlow();
+  const { completed, draft, setCurrentStep, updateHabits } = useRoomieFlow();
 
   React.useEffect(() => {
     setCurrentStep(2);
@@ -144,10 +139,7 @@ function OnboardingStep2Route() {
       value={draft.habits}
       onBack={() => navigate(RoutePaths.ONBOARDING_STEP_1)}
       onChange={updateHabits}
-      onSkip={() => {
-        skipOnboarding();
-        navigate(RoutePaths.LANDING);
-      }}
+      onSkip={() => navigate(RoutePaths.ONBOARDING_STEP_3)}
       onNext={(value) => {
         updateHabits(value);
         navigate(RoutePaths.ONBOARDING_STEP_3);
@@ -158,7 +150,7 @@ function OnboardingStep2Route() {
 
 function OnboardingStep3Route() {
   const navigate = useNavigate();
-  const { completed, draft, setCurrentStep, updateLiving, skipOnboarding } = useRoomieFlow();
+  const { completed, draft, setCurrentStep, updateLiving } = useRoomieFlow();
 
   React.useEffect(() => {
     setCurrentStep(3);
@@ -172,19 +164,12 @@ function OnboardingStep3Route() {
     return <Navigate to={RoutePaths.ONBOARDING_STEP_1} replace />;
   }
 
-  if (!isHabitsStepComplete(draft.habits)) {
-    return <Navigate to={RoutePaths.ONBOARDING_STEP_2} replace />;
-  }
-
   return (
     <OnboardingStep3Page
       value={draft.living}
       onBack={() => navigate(RoutePaths.ONBOARDING_STEP_2)}
       onChange={updateLiving}
-      onSkip={() => {
-        skipOnboarding();
-        navigate(RoutePaths.LANDING);
-      }}
+      onSkip={() => navigate(RoutePaths.ONBOARDING_STEP_4)}
       onNext={(value) => {
         updateLiving(value);
         navigate(RoutePaths.ONBOARDING_STEP_4);
@@ -195,7 +180,7 @@ function OnboardingStep3Route() {
 
 function OnboardingStep4Route() {
   const navigate = useNavigate();
-  const { completed, draft, setCurrentStep, updateInterests, skipOnboarding } = useRoomieFlow();
+  const { completed, draft, setCurrentStep, updateInterests, finishOnboarding } = useRoomieFlow();
 
   React.useEffect(() => {
     setCurrentStep(4);
@@ -209,22 +194,14 @@ function OnboardingStep4Route() {
     return <Navigate to={RoutePaths.ONBOARDING_STEP_1} replace />;
   }
 
-  if (!isHabitsStepComplete(draft.habits)) {
-    return <Navigate to={RoutePaths.ONBOARDING_STEP_2} replace />;
-  }
-
-  if (!isLivingStepComplete(draft.living)) {
-    return <Navigate to={RoutePaths.ONBOARDING_STEP_3} replace />;
-  }
-
   return (
     <OnboardingStep4Page
       value={draft.interests}
       onBack={() => navigate(RoutePaths.ONBOARDING_STEP_3)}
       onChange={updateInterests}
       onSkip={() => {
-        skipOnboarding();
-        navigate(RoutePaths.LANDING);
+        finishOnboarding();
+        navigate(RoutePaths.DISCOVER);
       }}
       onComplete={(value) => {
         updateInterests(value);

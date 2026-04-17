@@ -117,9 +117,7 @@
   display: none;
 }
 
-.onboarding-page--step-4 .step-4-inner-actions {
-  display: flex;
-  gap: 10px;
+.onboarding-page--step-4 .step-4-actions {
   padding-top: 6px;
 }
 
@@ -267,9 +265,7 @@
     display: none;
   }
 
-  .onboarding-page--step-4 .step-4-inner-actions {
-    display: flex;
-    gap: 10px;
+  .onboarding-page--step-4 .step-4-actions {
     padding-top: 8px;
   }
 
@@ -374,7 +370,6 @@
     outline: none;
   }
 
-  .onboarding-page--step-4 .step-4-inner-actions,
   .onboarding-page--step-4 .step-4-actions {
     margin-top: 8px;
     gap: 14px;

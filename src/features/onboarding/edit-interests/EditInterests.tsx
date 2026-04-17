@@ -230,10 +230,6 @@ export function EditInterests({
               <span className="rm-nav-button__icon rm-nav-button__icon--dark">↗</span>
             </Button>
 
-            <Button htmlType="submit" className="rm-nav-button rm-nav-button--primary">
-              <span>Готово</span>
-              <span className="rm-nav-button__icon rm-nav-button__icon--lime">↗</span>
-            </Button>
           </div>
 
           {onSkip ? (

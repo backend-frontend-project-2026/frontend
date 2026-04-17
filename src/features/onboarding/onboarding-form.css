@@ -383,7 +383,7 @@
 
 .rm-nav-button--skip {
   align-self: flex-start;
-  width: calc(50% - 5px);
+  width: 100%
 }
 
 .onboarding-primary-button,

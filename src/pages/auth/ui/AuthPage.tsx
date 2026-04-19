@@ -5,7 +5,7 @@ import { RoutePaths } from '@/app/router/routePaths';
 import RoundedButton from '@/shared/ui/RoundedButton/RoundedButton';
 import { getApiErrorMessage, type AuthResponse } from '@/shared/api';
 import { authApi } from '@/shared/api/services/auth';
-import { saveAuthSession } from '@/shared/api/auth/session';
+import { saveAuthSession, isOnboardingCompleted } from '@/shared/api/auth/session';
 import styles from './AuthPage.module.css';
 
 const { Title, Text } = Typography;
@@ -37,6 +37,14 @@ const AuthPage = ({ mode: initialMode }: AuthPageProps) => {
   const [loginForm] = Form.useForm<LoginFormValues>();
   const [registerForm] = Form.useForm<RegisterFormValues>();
 
+  const redirectAfterAuth = () => {
+    if (isOnboardingCompleted()) {
+      navigate(RoutePaths.DISCOVER);
+    } else {
+      navigate(RoutePaths.ONBOARDING);
+    }
+  };
+
   const handleAuth = async (apiCall: () => Promise<AuthResponse>, successMessage: string) => {
     try {
       setIsSubmitting(true);
@@ -44,7 +52,7 @@ const AuthPage = ({ mode: initialMode }: AuthPageProps) => {
 
       saveAuthSession(authResponse);
       messageApi.success(successMessage);
-      navigate(RoutePaths.DISCOVER);
+      redirectAfterAuth();
     } catch (error) {
       messageApi.error(getApiErrorMessage(error));
     } finally {

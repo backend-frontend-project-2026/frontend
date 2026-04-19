@@ -23,12 +23,22 @@ import {
   OnboardingStep2Page,
   OnboardingStep3Page,
   OnboardingStep4Page,
+  OnboardingSummaryPage,
+  OnboardingSuccessPage,
 } from '@/pages/onboarding';
 
 import type {
   BasicInfoFormValue,
   HabitsFormValue,
+  InterestsFormValue,
   LivingPreferencesFormValue,
+} from '@/features/onboarding';
+
+import {
+  isBasicInfoStepComplete,
+  isHabitsStepComplete,
+  isInterestsStepComplete,
+  isLivingStepComplete,
 } from '@/features/onboarding';
 
 import DiscoverPage from '@/pages/discover/ui/DiscoverPage';
@@ -45,45 +55,52 @@ import ReportPage from '@/pages/report/ui/ReportPage';
 import NotFoundPage from '@/pages/not-found/ui/NotFoundPage';
 import { useRoomieFlow } from '@/app/providers/roomie-flow';
 
-function isBasicInfoStepComplete(value: BasicInfoFormValue) {
-  return Boolean(
-    value.name.trim() &&
-    value.age.trim() &&
-    value.gender &&
-    value.university.trim() &&
-    value.faculty.trim() &&
-    value.course.trim() &&
-    value.location.trim() &&
-    value.bio.trim()
-  );
-}
+type ResumeDraft = {
+  basicInfo: BasicInfoFormValue;
+  habits: HabitsFormValue;
+  living: LivingPreferencesFormValue;
+  interests: InterestsFormValue;
+};
 
-function isHabitsStepComplete(value: HabitsFormValue) {
-  return Boolean(
-    value.sleepSchedule &&
-    value.cleanliness &&
-    value.noiseLevel &&
-    value.guestFrequency &&
-    value.smokingPreference &&
-    value.alcoholPreference &&
-    value.roomOrderPreference &&
-    value.petPreference &&
-    (!value.hasQuietHours || (value.quietFrom.trim() && value.quietTo.trim()))
-  );
-}
+function getResumeOnboardingPath(draft: ResumeDraft, currentStep: 1 | 2 | 3 | 4) {
+  if (!isBasicInfoStepComplete(draft.basicInfo)) {
+    return RoutePaths.ONBOARDING_STEP_1;
+  }
 
-function isLivingStepComplete(value: LivingPreferencesFormValue) {
-  return Boolean(
-    value.budgetMin.trim() &&
-    value.budgetMax.trim() &&
-    value.moveInDate.trim() &&
-    value.stayDuration
-  );
+  if (currentStep === 1) {
+    return RoutePaths.ONBOARDING_STEP_1;
+  }
+
+  if (!isHabitsStepComplete(draft.habits)) {
+    return RoutePaths.ONBOARDING_STEP_2;
+  }
+
+  if (currentStep === 2) {
+    return RoutePaths.ONBOARDING_STEP_2;
+  }
+
+  if (!isLivingStepComplete(draft.living)) {
+    return RoutePaths.ONBOARDING_STEP_3;
+  }
+
+  if (currentStep === 3) {
+    return RoutePaths.ONBOARDING_STEP_3;
+  }
+
+  if (!isInterestsStepComplete(draft.interests)) {
+    return RoutePaths.ONBOARDING_STEP_4;
+  }
+
+  return RoutePaths.ONBOARDING_SUMMARY;
 }
 
 function OnboardingStep1Route() {
   const navigate = useNavigate();
-  const { completed, draft, updateBasicInfo } = useRoomieFlow();
+  const { completed, draft, setCurrentStep, updateBasicInfo } = useRoomieFlow();
+
+  React.useEffect(() => {
+    setCurrentStep(1);
+  }, [setCurrentStep]);
 
   if (completed) {
     return <Navigate to={RoutePaths.DISCOVER} replace />;
@@ -92,7 +109,7 @@ function OnboardingStep1Route() {
   return (
     <OnboardingStep1Page
       value={draft.basicInfo}
-      onBack={() => navigate(RoutePaths.LANDING)}
+      onChange={updateBasicInfo}
       onNext={(value) => {
         updateBasicInfo(value);
         navigate(RoutePaths.ONBOARDING_STEP_2);
@@ -103,7 +120,11 @@ function OnboardingStep1Route() {
 
 function OnboardingStep2Route() {
   const navigate = useNavigate();
-  const { completed, draft, updateHabits } = useRoomieFlow();
+  const { completed, draft, setCurrentStep, updateHabits } = useRoomieFlow();
+
+  React.useEffect(() => {
+    setCurrentStep(2);
+  }, [setCurrentStep]);
 
   if (completed) {
     return <Navigate to={RoutePaths.DISCOVER} replace />;
@@ -117,6 +138,8 @@ function OnboardingStep2Route() {
     <OnboardingStep2Page
       value={draft.habits}
       onBack={() => navigate(RoutePaths.ONBOARDING_STEP_1)}
+      onChange={updateHabits}
+      onSkip={() => navigate(RoutePaths.ONBOARDING_STEP_3)}
       onNext={(value) => {
         updateHabits(value);
         navigate(RoutePaths.ONBOARDING_STEP_3);
@@ -127,7 +150,11 @@ function OnboardingStep2Route() {
 
 function OnboardingStep3Route() {
   const navigate = useNavigate();
-  const { completed, draft, updateLiving } = useRoomieFlow();
+  const { completed, draft, setCurrentStep, updateLiving } = useRoomieFlow();
+
+  React.useEffect(() => {
+    setCurrentStep(3);
+  }, [setCurrentStep]);
 
   if (completed) {
     return <Navigate to={RoutePaths.DISCOVER} replace />;
@@ -137,14 +164,12 @@ function OnboardingStep3Route() {
     return <Navigate to={RoutePaths.ONBOARDING_STEP_1} replace />;
   }
 
-  if (!isHabitsStepComplete(draft.habits)) {
-    return <Navigate to={RoutePaths.ONBOARDING_STEP_2} replace />;
-  }
-
   return (
     <OnboardingStep3Page
       value={draft.living}
       onBack={() => navigate(RoutePaths.ONBOARDING_STEP_2)}
+      onChange={updateLiving}
+      onSkip={() => navigate(RoutePaths.ONBOARDING_STEP_4)}
       onNext={(value) => {
         updateLiving(value);
         navigate(RoutePaths.ONBOARDING_STEP_4);
@@ -155,7 +180,44 @@ function OnboardingStep3Route() {
 
 function OnboardingStep4Route() {
   const navigate = useNavigate();
-  const { completed, draft, updateInterests, finishOnboarding } = useRoomieFlow();
+  const { completed, draft, setCurrentStep, updateInterests, finishOnboarding } = useRoomieFlow();
+
+  React.useEffect(() => {
+    setCurrentStep(4);
+  }, [setCurrentStep]);
+
+  if (completed) {
+    return <Navigate to={RoutePaths.DISCOVER} replace />;
+  }
+
+  if (!isBasicInfoStepComplete(draft.basicInfo)) {
+    return <Navigate to={RoutePaths.ONBOARDING_STEP_1} replace />;
+  }
+
+  return (
+    <OnboardingStep4Page
+      value={draft.interests}
+      onBack={() => navigate(RoutePaths.ONBOARDING_STEP_3)}
+      onChange={updateInterests}
+      onSkip={() => {
+        finishOnboarding();
+        navigate(RoutePaths.DISCOVER);
+      }}
+      onComplete={(value) => {
+        updateInterests(value);
+        navigate(RoutePaths.ONBOARDING_SUMMARY);
+      }}
+    />
+  );
+}
+
+function OnboardingSummaryRoute() {
+  const navigate = useNavigate();
+  const { completed, draft, setCurrentStep, finishOnboarding } = useRoomieFlow();
+
+  React.useEffect(() => {
+    setCurrentStep(4);
+  }, [setCurrentStep]);
 
   if (completed) {
     return <Navigate to={RoutePaths.DISCOVER} replace />;
@@ -173,16 +235,39 @@ function OnboardingStep4Route() {
     return <Navigate to={RoutePaths.ONBOARDING_STEP_3} replace />;
   }
 
+  if (!isInterestsStepComplete(draft.interests)) {
+    return <Navigate to={RoutePaths.ONBOARDING_STEP_4} replace />;
+  }
+
   return (
-    <OnboardingStep4Page
-      value={draft.interests}
-      onBack={() => navigate(RoutePaths.ONBOARDING_STEP_3)}
-      onComplete={(value) => {
-        updateInterests(value);
+    <OnboardingSummaryPage
+      basicInfo={draft.basicInfo}
+      habits={draft.habits}
+      living={draft.living}
+      interests={draft.interests}
+      onBack={() => navigate(RoutePaths.ONBOARDING_STEP_4)}
+      onEditBasicInfo={() => navigate(RoutePaths.ONBOARDING_STEP_1)}
+      onEditHabits={() => navigate(RoutePaths.ONBOARDING_STEP_2)}
+      onEditLiving={() => navigate(RoutePaths.ONBOARDING_STEP_3)}
+      onEditInterests={() => navigate(RoutePaths.ONBOARDING_STEP_4)}
+      onComplete={() => {
         finishOnboarding();
-        navigate(RoutePaths.DISCOVER);
+        navigate(RoutePaths.ONBOARDING_SUCCESS);
       }}
     />
+  );
+}
+
+function OnboardingSuccessRoute() {
+  const navigate = useNavigate();
+  const { completed, draft, currentStep } = useRoomieFlow();
+
+  if (!completed) {
+    return <Navigate to={getResumeOnboardingPath(draft, currentStep)} replace />;
+  }
+
+  return (
+    <OnboardingSuccessPage onContinue={() => navigate(RoutePaths.DISCOVER, { replace: true })} />
   );
 }
 
@@ -304,25 +389,13 @@ function UserProfileRoute() {
   );
 }
 function OnboardingEntryRoute() {
-  const { completed, draft } = useRoomieFlow();
+  const { completed, draft, currentStep } = useRoomieFlow();
 
   if (completed) {
     return <Navigate to={RoutePaths.DISCOVER} replace />;
   }
 
-  if (isLivingStepComplete(draft.living)) {
-    return <Navigate to={RoutePaths.ONBOARDING_STEP_4} replace />;
-  }
-
-  if (isHabitsStepComplete(draft.habits)) {
-    return <Navigate to={RoutePaths.ONBOARDING_STEP_3} replace />;
-  }
-
-  if (isBasicInfoStepComplete(draft.basicInfo)) {
-    return <Navigate to={RoutePaths.ONBOARDING_STEP_2} replace />;
-  }
-
-  return <Navigate to={RoutePaths.ONBOARDING_STEP_1} replace />;
+  return <Navigate to={getResumeOnboardingPath(draft, currentStep)} replace />;
 }
 
 export const AppRouter = () => {
@@ -331,6 +404,7 @@ export const AppRouter = () => {
       <Routes>
         {/* Auth и онбординг */}
         <Route element={<AuthLayout />}>
+          <Route path={RoutePaths.AUTH} element={<Navigate to={RoutePaths.LOGIN} replace />} />
           <Route path={RoutePaths.LOGIN} element={<AuthPage mode="login" />} />
           <Route path={RoutePaths.REGISTER} element={<AuthPage mode="register" />} />
           <Route path={RoutePaths.VERIFY_EMAIL} element={<VerifyEmailPage />} />
@@ -347,6 +421,8 @@ export const AppRouter = () => {
           <Route path={RoutePaths.ONBOARDING_STEP_2} element={<OnboardingStep2Route />} />
           <Route path={RoutePaths.ONBOARDING_STEP_3} element={<OnboardingStep3Route />} />
           <Route path={RoutePaths.ONBOARDING_STEP_4} element={<OnboardingStep4Route />} />
+          <Route path={RoutePaths.ONBOARDING_SUMMARY} element={<OnboardingSummaryRoute />} />
+          <Route path={RoutePaths.ONBOARDING_SUCCESS} element={<OnboardingSuccessRoute />} />
 
           <Route
             path={RoutePaths.DISCOVER}
@@ -409,6 +485,15 @@ export const AppRouter = () => {
               <RoleRoute allowedRoles={['admin']}>
                 <AdminReportsPage />
               </RoleRoute>
+            }
+          />
+
+          <Route
+            path={RoutePaths.CHATS}
+            element={
+              <ProtectedRoute>
+                <ChatPage />
+              </ProtectedRoute>
             }
           />
 

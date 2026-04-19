@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import styles from './MatchesPage.module.css';
 import { List, Avatar, Empty, Input, Button } from 'antd';
+import { RoutePaths } from '@/app/router/routePaths';
 
 type Match = {
   id: string;
@@ -49,7 +50,7 @@ const MatchesPage = () => {
           renderItem={(m) => (
             <List.Item
               key={m.id}
-              onClick={() => navigate(`/chat/${m.id}`)}
+              onClick={() => navigate(`${RoutePaths.CHATS}/${m.id}`)}
               style={{ cursor: 'pointer' }}
             >
               <List.Item.Meta
@@ -75,7 +76,7 @@ const MatchesPage = () => {
           <h3>Выбери мэтч слева</h3>
           <p>Тут появится переписка и быстрые действия</p>
 
-          <Button type="primary" onClick={() => matches[0] && navigate(`/chat/${matches[0].id}`)}>
+          <Button type="primary" onClick={() => matches[0] && navigate(`${RoutePaths.CHATS}/${matches[0].id}`)}>
             Открыть чат
           </Button>
         </div>

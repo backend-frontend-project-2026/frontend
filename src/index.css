@@ -27,6 +27,46 @@
   --color-warning-bg: #fffbe6;
   --color-text-hint: #555555;
   --color-placeholder: #c0c0c0;
+
+  --color-onboarding-placeholder: #a1a8b4;
+  --color-onboarding-card-border-desktop: #dde2e7;
+  --color-onboarding-card-bg-desktop: rgb(255 255 255 / 84%);
+  --color-onboarding-label-desktop: #90949c;
+  --color-onboarding-label-lg: #7f8792;
+  --color-onboarding-input-border-sm: #e0e1e4;
+  --color-onboarding-input-border-md: #dadde1;
+  --color-onboarding-input-border-lg: #d8dde3;
+  --color-onboarding-input-bg-md: rgb(255 255 255 / 96%);
+  --color-onboarding-input-gradient: linear-gradient(180deg, #ffffff 0%, #fbfcfd 100%);
+  --color-onboarding-shadow-sm: 0 8px 18px rgb(190 193 198 / 16%);
+  --color-onboarding-shadow-md: 0 12px 24px rgb(175 181 190 / 18%);
+  --color-onboarding-shadow-lg: 0 10px 24px rgb(175 181 190 / 14%);
+  --color-onboarding-shadow-inset: inset 0 1px 0 rgb(255 255 255 / 88%);
+  --color-onboarding-nav-border: #e3e6ea;
+  --color-onboarding-nav-text: #8f949b;
+  --color-onboarding-pill-border: #d9d9dc;
+  --color-onboarding-pill-border-md: #dadde1;
+  --color-onboarding-pill-text-md: #23252a;
+  --color-onboarding-dot: #939296;
+  --color-onboarding-checkbox-border: #dedee0;
+  --color-onboarding-checkbox-bg: #fafafa;
+  --color-onboarding-checkbox-shadow: inset 0 1px 0 rgb(255 255 255 / 70%);
+  --color-onboarding-budget-fill: #e6efb9;
+  --color-onboarding-textarea-border: #dfe3e7;
+  --color-onboarding-mobile-note: #afb3bc;
+
+  --color-summary-card-border: #d9dcdf;
+  --color-summary-card-bg: rgb(252 252 252 / 90%);
+  --color-summary-section-border: #e0e1e4;
+  --color-summary-title: #17181b;
+  --color-summary-text: #8f8d92;
+  --color-summary-row-border: #f0f1f3;
+  --color-summary-label: #9a999e;
+  --color-summary-value: #202226;
+  --color-summary-tag-bg: #d8f23e;
+  --color-summary-tag-text: #222328;
+  --color-summary-note-bg: rgb(216 242 62 / 20%);
+  --color-summary-note-text: #2b2c31;
 }
 
 *,
@@ -45,6 +85,7 @@ body,
 }
 
 body {
+  overflow-x: hidden;
   font-family:
     Inter,
     -apple-system,

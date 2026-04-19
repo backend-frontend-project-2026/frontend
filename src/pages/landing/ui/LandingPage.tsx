@@ -28,6 +28,12 @@ const howItWorksCards = [
   },
 ];
 
+const mobileSteps = [
+  { n: '1', title: 'Заполни анкету', text: 'Пара минут — и всё готово.' },
+  { n: '2', title: 'Лайкай анкеты', text: 'Свайпай как в Tinder, но по делу.' },
+  { n: '3', title: 'Совпадение!', text: 'Открывается чат — можно договориться.' },
+];
+
 const LandingPage = () => {
   const navigate = useNavigate();
 
@@ -41,10 +47,18 @@ const LandingPage = () => {
       <section className={styles.hero}>
         <div className={styles.heroLeft}>
           <h1 className={styles.h1}>Подберём соседа по привычкам</h1>
+
+          {/* Десктопный подзаголовок */}
           <p className={styles.subtitle}>
             Анкета, фильтры, лайки и чат — внутри студенческого сообщества. Дружелюбно и безопасно.
           </p>
 
+          {/* Мобильный подзаголовок */}
+          <p className={styles.mobileSubtitle}>
+            Внутренний Tinder для студентов: анкета, фильтры, лайки и чат. Без лишнего шума.
+          </p>
+
+          {/* Бейджи — только десктоп */}
           <div className={styles.badges}>
             {badges.map(({ label, active }) => (
               <Tag
@@ -69,9 +83,7 @@ const LandingPage = () => {
                     width: 8,
                     height: 8,
                     borderRadius: '50%',
-                    background: active
-                      ? 'var(--color-success)'
-                      : 'var(--color-text-secondary)',
+                    background: active ? 'var(--color-success)' : 'var(--color-text-secondary)',
                     display: 'inline-block',
                     flexShrink: 0,
                   }}
@@ -81,16 +93,26 @@ const LandingPage = () => {
             ))}
           </div>
 
+          {/* Кнопки */}
           <div className={styles.buttons}>
             <RoundedButton variant="dark" onClick={() => navigate(RoutePaths.AUTH)}>
               Найти соседа
             </RoundedButton>
-            <RoundedButton variant="gray" onClick={scrollToHowItWorks}>
-              Как работает
-            </RoundedButton>
+            {/* Вторая кнопка — только десктоп */}
+            <span className={styles.desktopOnly}>
+              <RoundedButton variant="gray" onClick={scrollToHowItWorks}>
+                Как работает
+              </RoundedButton>
+            </span>
           </div>
+
+          {/* Текст безопасности — только мобилка */}
+          <p className={styles.mobileSafetyText}>
+            Безопасность: жалобы, блокировка и &quot;тихие часы&quot;.
+          </p>
         </div>
 
+        {/* Карточка Кати — только десктоп */}
         <div className={styles.heroRight}>
           <div className={styles.previewCard}>
             <div className={styles.previewPhoto} />
@@ -108,7 +130,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* How it works */}
+      {/* How it works — десктоп */}
       <section id="how-it-works" className={styles.howItWorks}>
         <div className={styles.howItWorksInner}>
           <div className={styles.cards}>
@@ -121,6 +143,28 @@ const LandingPage = () => {
           </div>
         </div>
       </section>
+
+      {/* Мобильная секция шагов */}
+      <div className={styles.mobileSteps}>
+        <h2 className={styles.mobileStepsTitle}>Как это работает</h2>
+
+        {mobileSteps.map(({ n, title, text }) => (
+          <div key={n} className={styles.step}>
+            <span className={styles.stepNumber}>{n}</span>
+            <div>
+              <p className={styles.stepTitle}>{title}</p>
+              <p className={styles.stepText}>{text}</p>
+            </div>
+          </div>
+        ))}
+
+        <div className={styles.safetyBlock}>
+          <p className={styles.safetyTitle}>Безопасность</p>
+          <p className={styles.safetyText}>
+            Пожаловаться • Заблокировать • Настроить тихие часы • Скрыть контакты до мэтча
+          </p>
+        </div>
+      </div>
     </div>
   );
 };

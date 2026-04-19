@@ -14,9 +14,22 @@ export type OnboardingDraft = {
   interests: InterestsFormValue;
 };
 
-export type OnboardingContextValue = {
-  completed: boolean;
+export type OnboardingStep = 1 | 2 | 3 | 4;
+
+export type OnboardingStatus = 'in_progress' | 'skipped' | 'completed';
+
+export type PersistedOnboardingState = {
+  status: OnboardingStatus;
+  currentStep: OnboardingStep;
   draft: OnboardingDraft;
+};
+
+export type OnboardingContextValue = {
+  status: OnboardingStatus;
+  completed: boolean;
+  currentStep: OnboardingStep;
+  draft: OnboardingDraft;
+  setCurrentStep: (step: OnboardingStep) => void;
   updateBasicInfo: (value: BasicInfoFormValue) => void;
   updateHabits: (value: HabitsFormValue) => void;
   updateLiving: (value: LivingPreferencesFormValue) => void;

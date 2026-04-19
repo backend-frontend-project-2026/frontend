@@ -1,65 +1,39 @@
 import { useEffect, useMemo, useState, type FormEvent, useRef } from 'react';
-import { Button, Input, Radio, Upload, type RadioChangeEvent } from 'antd';
-import type { User } from '../../../entities/user';
+import { Button, Input, Radio, Typography, Upload, type RadioChangeEvent } from 'antd';
+import type { BasicInfoErrors, BasicInfoFormValue } from './types';
 import './edit-basic-info.css';
+import { DEFAULT_BASIC_INFO_FORM_VALUE } from './constants';
+import { readFileAsDataUrl, revokeObjectUrl, validateImageFile } from './lib/basicInfoHelpers';
 
-export type BasicInfoFormValue = {
-  name: string;
-  age: string;
-  gender: User['gender'] | '';
-  university: string;
-  faculty: string;
-  course: string;
-  location: string;
-  bio: string;
-  avatar: string;
-  photos: string[];
-};
 const { TextArea } = Input;
-
-type BasicInfoErrors = Partial<Record<keyof BasicInfoFormValue, string>>;
+const { Title } = Typography;
 
 type EditBasicInfoProps = {
   initialValue?: Partial<BasicInfoFormValue>;
   onBack?: () => void;
   onNext: (value: BasicInfoFormValue) => void;
+  onChange?: (value: BasicInfoFormValue) => void;
+  onSkip?: () => void;
   formId?: string;
   hideHeader?: boolean;
   hideActions?: boolean;
 };
 
-const defaultValue: BasicInfoFormValue = {
-  name: '',
-  age: '',
-  gender: '',
-  university: '',
-  faculty: '',
-  course: '',
-  location: '',
-  bio: '',
-  avatar: '',
-  photos: [],
-};
-
-function revokeObjectUrl(url: string) {
-  if (url.startsWith('blob:')) {
-    URL.revokeObjectURL(url);
-  }
-}
-
 export function EditBasicInfo({
   initialValue,
   onBack,
   onNext,
+  onChange,
+  onSkip,
   formId,
   hideHeader = false,
   hideActions = false,
 }: EditBasicInfoProps) {
   const mergedInitialValue = useMemo(
     () => ({
-      ...defaultValue,
+      ...DEFAULT_BASIC_INFO_FORM_VALUE,
       ...initialValue,
-      photos: initialValue?.photos ?? defaultValue.photos,
+      photos: initialValue?.photos ?? DEFAULT_BASIC_INFO_FORM_VALUE.photos,
     }),
     [initialValue]
   );
@@ -79,6 +53,9 @@ export function EditBasicInfo({
       objectUrlsRef.current.forEach(revokeObjectUrl);
     };
   }, []);
+  useEffect(() => {
+    onChange?.(formValue);
+  }, [formValue, onChange]);
 
   const filledMainFields = [
     formValue.name,
@@ -116,11 +93,33 @@ export function EditBasicInfo({
   }
 
   function clearAvatar() {
-    if (formValue.avatar) {
-      revokeObjectUrl(formValue.avatar);
-    }
+    setFormValue((current) => {
+      if (current.avatar) {
+        revokeObjectUrl(current.avatar);
+      }
 
-    setField('avatar', '');
+      return {
+        ...current,
+        avatar: '',
+      };
+    });
+
+    setErrors((current) => ({
+      ...current,
+      avatar: undefined,
+    }));
+  }
+
+  function setUploadError(message: string) {
+    setErrors((current) => ({ ...current, photos: message }));
+  }
+
+  function clearUploadErrors() {
+    setErrors((current) => ({
+      ...current,
+      avatar: undefined,
+      photos: undefined,
+    }));
   }
 
   function validate(value: BasicInfoFormValue) {
@@ -163,6 +162,10 @@ export function EditBasicInfo({
       nextErrors.bio = 'Био должно быть хотя бы 12 символов.';
     }
 
+    if (!value.avatar.trim() && value.photos.length === 0) {
+      nextErrors.avatar = 'Добавь хотя бы одно фото.';
+    }
+
     return nextErrors;
   }
 
@@ -200,21 +203,27 @@ export function EditBasicInfo({
       {!hideHeader ? (
         <div className="rm-form-head">
           <p className="rm-form-step">Шаг 1</p>
-          <h3 className="rm-form-title">Профиль</h3>
+          <Title level={3} className="rm-form-title">
+            Профиль
+          </Title>
           <p className="rm-form-description">Базовая информация для анкеты и discover.</p>
         </div>
       ) : null}
 
       {isStepEmpty ? (
         <div className="onboarding-form-state">
-          <h4 className="onboarding-form-state__title">Черновик пока пустой</h4>
+          <Title level={4} className="onboarding-form-state__title">
+            Черновик пока пустой
+          </Title>
           <p className="onboarding-form-state__text">Добавь имя, пол, вуз и хотя бы одно фото.</p>
         </div>
       ) : null}
 
       {isStepIncomplete ? (
         <div className="onboarding-form-state onboarding-form-state--warning">
-          <h4 className="onboarding-form-state__title">Анкета заполнена не до конца</h4>
+          <Title level={4} className="onboarding-form-state__title">
+            Анкета заполнена не до конца
+          </Title>
           <p className="onboarding-form-state__text">
             На этом шаге ещё не хватает части базовой информации или фото для профиля.
           </p>
@@ -223,7 +232,9 @@ export function EditBasicInfo({
 
       <section className="rm-form-section">
         <div className="rm-form-section__head">
-          <h4 className="rm-form-section__title">Пол</h4>
+          <Title level={4} className="rm-form-section__title">
+            Пол
+          </Title>
           <p className="rm-form-helper">Нужен для анкеты и фильтров</p>
         </div>
 
@@ -339,20 +350,40 @@ export function EditBasicInfo({
 
       <section className="rm-form-section">
         <div className="rm-form-section__head">
-          <h4 className="rm-form-section__title">Фото</h4>
+          <Title level={4} className="rm-form-section__title">
+            Фото
+          </Title>
           <p className="rm-form-helper">Аватар и дополнительные фото для профиля</p>
         </div>
 
+        {errors.avatar ? <small className="rm-form-error">{errors.avatar}</small> : null}
+
         <div className="rm-form-upload-row">
           <Upload
-            accept="image/*"
+            accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
             showUploadList={false}
             beforeUpload={(file) => {
-              if (formValue.avatar) {
-                revokeObjectUrl(formValue.avatar);
+              const validationError = validateImageFile(file);
+
+              if (validationError) {
+                setUploadError(validationError);
+                return false;
               }
 
-              setField('avatar', URL.createObjectURL(file));
+              void readFileAsDataUrl(file)
+                .then((nextAvatar) => {
+                  clearUploadErrors();
+
+                  if (formValue.avatar) {
+                    revokeObjectUrl(formValue.avatar);
+                  }
+
+                  setField('avatar', nextAvatar);
+                })
+                .catch(() => {
+                  setUploadError('Не удалось прочитать изображение. Попробуй другой файл.');
+                });
+
               return false;
             }}
           >
@@ -362,25 +393,37 @@ export function EditBasicInfo({
           </Upload>
 
           <Upload
-            accept="image/*"
+            accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
             multiple
             showUploadList={false}
             beforeUpload={(file) => {
-              const nextPhoto = URL.createObjectURL(file);
+              const validationError = validateImageFile(file);
 
-              setFormValue((current) => {
-                const remainingSlots = Math.max(0, 6 - current.photos.length);
+              if (validationError) {
+                setUploadError(validationError);
+                return false;
+              }
 
-                if (remainingSlots === 0) {
-                  revokeObjectUrl(nextPhoto);
-                  return current;
-                }
+              void readFileAsDataUrl(file)
+                .then((nextPhoto) => {
+                  clearUploadErrors();
 
-                return {
-                  ...current,
-                  photos: [...current.photos, nextPhoto].slice(0, 6),
-                };
-              });
+                  setFormValue((current) => {
+                    const remainingSlots = Math.max(0, 6 - current.photos.length);
+
+                    if (remainingSlots === 0) {
+                      return current;
+                    }
+
+                    return {
+                      ...current,
+                      photos: [...current.photos, nextPhoto].slice(0, 6),
+                    };
+                  });
+                })
+                .catch(() => {
+                  setUploadError('Не удалось прочитать изображение. Попробуй другой файл.');
+                });
 
               return false;
             }}
@@ -393,6 +436,8 @@ export function EditBasicInfo({
             </Button>
           </Upload>
         </div>
+
+        {errors.photos ? <small className="rm-form-error">{errors.photos}</small> : null}
 
         {hasMedia ? (
           <div className="rm-form-gallery">
@@ -447,20 +492,34 @@ export function EditBasicInfo({
 
       {!hideActions ? (
         <div className="rm-form-actions">
-          <Button
-            htmlType="button"
-            className="rm-nav-button rm-nav-button--ghost"
-            onClick={onBack}
-            disabled={!onBack}
-          >
-            <span>Назад</span>
-            <span className="rm-nav-button__icon rm-nav-button__icon--dark">↗</span>
-          </Button>
+          <div className="rm-actions-row">
+            {onBack ? (
+              <Button
+                htmlType="button"
+                className="rm-nav-button rm-nav-button--ghost"
+                onClick={onBack}
+              >
+                <span>Назад</span>
+                <span className="rm-nav-button__icon rm-nav-button__icon--dark">↗</span>
+              </Button>
+            ) : null}
 
-          <Button htmlType="submit" className="rm-nav-button rm-nav-button--primary">
-            <span>Далее</span>
-            <span className="rm-nav-button__icon rm-nav-button__icon--lime">↗</span>
-          </Button>
+            <Button htmlType="submit" className="rm-nav-button rm-nav-button--primary">
+              <span>Далее</span>
+              <span className="rm-nav-button__icon rm-nav-button__icon--lime">↗</span>
+            </Button>
+          </div>
+
+          {onSkip ? (
+            <Button
+              htmlType="button"
+              className="rm-nav-button rm-nav-button--ghost rm-nav-button--skip"
+              onClick={onSkip}
+            >
+              <span>Пропустить пока</span>
+              <span className="rm-nav-button__icon rm-nav-button__icon--dark">↗</span>
+            </Button>
+          ) : null}
         </div>
       ) : null}
     </form>

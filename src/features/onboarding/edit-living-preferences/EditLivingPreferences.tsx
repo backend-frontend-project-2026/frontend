@@ -1,137 +1,32 @@
-import { useMemo, useState, type FormEvent } from 'react';
-import type { User } from '../../../entities/user';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
+
 import '../onboarding-form.css';
-import { Button, Checkbox, Input } from 'antd';
+import type { LivingPreferencesErrors, LivingPreferencesFormValue } from './types';
+import { Button, Checkbox, Input, Typography } from 'antd';
 
-export type LivingPreferencesFormValue = {
-  budgetMin: string;
-  budgetMax: string;
-  moveInDate: string;
-  stayDuration: User['stayDuration'] | '';
-  housingType: User['housingType'] | '';
-  livingNotes: string;
-  idealRoommateDescription: string;
-  rentalCriteria: string;
-};
+import {
+  DESKTOP_CONDITIONS,
+  formatBudgetRange,
+  formatStayDuration,
+  getSelectedConditionsFromNotes,
+  MOBILE_CONDITIONS,
+  parseBudgetRange,
+  parseStayDuration,
+} from './lib/livingPreferencesHelpers';
+import { DEFAULT_LIVING_PREFERENCES_FORM_VALUE } from './constants';
 
-type LivingPreferencesErrors = Partial<
-  Record<'budgetRange' | 'moveInDate' | 'stayDuration', string>
->;
+const { Title } = Typography;
 
 type EditLivingPreferencesProps = {
   initialValue?: Partial<LivingPreferencesFormValue>;
   onBack?: () => void;
   onNext: (value: LivingPreferencesFormValue) => void;
+  onChange?: (value: LivingPreferencesFormValue) => void;
+  onSkip?: () => void;
   formId?: string;
   hideHeader?: boolean;
   hideActions?: boolean;
 };
-
-type Step3ConditionOption = {
-  key: string;
-  label: string;
-};
-
-const defaultValue: LivingPreferencesFormValue = {
-  budgetMin: '',
-  budgetMax: '',
-  moveInDate: '',
-  stayDuration: '',
-  housingType: '',
-  livingNotes: '',
-  idealRoommateDescription: '',
-  rentalCriteria: '',
-};
-
-const mobileConditions: Step3ConditionOption[] = [
-  { key: 'room_smoking', label: 'Курение в комнате' },
-  { key: 'frequent_guests', label: 'Гости часто' },
-  { key: 'late_noise', label: 'Шум после 23:00' },
-  { key: 'no_cleaning', label: 'Без уборки вообще' },
-  { key: 'pets', label: 'Питомцы' },
-];
-
-const desktopConditions: Step3ConditionOption[] = [
-  { key: 'non_smoker', label: 'Не курит' },
-  { key: 'quiet_evening', label: 'Только тихий режим вечером' },
-  { key: 'no_weekday_guests', label: 'Без гостей по будням' },
-  { key: 'cleanliness_required', label: 'Чистота обязательна' },
-  { key: 'no_animals', label: 'Без животных' },
-];
-
-function formatBudgetRange(min?: string, max?: string) {
-  if (!min || !max) {
-    return '';
-  }
-
-  return `${min}–${max} тыс ₽ / мес`;
-}
-
-function parseBudgetRange(value: string) {
-  const matches = value.match(/\d+/g);
-
-  if (!matches || matches.length < 2) {
-    return null;
-  }
-
-  return {
-    min: matches[0],
-    max: matches[1],
-  };
-}
-
-function formatStayDuration(value: LivingPreferencesFormValue['stayDuration']) {
-  switch (value) {
-    case '1-3 months':
-      return '1–3 месяца';
-    case '3-6 months':
-      return '3–6 месяцев';
-    case '6-12 months':
-      return '6–12 месяцев';
-    case '12+ months':
-      return '12+ месяцев';
-    default:
-      return '';
-  }
-}
-
-function parseStayDuration(value: string): LivingPreferencesFormValue['stayDuration'] | '' {
-  const normalized = value.toLowerCase().replace(/\s+/g, ' ').trim();
-
-  if (!normalized) {
-    return '';
-  }
-
-  if (normalized.includes('12+')) {
-    return '12+ months';
-  }
-
-  if (normalized.includes('1–3') || normalized.includes('1-3')) {
-    return '1-3 months';
-  }
-
-  if (normalized.includes('3–6') || normalized.includes('3-6')) {
-    return '3-6 months';
-  }
-
-  if (
-    normalized.includes('6 месяцев') ||
-    normalized.includes('6–12') ||
-    normalized.includes('6-12')
-  ) {
-    return '6-12 months';
-  }
-
-  return '';
-}
-
-function getSelectedConditionsFromNotes(value: string) {
-  const normalized = value.toLowerCase();
-
-  return [...mobileConditions, ...desktopConditions]
-    .filter((item) => normalized.includes(item.label.toLowerCase()))
-    .map((item) => item.key);
-}
 
 function ConditionItem({ value, label }: { value: string; label: string }) {
   return (
@@ -146,12 +41,16 @@ export function EditLivingPreferences({
   initialValue,
   onBack,
   onNext,
+  onChange,
+  onSkip,
   formId,
   hideHeader = false,
   hideActions = false,
 }: EditLivingPreferencesProps) {
-  const mergedInitialValue = useMemo(() => ({ ...defaultValue, ...initialValue }), [initialValue]);
-
+  const mergedInitialValue = useMemo(
+    () => ({ ...DEFAULT_LIVING_PREFERENCES_FORM_VALUE, ...initialValue }),
+    [initialValue]
+  );
   const [formValue, setFormValue] = useState<LivingPreferencesFormValue>(mergedInitialValue);
   const [budgetRange, setBudgetRange] = useState(
     formatBudgetRange(mergedInitialValue.budgetMin, mergedInitialValue.budgetMax)
@@ -164,17 +63,20 @@ export function EditLivingPreferences({
   );
   const [errors, setErrors] = useState<LivingPreferencesErrors>({});
 
+  useEffect(() => {
+    onChange?.(formValue);
+  }, [formValue, onChange]);
+
   const filledCount = [
     budgetRange,
     formValue.moveInDate,
     stayDurationText,
-    formValue.housingType,
     formValue.idealRoommateDescription,
     formValue.rentalCriteria,
   ].filter((value) => String(value ?? '').trim()).length;
 
   const isStepEmpty = filledCount === 0;
-  const isStepIncomplete = !isStepEmpty && filledCount < 6;
+  const isStepIncomplete = !isStepEmpty && filledCount < 5;
 
   function setField<K extends keyof LivingPreferencesFormValue>(
     field: K,
@@ -201,6 +103,14 @@ export function EditLivingPreferences({
       nextErrors.stayDuration = 'Укажи срок аренды.';
     }
 
+    if (!formValue.idealRoommateDescription.trim()) {
+      nextErrors.idealRoommateDescription = 'Опиши идеального соседа.';
+    }
+
+    if (!formValue.rentalCriteria.trim()) {
+      nextErrors.rentalCriteria = 'Укажи критерии для съёма квартиры.';
+    }
+
     return nextErrors;
   }
 
@@ -222,7 +132,7 @@ export function EditLivingPreferences({
     }
 
     const labelMap = Object.fromEntries(
-      [...mobileConditions, ...desktopConditions].map((item) => [item.key, item.label])
+      [...MOBILE_CONDITIONS, ...DESKTOP_CONDITIONS].map((item) => [item.key, item.label])
     );
 
     const selectedLabels = selectedConditions.map((key) => labelMap[key]).filter(Boolean);
@@ -253,7 +163,9 @@ export function EditLivingPreferences({
       {!hideHeader ? (
         <div className="onboarding-feature-copy">
           <p className="onboarding-feature-eyebrow">Шаг 3</p>
-          <h3 className="onboarding-feature-title">Условия</h3>
+          <Title level={3} className="onboarding-feature-title">
+            Условия
+          </Title>
           <p className="onboarding-feature-description">
             Бюджет, дата заезда, срок аренды и условия совместного проживания.
           </p>
@@ -262,7 +174,9 @@ export function EditLivingPreferences({
 
       {isStepEmpty ? (
         <div className="onboarding-form-state">
-          <h4 className="onboarding-form-state__title">Шаг ещё пустой</h4>
+          <Title level={4} className="onboarding-form-state__title">
+            Шаг ещё пустой
+          </Title>
           <p className="onboarding-form-state__text">
             Укажи бюджет, дату заезда и основные условия совместного проживания.
           </p>
@@ -271,7 +185,9 @@ export function EditLivingPreferences({
 
       {isStepIncomplete ? (
         <div className="onboarding-form-state onboarding-form-state--warning">
-          <h4 className="onboarding-form-state__title">Условия заполнены не до конца</h4>
+          <Title level={4} className="onboarding-form-state__title">
+            Условия заполнены не до конца
+          </Title>
           <p className="onboarding-form-state__text">
             Здесь ещё стоит дописать срок аренды, идеального соседа и критерии для съёма.
           </p>
@@ -333,14 +249,16 @@ export function EditLivingPreferences({
       </section>
 
       <section className="step-3-group step-3-group--conditions">
-        <h4 className="step-3-section-title">Жёсткие условия</h4>
+        <Title level={4} className="step-3-section-title">
+          Жёсткие условия
+        </Title>
 
         <Checkbox.Group
           className="step-3-conditions-list step-3-conditions-list--mobile"
           value={selectedConditions}
           onChange={(checkedValues) => setSelectedConditions(checkedValues.map(String))}
         >
-          {mobileConditions.map((item) => (
+          {MOBILE_CONDITIONS.map((item) => (
             <ConditionItem key={item.key} value={item.key} label={item.label} />
           ))}
         </Checkbox.Group>
@@ -350,7 +268,7 @@ export function EditLivingPreferences({
           value={selectedConditions}
           onChange={(checkedValues) => setSelectedConditions(checkedValues.map(String))}
         >
-          {desktopConditions.map((item) => (
+          {DESKTOP_CONDITIONS.map((item) => (
             <ConditionItem key={item.key} value={item.key} label={item.label} />
           ))}
         </Checkbox.Group>
@@ -367,6 +285,10 @@ export function EditLivingPreferences({
         />
       </label>
 
+      {errors.idealRoommateDescription ? (
+        <small className="rm-form-error">{errors.idealRoommateDescription}</small>
+      ) : null}
+
       <label className="step-3-ideal-field">
         <span className="step-3-label">Критерии для съёма квартиры</span>
         <Input.TextArea
@@ -378,22 +300,39 @@ export function EditLivingPreferences({
         />
       </label>
 
-      {!hideActions ? (
-        <div className="onboarding-feature-actions onboarding-page__actions--step-3">
-          <Button
-            htmlType="button"
-            className="rm-nav-button rm-nav-button--ghost"
-            onClick={onBack}
-            disabled={!onBack}
-          >
-            <span>Назад</span>
-            <span className="rm-nav-button__icon rm-nav-button__icon--dark">↗</span>
-          </Button>
+      {errors.rentalCriteria ? (
+        <small className="rm-form-error">{errors.rentalCriteria}</small>
+      ) : null}
 
-          <Button htmlType="submit" className="rm-nav-button rm-nav-button--primary">
-            <span>Далее</span>
-            <span className="rm-nav-button__icon rm-nav-button__icon--lime">↗</span>
-          </Button>
+      {!hideActions ? (
+        <div className="onboarding-feature-actions step-3-actions">
+          <div className="rm-actions-row">
+            <Button
+              htmlType="button"
+              className="rm-nav-button rm-nav-button--ghost"
+              onClick={onBack}
+              disabled={!onBack}
+            >
+              <span>Назад</span>
+              <span className="rm-nav-button__icon rm-nav-button__icon--dark">↗</span>
+            </Button>
+
+            <Button htmlType="submit" className="rm-nav-button rm-nav-button--primary">
+              <span>Далее</span>
+              <span className="rm-nav-button__icon rm-nav-button__icon--lime">↗</span>
+            </Button>
+          </div>
+
+          {onSkip ? (
+            <Button
+              htmlType="button"
+              className="rm-nav-button rm-nav-button--ghost rm-nav-button--skip"
+              onClick={onSkip}
+            >
+              <span>Пропустить пока</span>
+              <span className="rm-nav-button__icon rm-nav-button__icon--dark">↗</span>
+            </Button>
+          ) : null}
         </div>
       ) : null}
     </form>

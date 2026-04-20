@@ -341,7 +341,6 @@ function FiltersRoute() {
     />
   );
 }
-
 function UserProfileRoute() {
   const navigate = useNavigate();
   const { userId } = useParams();
@@ -357,7 +356,6 @@ function UserProfileRoute() {
 
   React.useEffect(() => {
     selectProfileById(userId);
-
     return () => {
       clearSelectedUser();
     };
@@ -365,6 +363,10 @@ function UserProfileRoute() {
 
   if (!completed) {
     return <Navigate to={RoutePaths.ONBOARDING_STEP_1} replace />;
+  }
+
+  if (!profileUser) {
+    return <NotFoundPage />;
   }
 
   return (
@@ -386,7 +388,6 @@ function UserProfileRoute() {
     />
   );
 }
-
 function OnboardingEntryRoute() {
   const { completed, draft, currentStep } = useRoomieFlow();
 

@@ -1,6 +1,7 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './MatchesPage.module.css';
-import { List, Avatar, Empty, Input, Button } from 'antd';
+import { List, Avatar, Empty, Input, Button, Spin, Result } from 'antd';
 import { RoutePaths } from '@/app/router/routePaths';
 
 type Match = {
@@ -30,7 +31,47 @@ const mockMatches: Match[] = [
 
 const MatchesPage = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [loadKey, setLoadKey] = useState(0);
   const matches = mockMatches;
+
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    const timer = setTimeout(() => {
+      setLoading(false);
+      // TODO: заменить на API когда бэкенд добавит GET /matches
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [loadKey]);
+
+  if (loading) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.spinnerWrapper}>
+          <Spin size="large" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={styles.page}>
+        <Result
+          status="error"
+          title="Не удалось загрузить мэтчи"
+          subTitle={error}
+          extra={
+            <Button type="primary" onClick={() => setLoadKey(k => k + 1)}>
+              Попробовать снова
+            </Button>
+          }
+        />
+      </div>
+    );
+  }
 
   return (
     <div className={styles.page}>
@@ -45,7 +86,13 @@ const MatchesPage = () => {
           className={styles.list}
           dataSource={matches}
           locale={{
-            emptyText: <Empty description="Пока нет мэтчей" />,
+            emptyText: (
+              <Empty description="Пока нет мэтчей. Лайкай анкеты в Поиске!">
+                <Button type="primary" onClick={() => navigate(RoutePaths.DISCOVER)}>
+                  Перейти в Поиск
+                </Button>
+              </Empty>
+            ),
           }}
           renderItem={(m) => (
             <List.Item

@@ -1,21 +1,23 @@
 .page {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   background: var(--color-bg);
 }
 
 .left {
+  display: flex;
+  flex-direction: column;
   flex: 1;
+  overflow: hidden;
   padding: 16px;
 }
 
 .header {
-  position: sticky;
-  top: 0;
-  background: var(--color-bg);
+  flex-shrink: 0;
   padding-bottom: 12px;
-  z-index: 2;
+  background: var(--color-bg);
 }
 
 .title {
@@ -31,10 +33,16 @@
 
 /* ⚠️ теперь стиль Input лучше задавать через antd, а не вручную */
 
-.list {
+.spinnerWrapper {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  justify-content: center;
+  padding-top: 120px;
+  width: 100%;
+}
+
+.list {
+  flex: 1;
+  overflow-y: auto;
   margin-top: 12px;
 }
 
@@ -119,6 +127,7 @@
   }
 
   .left {
+    flex: none;
     width: 380px;
     border-right: 1px solid var(--color-border);
     background: var(--color-bg);

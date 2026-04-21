@@ -34,6 +34,7 @@ const MatchesPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [loadKey, setLoadKey] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
   const matches = mockMatches;
 
   useEffect(() => {
@@ -73,24 +74,42 @@ const MatchesPage = () => {
     );
   }
 
+  const filteredMatches = matches.filter(m =>
+    m.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className={styles.page}>
       <div className={styles.left}>
         <div className={styles.header}>
           <h1 className={styles.title}>Мэтчи</h1>
 
-          <Input className={styles.search} placeholder="Поиск..." />
+          <Input
+            className={styles.search}
+            placeholder="Поиск..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            allowClear
+          />
         </div>
 
         <List
           className={styles.list}
-          dataSource={matches}
+          dataSource={filteredMatches}
           locale={{
             emptyText: (
-              <Empty description="Пока нет мэтчей. Лайкай анкеты в Поиске!">
-                <Button type="primary" onClick={() => navigate(RoutePaths.DISCOVER)}>
-                  Перейти в Поиск
-                </Button>
+              <Empty
+                description={
+                  searchQuery
+                    ? `По запросу «${searchQuery}» ничего не найдено`
+                    : 'Пока нет мэтчей. Лайкай анкеты в Поиске!'
+                }
+              >
+                {!searchQuery && (
+                  <Button type="primary" onClick={() => navigate(RoutePaths.DISCOVER)}>
+                    Перейти в Поиск
+                  </Button>
+                )}
               </Empty>
             ),
           }}
@@ -123,7 +142,7 @@ const MatchesPage = () => {
           <h3>Выбери мэтч слева</h3>
           <p>Тут появится переписка и быстрые действия</p>
 
-          <Button type="primary" onClick={() => matches[0] && navigate(`${RoutePaths.CHATS}/${matches[0].id}`)}>
+          <Button type="primary" onClick={() => filteredMatches[0] && navigate(`${RoutePaths.CHATS}/${filteredMatches[0].id}`)}>
             Открыть чат
           </Button>
         </div>

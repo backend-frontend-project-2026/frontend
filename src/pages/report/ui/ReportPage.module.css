@@ -89,6 +89,12 @@
   opacity: 0.4;
 }
 
+.btn:disabled {
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
 .secondary {
   background: var(--color-gray-light);
 }
@@ -152,4 +158,49 @@
   .confirmBox {
     padding: 16px;
   }
+}
+
+.successCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.successBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: var(--color-dark);
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.successDetails {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--color-light-bg);
+  color: var(--color-gray);
+  font-size: 13px;
+}
+
+.successDetails strong {
+  color: var(--color-dark);
+  font-size: 14px;
+}
+
+.successReasonLabel {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-gray);
 }

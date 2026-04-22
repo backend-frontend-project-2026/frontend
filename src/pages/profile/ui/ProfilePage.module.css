@@ -30,6 +30,10 @@
   margin: 0;
   font-size: 18px;
 }
+.userInfo {
+  flex: 1;
+  min-width: 0;
+}
 
 .userInfo p {
   margin: 0;
@@ -79,9 +83,40 @@
 }
 
 .settings li {
-  padding: 12px 0;
   border-bottom: 1px solid #eee;
+}
+
+.settingsButton {
+  width: 100%;
+  padding: 12px 0;
+  border: none;
+  background: transparent;
   cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  font: inherit;
+  color: inherit;
+  text-align: left;
+
+  transition: opacity 0.2s ease;
+}
+
+.settingsButton:hover {
+  opacity: 0.7;
+}
+
+.settingsButton:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.settingsArrow {
+  color: #777;
+  font-size: 14px;
 }
 
 @media screen and (min-width: 768px) {

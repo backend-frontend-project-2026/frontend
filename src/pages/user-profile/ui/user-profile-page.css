@@ -291,6 +291,73 @@
   line-height: 1.28;
 }
 
+.candidate-reaction-feedback {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid #dadddf;
+  border-radius: 16px;
+  background: rgb(255 255 255 / 92%);
+  box-shadow: 0 8px 18px rgb(120 123 132 / 10%);
+  animation: candidate-feedback-appear 0.22s ease-out;
+}
+
+.candidate-reaction-feedback--like {
+  border-color: #cfeb65;
+  background: linear-gradient(180deg, rgb(245 255 216 / 96%) 0%, rgb(255 255 255 / 92%) 100%);
+}
+
+.candidate-reaction-feedback--superlike {
+  border-color: #cfd5dd;
+  background: linear-gradient(180deg, rgb(244 247 251 / 96%) 0%, rgb(255 255 255 / 92%) 100%);
+}
+
+.candidate-reaction-feedback--skip {
+  border-color: #dadddf;
+  background: linear-gradient(180deg, rgb(248 248 248 / 96%) 0%, rgb(255 255 255 / 92%) 100%);
+}
+
+.candidate-reaction-feedback__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  min-width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #111318;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.candidate-reaction-feedback--like .candidate-reaction-feedback__icon {
+  background: #d6f33d;
+  color: #111318;
+}
+
+.candidate-reaction-feedback__content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.candidate-reaction-feedback__content strong {
+  color: #17181b;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.candidate-reaction-feedback__content span {
+  color: #737882;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
 .candidate-mobile__actions,
 .candidate-desktop__actions {
   gap: 10px;
@@ -349,6 +416,25 @@
   color: #fff !important;
   border: none !important;
   box-shadow: none !important;
+}
+
+.candidate-action-button.ant-btn[disabled],
+.candidate-action-button.ant-btn[disabled]:hover,
+.candidate-action-button.ant-btn[disabled]:focus,
+.candidate-action-button.ant-btn[disabled]:active,
+.candidate-action-button.ant-btn[disabled]:focus-visible {
+  opacity: 0.72;
+  color: #17181b !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.candidate-action-button--primary.ant-btn[disabled],
+.candidate-action-button--primary.ant-btn[disabled]:hover,
+.candidate-action-button--primary.ant-btn[disabled]:focus,
+.candidate-action-button--primary.ant-btn[disabled]:active,
+.candidate-action-button--primary.ant-btn[disabled]:focus-visible {
+  color: #fff !important;
 }
 
 .candidate-action-button.ant-btn .ant-btn-icon {
@@ -1183,5 +1269,17 @@
   .rm-shell--candidate .rm-shell__content::after {
     content: none;
     display: none;
+  }
+}
+
+@keyframes candidate-feedback-appear {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

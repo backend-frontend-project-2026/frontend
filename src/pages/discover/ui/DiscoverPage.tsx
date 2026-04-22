@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button, Input, Typography } from 'antd';
 import type { User, UserFilters } from '../../../entities/user';
 import {
@@ -38,6 +38,56 @@ import type {
 } from '../lib/types';
 
 const { Title } = Typography;
+
+type DiscoverReaction = 'like' | 'skip' | 'superlike';
+
+const DISCOVER_REACTION_FEEDBACK: Record<
+  DiscoverReaction,
+  {
+    title: string;
+    text: string;
+    icon: string;
+  }
+> = {
+  like: {
+    title: 'Лайк отправлен',
+    text: 'Анкета добавлена в понравившиеся. Показываем следующую анкету.',
+    icon: '♥',
+  },
+  skip: {
+    title: 'Анкета пропущена',
+    text: 'Показываем следующую анкету.',
+    icon: '✕',
+  },
+  superlike: {
+    title: 'Супер-лайк отправлен',
+    text: 'Анкета отмечена как особенно интересная. Показываем следующую анкету.',
+    icon: '★',
+  },
+};
+
+function DiscoverReactionFeedback({ reaction }: { reaction: DiscoverReaction }) {
+  const current = DISCOVER_REACTION_FEEDBACK[reaction];
+
+  return (
+    <div
+      className={['discover-reaction-feedback', `discover-reaction-feedback--${reaction}`].join(
+        ' '
+      )}
+      role="status"
+      aria-live="polite"
+    >
+      <span className="discover-reaction-feedback__icon" aria-hidden="true">
+        {current.icon}
+      </span>
+
+      <div className="discover-reaction-feedback__content">
+        <strong>{current.title}</strong>
+        <span>{current.text}</span>
+      </div>
+    </div>
+  );
+}
 
 type DiscoverPageProps = {
   users: User[];
@@ -119,6 +169,9 @@ export default function DiscoverPage({
     getInitialSidebarGuestFrequency(activeFilters)
   );
 
+  const [pendingReaction, setPendingReaction] = useState<DiscoverReaction | null>(null);
+  const reactionTimeoutRef = useRef<number | null>(null);
+
   useEffect(() => {
     setBudgetValue(formatSidebarBudget(activeFilters));
     setMoveInDateValue(activeFilters?.moveInDate ?? '');
@@ -127,6 +180,35 @@ export default function DiscoverPage({
     setCleanlinessValue(getInitialSidebarCleanliness(activeFilters));
     setGuestValue(getInitialSidebarGuestFrequency(activeFilters));
   }, [activeFilters]);
+
+  useEffect(() => {
+    return () => {
+      if (reactionTimeoutRef.current !== null) {
+        window.clearTimeout(reactionTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleReaction = useCallback(
+    (reaction: DiscoverReaction, callback?: () => void) => {
+      if (pendingReaction) {
+        return;
+      }
+
+      setPendingReaction(reaction);
+
+      if (reactionTimeoutRef.current !== null) {
+        window.clearTimeout(reactionTimeoutRef.current);
+      }
+
+      reactionTimeoutRef.current = window.setTimeout(() => {
+        reactionTimeoutRef.current = null;
+        callback?.();
+        setPendingReaction(null);
+      }, 700);
+    },
+    [pendingReaction]
+  );
 
   function handleApplyDesktopFilters() {
     const nextFilters: UserFilters = {};
@@ -207,11 +289,18 @@ export default function DiscoverPage({
               />
             </div>
 
+            {pendingReaction ? (
+              <div className="discover-mobile__feedback">
+                <DiscoverReactionFeedback reaction={pendingReaction} />
+              </div>
+            ) : null}
+
             <div className="discover-mobile__actions">
               <SkipProfileButton
                 className="discover-mobile__action discover-mobile__action--skip"
                 ariaLabel="Пропустить"
-                onClick={() => onSkip?.(currentUser)}
+                onClick={() => handleReaction('skip', () => onSkip?.(currentUser))}
+                disabled={Boolean(pendingReaction)}
               >
                 ✕
               </SkipProfileButton>
@@ -219,7 +308,8 @@ export default function DiscoverPage({
               <SuperLikeProfileButton
                 className="discover-mobile__action discover-mobile__action--super"
                 ariaLabel="Супер-лайк"
-                onClick={() => onSuperLike?.(currentUser)}
+                onClick={() => handleReaction('superlike', () => onSuperLike?.(currentUser))}
+                disabled={Boolean(pendingReaction)}
               >
                 ★
               </SuperLikeProfileButton>
@@ -227,7 +317,8 @@ export default function DiscoverPage({
               <LikeProfileButton
                 className="discover-mobile__action discover-mobile__action--like"
                 ariaLabel="Лайк"
-                onClick={() => onLike?.(currentUser)}
+                onClick={() => handleReaction('like', () => onLike?.(currentUser))}
+                disabled={Boolean(pendingReaction)}
               >
                 ♥
               </LikeProfileButton>
@@ -395,10 +486,13 @@ export default function DiscoverPage({
                 onOpenProfile={onOpenProfile}
               />
 
+              {pendingReaction ? <DiscoverReactionFeedback reaction={pendingReaction} /> : null}
+
               <div className="discover-feed__actions">
                 <SkipProfileButton
                   className="discover-desktop-button discover-desktop-button--soft"
-                  onClick={() => onSkip?.(currentUser)}
+                  onClick={() => handleReaction('skip', () => onSkip?.(currentUser))}
+                  disabled={Boolean(pendingReaction)}
                 >
                   <span>Пропуск</span>
                   <span className="discover-desktop-button__icon discover-desktop-button__icon--dark">
@@ -408,7 +502,8 @@ export default function DiscoverPage({
 
                 <SuperLikeProfileButton
                   className="discover-desktop-button discover-desktop-button--soft"
-                  onClick={() => onSuperLike?.(currentUser)}
+                  onClick={() => handleReaction('superlike', () => onSuperLike?.(currentUser))}
+                  disabled={Boolean(pendingReaction)}
                 >
                   <span>Супер-лайк</span>
                   <span className="discover-desktop-button__icon discover-desktop-button__icon--soft">
@@ -418,7 +513,8 @@ export default function DiscoverPage({
 
                 <LikeProfileButton
                   className="discover-desktop-button discover-desktop-button--primary"
-                  onClick={() => onLike?.(currentUser)}
+                  onClick={() => handleReaction('like', () => onLike?.(currentUser))}
+                  disabled={Boolean(pendingReaction)}
                 >
                   <span>Лайк</span>
                   <span className="discover-desktop-button__icon discover-desktop-button__icon--lime">

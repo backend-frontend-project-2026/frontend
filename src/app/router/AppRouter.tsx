@@ -1,9 +1,18 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Spin } from 'antd';
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom';
 import { RoutePaths } from '@/app/router/routePaths';
 import { ProtectedRoute } from '@/app/router/guards/ProtectedRoute';
 import { RoleRoute } from '@/app/router/guards/RoleRoute';
-import { MOCK_DISCOVER_USERS } from '@/entities/user';
+import { MOCK_DISCOVER_USERS, type User } from '@/entities/user';
 
 import AuthLayout from '@/app/layouts/AuthLayout/AuthLayout';
 import AppLayout from '@/app/layouts/AppLayout/AppLayout';
@@ -44,6 +53,7 @@ import {
 import DiscoverPage from '@/pages/discover/ui/DiscoverPage';
 import { FiltersPage } from '@/pages/filters';
 import { UserProfilePage } from '@/pages/user-profile';
+import UserProfileStatusPage from '@/pages/user-profile/ui/UserProfileStatusPage';
 import MatchesPage from '@/pages/matches/ui/MatchesPage';
 import ProfilePage from '@/pages/profile/ui/ProfilePage';
 import SettingsPage from '@/pages/settings/ui/SettingsPage';
@@ -54,6 +64,8 @@ import ReportPage from '@/pages/report/ui/ReportPage';
 
 import NotFoundPage from '@/pages/not-found/ui/NotFoundPage';
 import { useRoomieFlow } from '@/app/providers/roomie-flow';
+import type { ProfileResponse } from '@/shared/api/generated';
+import { profilesApi } from '@/shared/api/services/profiles';
 
 type ResumeDraft = {
   basicInfo: BasicInfoFormValue;
@@ -61,6 +73,94 @@ type ResumeDraft = {
   living: LivingPreferencesFormValue;
   interests: InterestsFormValue;
 };
+
+function resolveRouteUserId(value?: string): number | null {
+  if (!value) {
+    return null;
+  }
+
+  if (/^\d+$/.test(value)) {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+  }
+
+  const match = value.match(/(\d+)$/);
+
+  if (!match) {
+    return null;
+  }
+
+  const parsed = Number(match[1]);
+
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+}
+
+const DEFAULT_PROFILE_USER: Omit<User, 'id'> = {
+  name: 'Пользователь',
+  age: 18,
+  gender: 'male',
+  housingType: 'rental',
+  university: 'Вуз не указан',
+  course: 'Курс не указан',
+  faculty: 'Факультет не указан',
+  location: 'Локация не указана',
+  district: 'Район не указан',
+  bio: 'Пользователь пока не заполнил описание.',
+  interests: [],
+  habits: {
+    sleepSchedule: 'flexible',
+    cleanliness: 'medium',
+    noiseLevel: 'moderate',
+    guestFrequency: 'rarely',
+    petPreference: 'no_pets',
+    smokingPreference: 'no',
+    alcoholPreference: 'no',
+    roomOrderPreference: 'balanced',
+  },
+  budget: {
+    min: 0,
+    max: 0,
+    currency: '₽',
+    period: 'month',
+  },
+  moveInDate: 'Не указано',
+  stayDuration: '6-12 months',
+  idealRoommateDescription: '',
+  rentalCriteria: '',
+  avatar: '',
+  photos: [],
+  isSmokingAllowed: false,
+  hasPets: false,
+  hasQuietHours: false,
+  verified: false,
+  compatibilityNote: '',
+};
+
+function mapProfileResponseToUser(profile: ProfileResponse, routeUserId: string): User {
+  const baseUser: User = {
+    id: routeUserId,
+    ...DEFAULT_PROFILE_USER,
+  };
+
+  return {
+    ...baseUser,
+    id: routeUserId,
+    name: profile.name?.trim() || baseUser.name,
+    age: profile.age ?? baseUser.age,
+    gender: profile.sex === 'female' || profile.sex === 'male' ? profile.sex : baseUser.gender,
+    university: profile.uni_id ? `Вуз #${profile.uni_id}` : baseUser.university,
+    faculty: profile.faculty_id ? `Факультет #${profile.faculty_id}` : baseUser.faculty,
+    course: profile.course ? `${profile.course} курс` : baseUser.course,
+    location: profile.city?.trim() || baseUser.location,
+    district: profile.neighbourhood_id ? `Район #${profile.neighbourhood_id}` : baseUser.district,
+    bio: profile.profile_description?.trim() || baseUser.bio,
+  };
+}
+
+function useIsProfileEditMode() {
+  const [searchParams] = useSearchParams();
+  return searchParams.get('mode') === 'edit';
+}
 
 function getResumeOnboardingPath(draft: ResumeDraft, currentStep: 1 | 2 | 3 | 4) {
   if (!isBasicInfoStepComplete(draft.basicInfo)) {
@@ -96,23 +196,27 @@ function getResumeOnboardingPath(draft: ResumeDraft, currentStep: 1 | 2 | 3 | 4)
 
 function OnboardingStep1Route() {
   const navigate = useNavigate();
+  const isEditMode = useIsProfileEditMode();
   const { completed, draft, setCurrentStep, updateBasicInfo } = useRoomieFlow();
 
   React.useEffect(() => {
     setCurrentStep(1);
   }, [setCurrentStep]);
 
-  if (completed) {
+  if (completed && !isEditMode) {
     return <Navigate to={RoutePaths.DISCOVER} replace />;
   }
 
   return (
     <OnboardingStep1Page
       value={draft.basicInfo}
+      onBack={isEditMode ? () => navigate(RoutePaths.PROFILE) : undefined}
       onChange={updateBasicInfo}
       onNext={(value) => {
         updateBasicInfo(value);
-        navigate(RoutePaths.ONBOARDING_STEP_2);
+        navigate(
+          isEditMode ? `${RoutePaths.ONBOARDING_STEP_2}?mode=edit` : RoutePaths.ONBOARDING_STEP_2
+        );
       }}
     />
   );
@@ -120,29 +224,45 @@ function OnboardingStep1Route() {
 
 function OnboardingStep2Route() {
   const navigate = useNavigate();
+  const isEditMode = useIsProfileEditMode();
   const { completed, draft, setCurrentStep, updateHabits } = useRoomieFlow();
 
   React.useEffect(() => {
     setCurrentStep(2);
   }, [setCurrentStep]);
 
-  if (completed) {
+  if (completed && !isEditMode) {
     return <Navigate to={RoutePaths.DISCOVER} replace />;
   }
 
   if (!isBasicInfoStepComplete(draft.basicInfo)) {
-    return <Navigate to={RoutePaths.ONBOARDING_STEP_1} replace />;
+    return (
+      <Navigate
+        to={isEditMode ? `${RoutePaths.ONBOARDING_STEP_1}?mode=edit` : RoutePaths.ONBOARDING_STEP_1}
+        replace
+      />
+    );
   }
 
   return (
     <OnboardingStep2Page
       value={draft.habits}
-      onBack={() => navigate(RoutePaths.ONBOARDING_STEP_1)}
+      onBack={() =>
+        navigate(
+          isEditMode ? `${RoutePaths.ONBOARDING_STEP_1}?mode=edit` : RoutePaths.ONBOARDING_STEP_1
+        )
+      }
       onChange={updateHabits}
-      onSkip={() => navigate(RoutePaths.ONBOARDING_STEP_3)}
+      onSkip={() =>
+        navigate(
+          isEditMode ? `${RoutePaths.ONBOARDING_STEP_3}?mode=edit` : RoutePaths.ONBOARDING_STEP_3
+        )
+      }
       onNext={(value) => {
         updateHabits(value);
-        navigate(RoutePaths.ONBOARDING_STEP_3);
+        navigate(
+          isEditMode ? `${RoutePaths.ONBOARDING_STEP_3}?mode=edit` : RoutePaths.ONBOARDING_STEP_3
+        );
       }}
     />
   );
@@ -150,29 +270,45 @@ function OnboardingStep2Route() {
 
 function OnboardingStep3Route() {
   const navigate = useNavigate();
+  const isEditMode = useIsProfileEditMode();
   const { completed, draft, setCurrentStep, updateLiving } = useRoomieFlow();
 
   React.useEffect(() => {
     setCurrentStep(3);
   }, [setCurrentStep]);
 
-  if (completed) {
+  if (completed && !isEditMode) {
     return <Navigate to={RoutePaths.DISCOVER} replace />;
   }
 
   if (!isBasicInfoStepComplete(draft.basicInfo)) {
-    return <Navigate to={RoutePaths.ONBOARDING_STEP_1} replace />;
+    return (
+      <Navigate
+        to={isEditMode ? `${RoutePaths.ONBOARDING_STEP_1}?mode=edit` : RoutePaths.ONBOARDING_STEP_1}
+        replace
+      />
+    );
   }
 
   return (
     <OnboardingStep3Page
       value={draft.living}
-      onBack={() => navigate(RoutePaths.ONBOARDING_STEP_2)}
+      onBack={() =>
+        navigate(
+          isEditMode ? `${RoutePaths.ONBOARDING_STEP_2}?mode=edit` : RoutePaths.ONBOARDING_STEP_2
+        )
+      }
       onChange={updateLiving}
-      onSkip={() => navigate(RoutePaths.ONBOARDING_STEP_4)}
+      onSkip={() =>
+        navigate(
+          isEditMode ? `${RoutePaths.ONBOARDING_STEP_4}?mode=edit` : RoutePaths.ONBOARDING_STEP_4
+        )
+      }
       onNext={(value) => {
         updateLiving(value);
-        navigate(RoutePaths.ONBOARDING_STEP_4);
+        navigate(
+          isEditMode ? `${RoutePaths.ONBOARDING_STEP_4}?mode=edit` : RoutePaths.ONBOARDING_STEP_4
+        );
       }}
     />
   );
@@ -180,32 +316,44 @@ function OnboardingStep3Route() {
 
 function OnboardingStep4Route() {
   const navigate = useNavigate();
+  const isEditMode = useIsProfileEditMode();
   const { completed, draft, setCurrentStep, updateInterests, finishOnboarding } = useRoomieFlow();
 
   React.useEffect(() => {
     setCurrentStep(4);
   }, [setCurrentStep]);
 
-  if (completed) {
+  if (completed && !isEditMode) {
     return <Navigate to={RoutePaths.DISCOVER} replace />;
   }
 
   if (!isBasicInfoStepComplete(draft.basicInfo)) {
-    return <Navigate to={RoutePaths.ONBOARDING_STEP_1} replace />;
+    return (
+      <Navigate
+        to={isEditMode ? `${RoutePaths.ONBOARDING_STEP_1}?mode=edit` : RoutePaths.ONBOARDING_STEP_1}
+        replace
+      />
+    );
   }
 
   return (
     <OnboardingStep4Page
       value={draft.interests}
-      onBack={() => navigate(RoutePaths.ONBOARDING_STEP_3)}
+      onBack={() =>
+        navigate(
+          isEditMode ? `${RoutePaths.ONBOARDING_STEP_3}?mode=edit` : RoutePaths.ONBOARDING_STEP_3
+        )
+      }
       onChange={updateInterests}
       onSkip={() => {
         finishOnboarding();
-        navigate(RoutePaths.DISCOVER);
+        navigate(isEditMode ? RoutePaths.PROFILE : RoutePaths.DISCOVER);
       }}
       onComplete={(value) => {
         updateInterests(value);
-        navigate(RoutePaths.ONBOARDING_SUMMARY);
+        navigate(
+          isEditMode ? `${RoutePaths.ONBOARDING_SUMMARY}?mode=edit` : RoutePaths.ONBOARDING_SUMMARY
+        );
       }}
     />
   );
@@ -213,30 +361,51 @@ function OnboardingStep4Route() {
 
 function OnboardingSummaryRoute() {
   const navigate = useNavigate();
+  const isEditMode = useIsProfileEditMode();
   const { completed, draft, setCurrentStep, finishOnboarding } = useRoomieFlow();
 
   React.useEffect(() => {
     setCurrentStep(4);
   }, [setCurrentStep]);
 
-  if (completed) {
+  if (completed && !isEditMode) {
     return <Navigate to={RoutePaths.DISCOVER} replace />;
   }
 
   if (!isBasicInfoStepComplete(draft.basicInfo)) {
-    return <Navigate to={RoutePaths.ONBOARDING_STEP_1} replace />;
+    return (
+      <Navigate
+        to={isEditMode ? `${RoutePaths.ONBOARDING_STEP_1}?mode=edit` : RoutePaths.ONBOARDING_STEP_1}
+        replace
+      />
+    );
   }
 
   if (!isHabitsStepComplete(draft.habits)) {
-    return <Navigate to={RoutePaths.ONBOARDING_STEP_2} replace />;
+    return (
+      <Navigate
+        to={isEditMode ? `${RoutePaths.ONBOARDING_STEP_2}?mode=edit` : RoutePaths.ONBOARDING_STEP_2}
+        replace
+      />
+    );
   }
 
   if (!isLivingStepComplete(draft.living)) {
-    return <Navigate to={RoutePaths.ONBOARDING_STEP_3} replace />;
+    return (
+      <Navigate
+        to={isEditMode ? `${RoutePaths.ONBOARDING_STEP_3}?mode=edit` : RoutePaths.ONBOARDING_STEP_3}
+        replace
+      />
+    );
   }
 
   if (!isInterestsStepComplete(draft.interests)) {
-    return <Navigate to={RoutePaths.ONBOARDING_STEP_4} replace />;
+    return (
+      <Navigate
+        to={isEditMode ? `${RoutePaths.ONBOARDING_STEP_4}?mode=edit` : RoutePaths.ONBOARDING_STEP_4}
+        replace
+      />
+    );
   }
 
   return (
@@ -245,14 +414,34 @@ function OnboardingSummaryRoute() {
       habits={draft.habits}
       living={draft.living}
       interests={draft.interests}
-      onBack={() => navigate(RoutePaths.ONBOARDING_STEP_4)}
-      onEditBasicInfo={() => navigate(RoutePaths.ONBOARDING_STEP_1)}
-      onEditHabits={() => navigate(RoutePaths.ONBOARDING_STEP_2)}
-      onEditLiving={() => navigate(RoutePaths.ONBOARDING_STEP_3)}
-      onEditInterests={() => navigate(RoutePaths.ONBOARDING_STEP_4)}
+      onBack={() =>
+        navigate(
+          isEditMode ? `${RoutePaths.ONBOARDING_STEP_4}?mode=edit` : RoutePaths.ONBOARDING_STEP_4
+        )
+      }
+      onEditBasicInfo={() =>
+        navigate(
+          isEditMode ? `${RoutePaths.ONBOARDING_STEP_1}?mode=edit` : RoutePaths.ONBOARDING_STEP_1
+        )
+      }
+      onEditHabits={() =>
+        navigate(
+          isEditMode ? `${RoutePaths.ONBOARDING_STEP_2}?mode=edit` : RoutePaths.ONBOARDING_STEP_2
+        )
+      }
+      onEditLiving={() =>
+        navigate(
+          isEditMode ? `${RoutePaths.ONBOARDING_STEP_3}?mode=edit` : RoutePaths.ONBOARDING_STEP_3
+        )
+      }
+      onEditInterests={() =>
+        navigate(
+          isEditMode ? `${RoutePaths.ONBOARDING_STEP_4}?mode=edit` : RoutePaths.ONBOARDING_STEP_4
+        )
+      }
       onComplete={() => {
         finishOnboarding();
-        navigate(RoutePaths.ONBOARDING_SUCCESS);
+        navigate(isEditMode ? RoutePaths.PROFILE : RoutePaths.ONBOARDING_SUCCESS);
       }}
     />
   );
@@ -341,53 +530,111 @@ function FiltersRoute() {
     />
   );
 }
+
 function UserProfileRoute() {
   const navigate = useNavigate();
   const { userId } = useParams();
-  const {
-    completed,
-    profileUser,
-    selectProfileById,
-    clearSelectedUser,
-    handleLike,
-    handleSkip,
-    handleSuperLike,
-  } = useRoomieFlow();
+  const { completed, openProfile, clearSelectedUser, handleLike, handleSkip, handleSuperLike } =
+    useRoomieFlow();
+
+  const [status, setStatus] = React.useState<'loading' | 'ready' | 'not-found' | 'error'>(
+    userId ? 'loading' : 'error'
+  );
+  const [resolvedUser, setResolvedUser] = React.useState<User | null>(null);
+
+  const apiUserId = React.useMemo(() => resolveRouteUserId(userId), [userId]);
 
   React.useEffect(() => {
-    selectProfileById(userId);
+    let isCancelled = false;
+
+    if (!userId || apiUserId === null) {
+      setResolvedUser(null);
+      setStatus('error');
+      return () => {
+        clearSelectedUser();
+      };
+    }
+
+    setResolvedUser(null);
+    setStatus('loading');
+
+    void profilesApi
+      .getByUserId(apiUserId)
+      .then((result) => {
+        if (isCancelled) {
+          return;
+        }
+
+        if (result.data) {
+          const mappedUser = mapProfileResponseToUser(result.data, userId);
+          setResolvedUser(mappedUser);
+          openProfile(mappedUser);
+          setStatus('ready');
+          return;
+        }
+
+        if (result.response.status === 404) {
+          setStatus('not-found');
+          return;
+        }
+
+        setStatus('error');
+      })
+      .catch(() => {
+        if (!isCancelled) {
+          setStatus('error');
+        }
+      });
+
     return () => {
+      isCancelled = true;
       clearSelectedUser();
     };
-  }, [userId, selectProfileById, clearSelectedUser]);
+  }, [apiUserId, userId, openProfile, clearSelectedUser]);
 
   if (!completed) {
     return <Navigate to={RoutePaths.ONBOARDING_STEP_1} replace />;
   }
 
-  if (!profileUser) {
-    return <NotFoundPage />;
+  if (status === 'loading') {
+    return (
+      <div style={{ minHeight: '50vh', display: 'grid', placeItems: 'center' }}>
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  if (status === 'not-found') {
+    return <UserProfileStatusPage variant="not-found" />;
+  }
+
+  if (status === 'error' || resolvedUser === null) {
+    return <UserProfileStatusPage variant="error" />;
   }
 
   return (
     <UserProfilePage
-      user={profileUser}
+      user={resolvedUser}
       onBack={() => navigate(RoutePaths.DISCOVER)}
       onLike={() => {
-        handleLike(profileUser);
+        handleLike(resolvedUser);
         navigate(RoutePaths.DISCOVER);
       }}
       onSkip={() => {
-        handleSkip(profileUser);
+        handleSkip(resolvedUser);
         navigate(RoutePaths.DISCOVER);
       }}
       onSuperLike={() => {
-        handleSuperLike(profileUser);
+        handleSuperLike(resolvedUser);
         navigate(RoutePaths.DISCOVER);
+      }}
+      onReport={() => {
+        navigate(RoutePaths.reportByUser(resolvedUser.id));
       }}
     />
   );
 }
+
 function OnboardingEntryRoute() {
   const { completed, draft, currentStep } = useRoomieFlow();
 
@@ -438,6 +685,15 @@ export const AppRouter = () => {
             element={
               <ProtectedRoute>
                 <FiltersRoute />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path={RoutePaths.USER_PROFILE_BASE}
+            element={
+              <ProtectedRoute>
+                <UserProfileStatusPage variant="error" />
               </ProtectedRoute>
             }
           />
@@ -502,6 +758,15 @@ export const AppRouter = () => {
             element={
               <ProtectedRoute>
                 <ChatPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path={`${RoutePaths.REPORT}/:userId`}
+            element={
+              <ProtectedRoute>
+                <ReportPage />
               </ProtectedRoute>
             }
           />

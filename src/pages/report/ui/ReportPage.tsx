@@ -5,6 +5,7 @@ import { RoutePaths } from '@/app/router/routePaths';
 import { getStoredUser } from '@/shared/api/auth/session';
 import { complaintsApi } from '@/shared/api/services/complaints';
 import { authApi } from '@/shared/api/services/auth';
+import { resolveRouteUserId } from '@/shared/utils/route';
 import styles from './ReportPage.module.css';
 
 const reasons = [
@@ -14,27 +15,6 @@ const reasons = [
   'Несоответствие анкеты',
   'Другое',
 ];
-
-const resolveRouteUserId = (value?: string): number | null => {
-  if (!value) {
-    return null;
-  }
-
-  if (/^\d+$/.test(value)) {
-    const parsed = Number(value);
-    return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
-  }
-
-  const match = value.match(/(\d+)$/);
-
-  if (!match) {
-    return null;
-  }
-
-  const parsed = Number(match[1]);
-
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
-};
 
 export const ReportPage = () => {
   const navigate = useNavigate();

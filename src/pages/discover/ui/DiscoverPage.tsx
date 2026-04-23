@@ -8,6 +8,10 @@ import {
 } from '../../../features/discover';
 import { BottomNav } from '../../../widgets/bottom-nav';
 import { ProfileCard } from '../../../widgets/profile-card';
+import {
+  ReactionFeedback,
+  type ReactionType,
+} from '../../../shared/ui/ReactionFeedback/ReactionFeedback';
 import { getDiscoverEmptyState } from '../lib/emptyState';
 import './discover-page.css';
 
@@ -39,7 +43,7 @@ import type {
 
 const { Title } = Typography;
 
-type DiscoverReaction = 'like' | 'skip' | 'superlike';
+type DiscoverReaction = ReactionType;
 
 const DISCOVER_REACTION_FEEDBACK: Record<
   DiscoverReaction,
@@ -65,29 +69,6 @@ const DISCOVER_REACTION_FEEDBACK: Record<
     icon: '★',
   },
 };
-
-function DiscoverReactionFeedback({ reaction }: { reaction: DiscoverReaction }) {
-  const current = DISCOVER_REACTION_FEEDBACK[reaction];
-
-  return (
-    <div
-      className={['discover-reaction-feedback', `discover-reaction-feedback--${reaction}`].join(
-        ' '
-      )}
-      role="status"
-      aria-live="polite"
-    >
-      <span className="discover-reaction-feedback__icon" aria-hidden="true">
-        {current.icon}
-      </span>
-
-      <div className="discover-reaction-feedback__content">
-        <strong>{current.title}</strong>
-        <span>{current.text}</span>
-      </div>
-    </div>
-  );
-}
 
 type DiscoverPageProps = {
   users: User[];
@@ -291,7 +272,11 @@ export default function DiscoverPage({
 
             {pendingReaction ? (
               <div className="discover-mobile__feedback">
-                <DiscoverReactionFeedback reaction={pendingReaction} />
+                <ReactionFeedback
+                  reaction={pendingReaction}
+                  messages={DISCOVER_REACTION_FEEDBACK}
+                  variant="discover"
+                />
               </div>
             ) : null}
 
@@ -486,7 +471,11 @@ export default function DiscoverPage({
                 onOpenProfile={onOpenProfile}
               />
 
-              {pendingReaction ? <DiscoverReactionFeedback reaction={pendingReaction} /> : null}
+              {pendingReaction ? <ReactionFeedback
+                reaction={pendingReaction}
+                messages={DISCOVER_REACTION_FEEDBACK}
+                variant="discover"
+              /> : null}
 
               <div className="discover-feed__actions">
                 <SkipProfileButton

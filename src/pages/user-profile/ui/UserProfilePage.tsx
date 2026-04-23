@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { BottomNav } from '../../../widgets/bottom-nav';
 import { Button, ConfigProvider } from 'antd';
 import type { User } from '../../../entities/user';
-import { BottomNav } from '../../../widgets/bottom-nav';
+import {
+  ReactionFeedback,
+  type ReactionType,
+} from '../../../shared/ui/ReactionFeedback/ReactionFeedback';
 import './user-profile-page.css';
 
 import {
@@ -25,7 +29,7 @@ type UserProfilePageProps = {
   onReport?: () => void;
 };
 
-type ProfileReaction = 'like' | 'skip' | 'superlike';
+type ProfileReaction = ReactionType;
 
 const REACTION_FEEDBACK: Record<
   ProfileReaction,
@@ -108,28 +112,6 @@ function CandidateChip({ label, accent = false }: { label: string; accent?: bool
   );
 }
 
-function ProfileReactionFeedback({ reaction }: { reaction: ProfileReaction }) {
-  const current = REACTION_FEEDBACK[reaction];
-
-  return (
-    <div
-      className={['candidate-reaction-feedback', `candidate-reaction-feedback--${reaction}`].join(
-        ' '
-      )}
-      role="status"
-      aria-live="polite"
-    >
-      <span className="candidate-reaction-feedback__icon" aria-hidden="true">
-        {current.icon}
-      </span>
-
-      <div className="candidate-reaction-feedback__content">
-        <strong>{current.title}</strong>
-        <span>{current.text}</span>
-      </div>
-    </div>
-  );
-}
 
 export function UserProfilePage({
   user,
@@ -328,7 +310,11 @@ export function UserProfilePage({
               <p className="candidate-mobile__about-text">{user.rentalCriteria || 'Не указано'}</p>
             </section>
 
-            {pendingReaction ? <ProfileReactionFeedback reaction={pendingReaction} /> : null}
+            {pendingReaction ? <ReactionFeedback
+              reaction={pendingReaction}
+              messages={REACTION_FEEDBACK}
+              variant="profile"
+            /> : null}
 
             <div className="candidate-mobile__actions">
               <ActionButton
@@ -404,7 +390,11 @@ export function UserProfilePage({
                 {user.gender === 'female' ? 'Женский' : 'Мужской'} • {user.district}
               </p>
 
-              {pendingReaction ? <ProfileReactionFeedback reaction={pendingReaction} /> : null}
+              {pendingReaction ? <ReactionFeedback
+                reaction={pendingReaction}
+                messages={REACTION_FEEDBACK}
+                variant="profile"
+              /> : null}
 
               <div className="candidate-desktop__actions">
                 <ActionButton

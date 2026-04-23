@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { RoutePaths } from '@/app/router/routePaths';
+import { withModeEdit } from '@/shared/utils/route';
 import { useRoomieFlow } from '@/app/providers/roomie-flow';
 import { getStoredUser } from '@/shared/api/auth/session';
 import { authApi } from '@/shared/api/services/auth';
@@ -135,7 +136,7 @@ const ProfilePage = () => {
       message.warning('Не удалось загрузить профиль с сервера. Откроется локальный черновик.');
     } finally {
       setIsPreparingEdit(false);
-      navigate(`${RoutePaths.ONBOARDING_STEP_1}?mode=edit`);
+      navigate(withModeEdit(RoutePaths.ONBOARDING_STEP_1));
     }
   };
 

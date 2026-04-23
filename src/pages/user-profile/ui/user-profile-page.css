@@ -351,6 +351,25 @@
   box-shadow: none !important;
 }
 
+.candidate-action-button.ant-btn[disabled],
+.candidate-action-button.ant-btn[disabled]:hover,
+.candidate-action-button.ant-btn[disabled]:focus,
+.candidate-action-button.ant-btn[disabled]:active,
+.candidate-action-button.ant-btn[disabled]:focus-visible {
+  opacity: 0.72;
+  color: #17181b !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.candidate-action-button--primary.ant-btn[disabled],
+.candidate-action-button--primary.ant-btn[disabled]:hover,
+.candidate-action-button--primary.ant-btn[disabled]:focus,
+.candidate-action-button--primary.ant-btn[disabled]:active,
+.candidate-action-button--primary.ant-btn[disabled]:focus-visible {
+  color: #fff !important;
+}
+
 .candidate-action-button.ant-btn .ant-btn-icon {
   margin-inline-end: 0 !important;
   margin-inline-start: 0 !important;

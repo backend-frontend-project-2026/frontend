@@ -1,0 +1,19 @@
+.page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 64px);
+  background: var(--color-bg-page);
+  padding: 24px;
+}
+
+.result {
+  width: 100%;
+  max-width: 560px;
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 16px;
+  }
+}

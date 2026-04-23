@@ -1,6 +1,11 @@
-import { Button, ConfigProvider, Typography } from 'antd';
-import type { User } from '../../../entities/user';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { BottomNav } from '../../../widgets/bottom-nav';
+import { Button, ConfigProvider } from 'antd';
+import type { User } from '../../../entities/user';
+import {
+  ReactionFeedback,
+  type ReactionType,
+} from '../../../shared/ui/ReactionFeedback/ReactionFeedback';
 import './user-profile-page.css';
 
 import {
@@ -15,14 +20,40 @@ import {
   getStayShort,
 } from '../lib/userProfileGetters';
 
-const { Title } = Typography;
-
 type UserProfilePageProps = {
   user: User;
   onBack?: () => void;
   onLike?: () => void;
   onSkip?: () => void;
   onSuperLike?: () => void;
+  onReport?: () => void;
+};
+
+type ProfileReaction = ReactionType;
+
+const REACTION_FEEDBACK: Record<
+  ProfileReaction,
+  {
+    title: string;
+    text: string;
+    icon: string;
+  }
+> = {
+  like: {
+    title: 'Лайк отправлен',
+    text: 'Анкета добавлена в понравившиеся. Возвращаемся в поиск…',
+    icon: '♥',
+  },
+  skip: {
+    title: 'Анкета пропущена',
+    text: 'Покажем следующего кандидата в поиске.',
+    icon: '✕',
+  },
+  superlike: {
+    title: 'Супер-лайк отправлен',
+    text: 'Анкета отмечена как особенно интересная. Возвращаемся в поиск…',
+    icon: '★',
+  },
 };
 
 function ActionButton({
@@ -30,11 +61,13 @@ function ActionButton({
   variant = 'ghost',
   onClick,
   className,
+  disabled,
 }: {
   label: string;
   variant?: 'ghost' | 'primary';
   onClick?: () => void;
   className?: string;
+  disabled?: boolean;
 }) {
   return (
     <Button
@@ -63,6 +96,7 @@ function ActionButton({
       }
       iconPlacement="end"
       onClick={onClick}
+      disabled={disabled}
     >
       {label}
     </Button>
@@ -78,13 +112,47 @@ function CandidateChip({ label, accent = false }: { label: string; accent?: bool
   );
 }
 
+
 export function UserProfilePage({
   user,
   onBack,
   onLike,
   onSkip,
   onSuperLike,
+  onReport,
 }: UserProfilePageProps) {
+  const [pendingReaction, setPendingReaction] = useState<ProfileReaction | null>(null);
+  const reactionTimeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (reactionTimeoutRef.current !== null) {
+        window.clearTimeout(reactionTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleReaction = useCallback(
+    (reaction: ProfileReaction, callback?: () => void) => {
+      if (pendingReaction) {
+        return;
+      }
+
+      setPendingReaction(reaction);
+
+      reactionTimeoutRef.current = window.setTimeout(() => {
+        reactionTimeoutRef.current = null;
+
+        if (callback) {
+          callback();
+          return;
+        }
+
+        setPendingReaction(null);
+      }, 700);
+    },
+    [pendingReaction]
+  );
   const mainPhoto = user.avatar || user.photos[0] || '';
 
   const galleryPhotos = Array.from(new Set([user.avatar, ...user.photos].filter(Boolean)));
@@ -142,9 +210,7 @@ export function UserProfilePage({
                 </Button>
               </div>
 
-              <Title level={1} className="candidate-mobile__title">
-                Анкета
-              </Title>
+              <h1 className="candidate-mobile__title">Анкета</h1>
             </div>
 
             <Button
@@ -153,6 +219,7 @@ export function UserProfilePage({
               className="candidate-mobile__report"
               icon={<span className="candidate-mobile__report-icon">↗</span>}
               iconPlacement="end"
+              onClick={onReport}
             >
               Пожаловаться
             </Button>
@@ -176,9 +243,7 @@ export function UserProfilePage({
 
             {galleryPhotos.length > 1 ? (
               <section className="candidate-mobile__section">
-                <Title level={3} className="candidate-mobile__section-title">
-                  Фото
-                </Title>
+                <h3 className="candidate-mobile__section-title">Фото</h3>
                 <div className="candidate-mobile__gallery">
                   {galleryPhotos.map((photo, index) => (
                     <div key={`${photo}-${index}`} className="candidate-mobile__gallery-thumb">
@@ -190,9 +255,9 @@ export function UserProfilePage({
             ) : null}
 
             <div className="candidate-mobile__summary">
-              <Title level={2} className="candidate-mobile__name">
+              <h2 className="candidate-mobile__name">
                 {user.name}, {user.age}
-              </Title>
+              </h2>
 
               <p className="candidate-mobile__meta">
                 {user.university} • {user.faculty} • {user.course} •{' '}
@@ -202,9 +267,7 @@ export function UserProfilePage({
             </div>
 
             <section className="candidate-mobile__section">
-              <Title level={3} className="candidate-mobile__section-title">
-                Привычки
-              </Title>
+              <h3 className="candidate-mobile__section-title">Привычки</h3>
               <div className="candidate-mobile__chips-row">
                 {habitChips.map((chip) => (
                   <CandidateChip key={chip} label={chip} />
@@ -213,9 +276,7 @@ export function UserProfilePage({
             </section>
 
             <section className="candidate-mobile__section">
-              <Title level={3} className="candidate-mobile__section-title">
-                Условия
-              </Title>
+              <h2 className="candidate-mobile__section-title">Условия</h2>
               <div className="candidate-mobile__chips-row">
                 {conditionChips.map((chip) => (
                   <CandidateChip key={chip} label={chip} />
@@ -224,9 +285,7 @@ export function UserProfilePage({
             </section>
 
             <section className="candidate-mobile__section">
-              <Title level={3} className="candidate-mobile__section-title">
-                Интересы
-              </Title>
+              <h2 className="candidate-mobile__section-title">Интересы</h2>
               <div className="candidate-mobile__chips-row">
                 {interestChips.map((chip) => (
                   <CandidateChip key={chip} label={chip} />
@@ -235,32 +294,45 @@ export function UserProfilePage({
             </section>
 
             <section className="candidate-mobile__about">
-              <Title level={3} className="candidate-mobile__section-title">
-                Обо мне
-              </Title>
+              <h3 className="candidate-mobile__section-title">Обо мне</h3>
               <p className="candidate-mobile__about-text">{user.bio}</p>
             </section>
 
             <section className="candidate-mobile__about">
-              <Title level={3} className="candidate-mobile__section-title">
-                Идеальный сосед
-              </Title>
+              <h3 className="candidate-mobile__section-title">Идеальный сосед</h3>
               <p className="candidate-mobile__about-text">
                 {user.idealRoommateDescription || 'Не указано'}
               </p>
             </section>
 
             <section className="candidate-mobile__about">
-              <Title level={3} className="candidate-mobile__section-title">
-                Критерии для съёма
-              </Title>
+              <h3 className="candidate-mobile__section-title">Критерии для съёма</h3>
               <p className="candidate-mobile__about-text">{user.rentalCriteria || 'Не указано'}</p>
             </section>
 
+            {pendingReaction ? <ReactionFeedback
+              reaction={pendingReaction}
+              messages={REACTION_FEEDBACK}
+              variant="profile"
+            /> : null}
+
             <div className="candidate-mobile__actions">
-              <ActionButton label="Лайк" variant="primary" onClick={onLike} />
-              <ActionButton label="Супер-лайк" onClick={onSuperLike} />
-              <ActionButton label="Пропуск" onClick={onSkip} />
+              <ActionButton
+                label="Лайк"
+                variant="primary"
+                onClick={() => handleReaction('like', onLike)}
+                disabled={Boolean(pendingReaction)}
+              />
+              <ActionButton
+                label="Супер-лайк"
+                onClick={() => handleReaction('superlike', onSuperLike)}
+                disabled={Boolean(pendingReaction)}
+              />
+              <ActionButton
+                label="Пропуск"
+                onClick={() => handleReaction('skip', onSkip)}
+                disabled={Boolean(pendingReaction)}
+              />
             </div>
           </div>
 
@@ -309,37 +381,55 @@ export function UserProfilePage({
             ) : null}
 
             <div className="candidate-desktop__left-body">
-              <Title level={2} className="candidate-desktop__name">
+              <h2 className="candidate-desktop__name">
                 {user.name}, {user.age}
-              </Title>
+              </h2>
 
               <p className="candidate-desktop__meta">
                 {user.university} • {user.faculty} • {user.course} •{' '}
                 {user.gender === 'female' ? 'Женский' : 'Мужской'} • {user.district}
               </p>
 
+              {pendingReaction ? <ReactionFeedback
+                reaction={pendingReaction}
+                messages={REACTION_FEEDBACK}
+                variant="profile"
+              /> : null}
+
               <div className="candidate-desktop__actions">
-                <ActionButton label="Пропуск" onClick={onSkip} />
-                <ActionButton label="Супер-лайк" onClick={onSuperLike} />
+                <ActionButton
+                  label="Пропуск"
+                  onClick={() => handleReaction('skip', onSkip)}
+                  disabled={Boolean(pendingReaction)}
+                />
+                <ActionButton
+                  label="Супер-лайк"
+                  onClick={() => handleReaction('superlike', onSuperLike)}
+                  disabled={Boolean(pendingReaction)}
+                />
                 <ActionButton
                   label="Лайк"
                   variant="primary"
-                  onClick={onLike}
+                  onClick={() => handleReaction('like', onLike)}
                   className="candidate-action-button--wide"
+                  disabled={Boolean(pendingReaction)}
                 />
               </div>
             </div>
 
-            <Button type="text" htmlType="button" className="candidate-desktop__report-link">
+            <Button
+              type="text"
+              htmlType="button"
+              className="candidate-desktop__report-link"
+              onClick={onReport}
+            >
               Пожаловаться
             </Button>
           </div>
 
           <div className="candidate-desktop__right-card">
             <section className="candidate-desktop__section">
-              <Title level={3} className="candidate-desktop__section-title">
-                Привычки
-              </Title>
+              <h3 className="candidate-desktop__section-title">Привычки</h3>
 
               <div className="candidate-desktop__chips">
                 {habitChips.map((chip) => (
@@ -349,16 +439,12 @@ export function UserProfilePage({
             </section>
 
             <section className="candidate-desktop__section">
-              <Title level={3} className="candidate-desktop__section-title">
-                Условия
-              </Title>
+              <h3 className="candidate-desktop__section-title">Условия</h3>
               <p className="candidate-desktop__line">{desktopConditionLine}</p>
             </section>
 
             <section className="candidate-desktop__section">
-              <Title level={3} className="candidate-desktop__section-title">
-                Интересы
-              </Title>
+              <h3 className="candidate-desktop__section-title">Интересы</h3>
               <div className="candidate-desktop__chips">
                 {interestChips.map((chip) => (
                   <CandidateChip key={chip} label={chip} />
@@ -367,32 +453,24 @@ export function UserProfilePage({
             </section>
 
             <section className="candidate-desktop__section">
-              <Title level={3} className="candidate-desktop__section-title">
-                Тихие часы
-              </Title>
+              <h3 className="candidate-desktop__section-title">Тихие часы</h3>
               <p className="candidate-desktop__line">{quietHoursLine}</p>
             </section>
 
             <section className="candidate-desktop__section">
-              <Title level={3} className="candidate-desktop__section-title">
-                Короткое био
-              </Title>
+              <h3 className="candidate-desktop__section-title">Короткое био</h3>
               <p className="candidate-desktop__bio">{user.bio}</p>
             </section>
 
             <section className="candidate-desktop__section">
-              <Title level={3} className="candidate-desktop__section-title">
-                Идеальный сосед
-              </Title>
+              <h3 className="candidate-desktop__section-title">Идеальный сосед</h3>
               <p className="candidate-desktop__bio">
                 {user.idealRoommateDescription || 'Не указано'}
               </p>
             </section>
 
             <section className="candidate-desktop__section">
-              <Title level={3} className="candidate-desktop__section-title">
-                Критерии для съёма
-              </Title>
+              <h3 className="candidate-desktop__section-title">Критерии для съёма</h3>
               <p className="candidate-desktop__bio">{user.rentalCriteria || 'Не указано'}</p>
             </section>
           </div>

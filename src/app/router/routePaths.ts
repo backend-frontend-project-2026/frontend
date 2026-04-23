@@ -26,5 +26,6 @@ export const RoutePaths = {
   ADMIN_REPORTS: '/admin/reports',
   REPORT: '/report',
   NOT_FOUND: '*',
+  reportByUser: (userId: string): string => `/report/${userId}`,
   userProfile: (userId: string): string => `/user-profile/${userId}`,
 };

@@ -39,6 +39,10 @@ export function OnboardingProvider({ children }: PropsWithChildren) {
     setCurrentStepState(step);
   }, []);
 
+  const replaceDraft = useCallback((value: OnboardingDraft) => {
+    setDraft(value);
+  }, []);
+
   const updateBasicInfo = useCallback((value: BasicInfoFormValue) => {
     setDraft((current) => ({ ...current, basicInfo: value }));
   }, []);
@@ -75,6 +79,7 @@ export function OnboardingProvider({ children }: PropsWithChildren) {
       currentStep,
       draft,
       setCurrentStep,
+      replaceDraft,
       updateBasicInfo,
       updateHabits,
       updateLiving,
@@ -88,6 +93,7 @@ export function OnboardingProvider({ children }: PropsWithChildren) {
       currentStep,
       draft,
       setCurrentStep,
+      replaceDraft,
       updateBasicInfo,
       updateHabits,
       updateLiving,

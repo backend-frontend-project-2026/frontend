@@ -30,6 +30,7 @@ export type OnboardingContextValue = {
   currentStep: OnboardingStep;
   draft: OnboardingDraft;
   setCurrentStep: (step: OnboardingStep) => void;
+  replaceDraft: (value: OnboardingDraft) => void;
   updateBasicInfo: (value: BasicInfoFormValue) => void;
   updateHabits: (value: HabitsFormValue) => void;
   updateLiving: (value: LivingPreferencesFormValue) => void;

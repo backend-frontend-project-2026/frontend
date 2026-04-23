@@ -6,6 +6,7 @@ type LikeProfileButtonProps = {
   className?: string;
   children?: ReactNode;
   ariaLabel?: string;
+  disabled?: boolean;
 };
 
 export function LikeProfileButton({
@@ -13,9 +14,16 @@ export function LikeProfileButton({
   className,
   children = 'Лайк',
   ariaLabel = 'Лайк',
+  disabled = false,
 }: LikeProfileButtonProps) {
   return (
-    <Button htmlType="button" className={className} onClick={onClick} aria-label={ariaLabel}>
+    <Button
+      htmlType="button"
+      className={className}
+      onClick={onClick}
+      aria-label={ariaLabel}
+      disabled={disabled}
+    >
       {children}
     </Button>
   );

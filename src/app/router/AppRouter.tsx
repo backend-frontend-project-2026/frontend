@@ -108,9 +108,9 @@ export const AppRouter = () => {
           <Route
             path={RoutePaths.MATCHES}
             element={
-              <ProtectedRoute>
+              // <ProtectedRoute>
                 <MatchesPage />
-              </ProtectedRoute>
+              // </ProtectedRoute>
             }
           />
           <Route
@@ -135,15 +135,6 @@ export const AppRouter = () => {
               <RoleRoute allowedRoles={['admin']}>
                 <AdminReportsPage />
               </RoleRoute>
-            }
-          />
-
-          <Route
-            path={RoutePaths.CHATS}
-            element={
-              <ProtectedRoute>
-                <ChatPage />
-              </ProtectedRoute>
             }
           />
 

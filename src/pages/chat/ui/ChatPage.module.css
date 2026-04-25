@@ -1,3 +1,4 @@
+/* ========= ОСНОВНЫЕ СТИЛИ (десктоп) ========= */
 .chats {
   display: flex;
   height: 100vh;
@@ -5,7 +6,6 @@
   font-family: sans-serif;
 }
 
-/* САЙДБАР */
 .chats__sidebar {
   width: 320px;
   background: var(--color-white);
@@ -24,7 +24,6 @@
   overflow-y: auto;
 }
 
-/* ЧАТЫ В СПИСКЕ */
 .chatItem {
   display: flex;
   gap: 10px;
@@ -57,7 +56,6 @@
   color: var(--color-text-muted);
 }
 
-/* ЧАТ */
 .chat {
   flex: 1;
   display: flex;
@@ -69,9 +67,11 @@
   background: var(--color-white);
   border-bottom: 1px solid var(--color-border);
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-/* СООБЩЕНИЯ */
 .chat__messages {
   flex: 1;
   padding: 16px;
@@ -105,4 +105,36 @@
   padding: 12px;
   background: var(--color-white);
   border-top: 1px solid var(--color-border);
+}
+
+/* ========= МОБИЛЬНЫЕ КОНТЕЙНЕРЫ ========= */
+.chatsMobile {
+  height: 100vh;
+  background: var(--color-bg);
+}
+
+.chatMobile {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* ========= МЕДИА-ЗАПРОСЫ ДЛЯ МАЛЕНЬКИХ ЭКРАНОВ ========= */
+@media (max-width: 768px) {
+  .chats__sidebar {
+    width: 100%;
+    border-right: none;
+  }
+
+  .chat__header .ant-btn {
+    margin-right: 4px;
+  }
+
+  .msg {
+    max-width: 85%;
+  }
+
+  .chat__input {
+    padding: 8px;
+  }
 }

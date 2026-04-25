@@ -1,4 +1,5 @@
 import { Link, NavLink, Outlet } from 'react-router-dom';
+import { Input } from 'antd';
 import { RoutePaths } from '@/app/router/routePaths';
 import AppFooter from '@/shared/ui/AppFooter/AppFooter';
 import styles from './AppLayout.module.css';
@@ -6,7 +7,6 @@ import styles from './AppLayout.module.css';
 const navItems = [
   { label: 'Поиск', path: RoutePaths.DISCOVER },
   { label: 'Мэтчи', path: RoutePaths.MATCHES },
-  { label: 'Чаты', path: RoutePaths.CHATS },
   { label: 'Профиль', path: RoutePaths.PROFILE },
 ];
 
@@ -32,7 +32,7 @@ const AppLayout = () => {
             ))}
           </nav>
           <div className={styles.actions}>
-            {/* TODO: поиск реализован внутри ChatPage */}
+            <Input placeholder="Поиск по мэтчам/чатам..." className={styles.search} />
             <div className={styles.avatar} />
           </div>
         </div>

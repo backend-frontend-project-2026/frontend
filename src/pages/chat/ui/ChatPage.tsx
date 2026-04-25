@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Input, Button } from 'antd';
 import { LeftOutlined } from '@ant-design/icons';
 import { RoutePaths } from '@/app/router/routePaths';
+import { useIsMobile } from '@/shared/hooks/useIsMobile';
 import styles from './ChatPage.module.css';
 
 type Message = {
@@ -40,52 +41,13 @@ const ChatsPage = () => {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-  const [showSidebar, setShowSidebar] = useState(true);
-  const [showChat, setShowChat] = useState(false);
+  const isMobile = useIsMobile();
 
   const activeChatId = Number(id);
   const activeChat = chats.find((c) => c.id === activeChatId);
 
-  // Отслеживание изменения размера окна
-  useEffect(() => {
-    const handleResize = () => {
-      const mobile = window.innerWidth <= 768;
-      setIsMobile(mobile);
-      if (!mobile) {
-        // На десктопе показываем и сайдбар, и чат
-        setShowSidebar(true);
-        setShowChat(true);
-      } else {
-        // На мобилке: если есть активный чат, показываем только чат, иначе список
-        if (activeChat) {
-          setShowSidebar(false);
-          setShowChat(true);
-        } else {
-          setShowSidebar(true);
-          setShowChat(false);
-        }
-      }
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [activeChat]);
-
-  const handleSelectChat = (chatId: number) => {
-    navigate(`${RoutePaths.CHATS}/${chatId}`);
-    if (isMobile) {
-      setShowSidebar(false);
-      setShowChat(true);
-    }
-  };
-
-  const handleBackToList = () => {
-    navigate(RoutePaths.CHATS); // убираем id из URL
-    if (isMobile) {
-      setShowSidebar(true);
-      setShowChat(false);
-    }
-  };
+  const showSidebar = !isMobile || !activeChat;
+  const showChat = !isMobile || !!activeChat;
 
   const sendMessage = () => {
     if (!input.trim() || !activeChat) return;
@@ -102,9 +64,17 @@ const ChatsPage = () => {
     setInput('');
   };
 
+  const handleSelectChat = (chatId: number) => {
+    navigate(`${RoutePaths.CHATS}/${chatId}`);
+  };
+
+  const handleBackToList = () => {
+    navigate(RoutePaths.CHATS);
+  };
+
   const { TextArea } = Input;
 
-  // Десктопная версия — показываем сайдбар и чат одновременно
+  // Десктоп
   if (!isMobile) {
     return (
       <div className={styles.chats}>
@@ -115,7 +85,7 @@ const ChatsPage = () => {
               <div
                 key={chat.id}
                 className={`${styles.chatItem} ${chat.id === activeChatId ? styles.active : ''}`}
-                onClick={() => navigate(`${RoutePaths.CHATS}/${chat.id}`)}
+                onClick={() => handleSelectChat(chat.id)}
               >
                 <div className={styles.chatItem__avatar} />
                 <div>
@@ -126,7 +96,6 @@ const ChatsPage = () => {
             ))}
           </div>
         </aside>
-
         <main className={styles.chat}>
           {!activeChat ? (
             <div className={styles.chat__empty}>Выберите чат</div>
@@ -158,7 +127,7 @@ const ChatsPage = () => {
     );
   }
 
-  // Мобильная версия — показываем либо сайдбар, либо чат
+  // Мобилка
   return (
     <div className={styles.chatsMobile}>
       {showSidebar && (
@@ -181,16 +150,10 @@ const ChatsPage = () => {
           </div>
         </aside>
       )}
-
       {showChat && activeChat && (
         <main className={styles.chatMobile}>
           <div className={styles.chat__header}>
-            <Button
-              type="text"
-              icon={<LeftOutlined />}
-              onClick={handleBackToList}
-              style={{ marginRight: 8 }}
-            />
+            <Button type="text" icon={<LeftOutlined />} onClick={handleBackToList} />
             {activeChat.name}
           </div>
           <div className={styles.chat__messages}>

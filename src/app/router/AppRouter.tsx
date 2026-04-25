@@ -108,9 +108,9 @@ export const AppRouter = () => {
           <Route
             path={RoutePaths.MATCHES}
             element={
-              <ProtectedRoute>
+              // <ProtectedRoute>
                 <MatchesPage />
-              </ProtectedRoute>
+              // </ProtectedRoute>
             }
           />
           <Route

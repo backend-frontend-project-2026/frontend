@@ -26,7 +26,7 @@ export function ProfileProvider({ children }: PropsWithChildren) {
       const foundUser = MOCK_DISCOVER_USERS.find((user) => user.id === userId);
 
       if (!foundUser) {
-        setSelectedUser(null); // ✅ честный not-found
+        setSelectedUser(null); 
         return;
       }
 

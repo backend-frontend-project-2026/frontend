@@ -9,6 +9,15 @@
   --color-divider: #e6e6e6;
   --color-text-secondary: #8b8b8b;
 
+  --color-bg: var(--color-bg-page);
+  --color-gray: var(--color-text-secondary);
+  --color-warning-border: #f0d98a;
+  --color-shadow: rgb(35 36 39 / 14%);
+  --color-gray-light: var(--color-bg-search);
+  --color-gray-hover: #e9ebf0;
+  --color-light-bg: var(--color-white-soft);
+  --color-text-muted: var(--color-text-hint);
+
   /* Семантические */
   --color-error: #ff4d4d;
   --color-bg-page: #f5f6fa;

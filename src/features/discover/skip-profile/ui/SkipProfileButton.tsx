@@ -6,6 +6,7 @@ type SkipProfileButtonProps = {
   className?: string;
   children?: ReactNode;
   ariaLabel?: string;
+  disabled?: boolean;
 };
 
 export function SkipProfileButton({
@@ -13,9 +14,16 @@ export function SkipProfileButton({
   className,
   children = 'Пропустить',
   ariaLabel = 'Пропустить',
+  disabled = false,
 }: SkipProfileButtonProps) {
   return (
-    <Button htmlType="button" className={className} onClick={onClick} aria-label={ariaLabel}>
+    <Button
+      htmlType="button"
+      className={className}
+      onClick={onClick}
+      aria-label={ariaLabel}
+      disabled={disabled}
+    >
       {children}
     </Button>
   );

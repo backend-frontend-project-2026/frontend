@@ -5,9 +5,12 @@ import '@/app/styles/index.css';
 import App from './App.tsx';
 import 'antd/dist/reset.css';
 import '@/shared/api/setup';
+import ErrorBoundary from './app/providers/ErrorBoundary';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
   </StrictMode>
 );

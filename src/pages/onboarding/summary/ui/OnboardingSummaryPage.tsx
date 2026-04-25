@@ -332,19 +332,25 @@ export function OnboardingSummaryPage({
         <div className="onboarding-summary-note">После подтверждения откроется discover.</div>
 
         <div className="rm-form-actions">
-          <Button htmlType="button" className="rm-nav-button rm-nav-button--ghost" onClick={onBack}>
-            <span>Назад</span>
-            <span className="rm-nav-button__icon rm-nav-button__icon--dark">↗</span>
-          </Button>
+          <div className="rm-actions-row">
+            <Button
+              htmlType="button"
+              className="rm-nav-button rm-nav-button--ghost"
+              onClick={onBack}
+            >
+              <span>Назад</span>
+              <span className="rm-nav-button__icon rm-nav-button__icon--dark">↗</span>
+            </Button>
 
-          <Button
-            htmlType="button"
-            className="rm-nav-button rm-nav-button--primary"
-            onClick={onComplete}
-          >
-            <span>Завершить онбординг</span>
-            <span className="rm-nav-button__icon rm-nav-button__icon--lime">↗</span>
-          </Button>
+            <Button
+              htmlType="button"
+              className="rm-nav-button rm-nav-button--primary"
+              onClick={onComplete}
+            >
+              <span>Завершить онбординг</span>
+              <span className="rm-nav-button__icon rm-nav-button__icon--lime">↗</span>
+            </Button>
+          </div>
         </div>
       </div>
     </section>

@@ -12,9 +12,7 @@ interface RoleRouteProps {
 
 const NoAccess = () => (
   <div style={{ padding: 40, textAlign: 'center' }}>
-    <Title level={2} style={{ marginBottom: 16 }}>
-      Доступ запрещён
-    </Title>
+    <Title level={2} style={{ marginBottom: 16 }}>Доступ запрещён</Title>
     <Text type="secondary">У вас нет прав для просмотра этой страницы</Text>
   </div>
 );

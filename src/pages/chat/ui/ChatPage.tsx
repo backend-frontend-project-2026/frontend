@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Input, Button } from 'antd';
+import { Input, Button, Spin, Result } from 'antd';
 import { LeftOutlined } from '@ant-design/icons';
 import { RoutePaths } from '@/app/router/routePaths';
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
@@ -18,6 +18,7 @@ type Chat = {
   messages: Message[];
 };
 
+// TODO: заменить на API когда бэкенд добавит GET /chats/:id
 const mockChats: Chat[] = [
   {
     id: 1,
@@ -35,22 +36,109 @@ const mockChats: Chat[] = [
   },
 ];
 
+const { TextArea } = Input;
+
+const ChatLoadingState = ({ className }: { className: string }) => (
+  <div className={className}>
+    <Spin size="large" />
+  </div>
+);
+
+const ChatNotFound = ({ onBack }: { onBack: () => void }) => (
+  <Result
+    status="404"
+    title="Чат не найден"
+    subTitle="Возможно, ссылка устарела"
+    extra={
+      <Button type="primary" onClick={onBack}>
+        К мэтчам
+      </Button>
+    }
+  />
+);
+
+interface ChatContentProps {
+  chat: Chat;
+  input: string;
+  onInputChange: (val: string) => void;
+  onSend: () => void;
+  onBack?: () => void;
+  showBackButton?: boolean;
+}
+
+const ChatContent = ({
+  chat,
+  input,
+  onInputChange,
+  onSend,
+  onBack,
+  showBackButton = false,
+}: ChatContentProps) => (
+  <>
+    <div className={styles.chat__header}>
+      {showBackButton && onBack && (
+        <Button type="text" icon={<LeftOutlined />} onClick={onBack} />
+      )}
+      {chat.name}
+    </div>
+    <div className={styles.chat__messages}>
+      {chat.messages.map((m) => (
+        <div
+          key={m.id}
+          className={`${styles.msg} ${m.fromMe ? styles.me : styles.them}`}
+        >
+          {m.text}
+        </div>
+      ))}
+    </div>
+    <div className={styles.chat__input}>
+      <TextArea
+        value={input}
+        onChange={(e) => onInputChange(e.target.value)}
+        placeholder="Сообщение..."
+        autoSize={{ minRows: 1, maxRows: 4 }}
+        onPressEnter={(e) => {
+          if (!e.shiftKey) {
+            e.preventDefault();
+            onSend();
+          }
+        }}
+      />
+      <Button type="primary" onClick={onSend}>
+        Отправить
+      </Button>
+    </div>
+  </>
+);
+
 const ChatsPage = () => {
   const [chats, setChats] = useState<Chat[]>(mockChats);
   const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { id } = useParams();
 
   const isMobile = useIsMobile();
 
-  const activeChatId = Number(id);
+  const activeChatId = id != null ? Number(id) : null;
+
+  // TODO: заменить на API — GET /chats/:id/messages
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [activeChatId]);
+
   const activeChat = chats.find((c) => c.id === activeChatId);
 
-  const showSidebar = !isMobile || !activeChat;
-  const showChat = !isMobile || !!activeChat;
+  const hasId = !!id;
+  const showSidebar = !isMobile || !hasId;
+  const showChat = !isMobile || hasId;
 
   const sendMessage = () => {
-    if (!input.trim() || !activeChat) return;
+    if (!input.trim() || !activeChat || activeChatId == null) return;
     const newMessage: Message = {
       id: Date.now(),
       text: input,
@@ -69,10 +157,8 @@ const ChatsPage = () => {
   };
 
   const handleBackToList = () => {
-    navigate(RoutePaths.CHATS);
+    navigate(RoutePaths.MATCHES);
   };
-
-  const { TextArea } = Input;
 
   // Десктоп
   if (!isMobile) {
@@ -97,30 +183,17 @@ const ChatsPage = () => {
           </div>
         </aside>
         <main className={styles.chat}>
-          {!activeChat ? (
-            <div className={styles.chat__empty}>Выберите чат</div>
+          {loading ? (
+            <ChatLoadingState className={styles.chat__empty} />
+          ) : !activeChat ? (
+            <ChatNotFound onBack={handleBackToList} />
           ) : (
-            <>
-              <div className={styles.chat__header}>{activeChat.name}</div>
-              <div className={styles.chat__messages}>
-                {activeChat.messages.map((m) => (
-                  <div key={m.id} className={`${styles.msg} ${m.fromMe ? styles.me : styles.them}`}>
-                    {m.text}
-                  </div>
-                ))}
-              </div>
-              <div className={styles.chat__input}>
-                <TextArea
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Сообщение..."
-                  autoSize={{ minRows: 1, maxRows: 4 }}
-                />
-                <Button type="primary" onClick={sendMessage}>
-                  Отпр
-                </Button>
-              </div>
-            </>
+            <ChatContent
+              chat={activeChat}
+              input={input}
+              onInputChange={setInput}
+              onSend={sendMessage}
+            />
           )}
         </main>
       </div>
@@ -150,30 +223,22 @@ const ChatsPage = () => {
           </div>
         </aside>
       )}
-      {showChat && activeChat && (
+      {showChat && (
         <main className={styles.chatMobile}>
-          <div className={styles.chat__header}>
-            <Button type="text" icon={<LeftOutlined />} onClick={handleBackToList} />
-            {activeChat.name}
-          </div>
-          <div className={styles.chat__messages}>
-            {activeChat.messages.map((m) => (
-              <div key={m.id} className={`${styles.msg} ${m.fromMe ? styles.me : styles.them}`}>
-                {m.text}
-              </div>
-            ))}
-          </div>
-          <div className={styles.chat__input}>
-            <TextArea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Сообщение..."
-              autoSize={{ minRows: 1, maxRows: 4 }}
+          {loading ? (
+            <ChatLoadingState className={styles.chat__empty} />
+          ) : !activeChat ? (
+            <ChatNotFound onBack={handleBackToList} />
+          ) : (
+            <ChatContent
+              chat={activeChat}
+              input={input}
+              onInputChange={setInput}
+              onSend={sendMessage}
+              onBack={handleBackToList}
+              showBackButton
             />
-            <Button type="primary" onClick={sendMessage}>
-              Отпр
-            </Button>
-          </div>
+          )}
         </main>
       )}
     </div>

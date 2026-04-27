@@ -1,40 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Input, Button, Spin, Result } from 'antd';
+import { Input, Button, Spin, Result, message } from 'antd';
 import { LeftOutlined } from '@ant-design/icons';
 import { RoutePaths } from '@/app/router/routePaths';
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
+import { chatsApi } from '@/shared/api/services/chats';
+import { getStoredUser } from '@/shared/api/auth/session';
+import type { MessageResponse } from '@/shared/api/generated';
 import styles from './ChatPage.module.css';
-
-type Message = {
-  id: number;
-  text: string;
-  fromMe: boolean;
-};
-
-type Chat = {
-  id: number;
-  name: string;
-  messages: Message[];
-};
-
-// TODO: заменить на API когда бэкенд добавит GET /chats/:id
-const mockChats: Chat[] = [
-  {
-    id: 1,
-    name: 'Катя, 20',
-    messages: [
-      { id: 1, text: 'Привет! Видела твою анкету 😌', fromMe: false },
-      { id: 2, text: 'Привет! Да, супер. Во сколько обычно ложишься?', fromMe: true },
-      { id: 3, text: 'Около 23:30. А ты?', fromMe: false },
-    ],
-  },
-  {
-    id: 2,
-    name: 'Оля, 19',
-    messages: [{ id: 1, text: 'Привет! Договоримся о проживании?', fromMe: false }],
-  },
-];
 
 const { TextArea } = Input;
 
@@ -58,36 +31,42 @@ const ChatNotFound = ({ onBack }: { onBack: () => void }) => (
 );
 
 interface ChatContentProps {
-  chat: Chat;
+  chatName: string;
+  messages: MessageResponse[];
+  currentProfileId: number | null;
   input: string;
   onInputChange: (val: string) => void;
   onSend: () => void;
   onBack?: () => void;
   showBackButton?: boolean;
+  sending?: boolean;
 }
 
 const ChatContent = ({
-  chat,
+  chatName,
+  messages,
+  currentProfileId,
   input,
   onInputChange,
   onSend,
   onBack,
   showBackButton = false,
+  sending = false,
 }: ChatContentProps) => (
   <>
     <div className={styles.chat__header}>
       {showBackButton && onBack && (
         <Button type="text" icon={<LeftOutlined />} onClick={onBack} />
       )}
-      {chat.name}
+      {chatName}
     </div>
     <div className={styles.chat__messages}>
-      {chat.messages.map((m) => (
+      {messages.map((m) => (
         <div
           key={m.id}
-          className={`${styles.msg} ${m.fromMe ? styles.me : styles.them}`}
+          className={`${styles.msg} ${m.profile_id === currentProfileId ? styles.me : styles.them}`}
         >
-          {m.text}
+          {m.content}
         </div>
       ))}
     </div>
@@ -97,14 +76,15 @@ const ChatContent = ({
         onChange={(e) => onInputChange(e.target.value)}
         placeholder="Сообщение..."
         autoSize={{ minRows: 1, maxRows: 4 }}
+        disabled={sending}
         onPressEnter={(e) => {
-          if (!e.shiftKey) {
+          if (!e.shiftKey && !sending) {
             e.preventDefault();
             onSend();
           }
         }}
       />
-      <Button type="primary" onClick={onSend}>
+      <Button type="primary" onClick={onSend} loading={sending} disabled={sending}>
         Отправить
       </Button>
     </div>
@@ -112,87 +92,123 @@ const ChatContent = ({
 );
 
 const ChatsPage = () => {
-  const [chats, setChats] = useState<Chat[]>(mockChats);
+  const currentProfileId = useMemo(() => getStoredUser()?.id ?? null, []);
+
+  const [messages, setMessages] = useState<MessageResponse[]>([]);
+  const [chatName, setChatName] = useState('Чат');
   const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loadKey, setLoadKey] = useState(0);
+  const [sending, setSending] = useState(false);
   const navigate = useNavigate();
   const { id } = useParams();
 
   const isMobile = useIsMobile();
 
   const activeChatId = id != null ? Number(id) : null;
-
-  // TODO: заменить на API — GET /chats/:id/messages
-  useEffect(() => {
-    setLoading(true);
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [activeChatId]);
-
-  const activeChat = chats.find((c) => c.id === activeChatId);
-
   const hasId = !!id;
   const showSidebar = !isMobile || !hasId;
   const showChat = !isMobile || hasId;
 
-  const sendMessage = () => {
-    if (!input.trim() || !activeChat || activeChatId == null) return;
-    const newMessage: Message = {
-      id: Date.now(),
-      text: input,
-      fromMe: true,
-    };
-    setChats((prev) =>
-      prev.map((chat) =>
-        chat.id === activeChatId ? { ...chat, messages: [...chat.messages, newMessage] } : chat
-      )
-    );
-    setInput('');
-  };
+  useEffect(() => {
+    if (!activeChatId) return;
 
-  const handleSelectChat = (chatId: number) => {
-    navigate(`${RoutePaths.CHATS}/${chatId}`);
+    setLoading(true);
+    setError(null);
+    setChatName('Чат');
+
+    const controller = new AbortController();
+
+    Promise.all([
+      chatsApi.getMessages(activeChatId, controller.signal),
+      chatsApi.getChat(activeChatId, controller.signal),
+    ])
+      .then(([messagesData, chatData]) => {
+        setMessages(messagesData?.items ?? []);
+        // TODO: загрузить имя собеседника через GET /users/{id}/profile
+        if (chatData?.profile_id) {
+          setChatName(`Собеседник #${chatData.profile_id}`);
+        }
+      })
+      .catch((err: Error) => {
+        if (err.name !== 'AbortError') {
+          setError('Не удалось загрузить чат');
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+
+    return () => controller.abort();
+  }, [activeChatId, loadKey]);
+
+  // TODO: добавить пагинацию сообщений
+  // TODO: добавить WebSocket для real-time обновлений
+  const sendMessage = async () => {
+    if (!input.trim() || !activeChatId || !currentProfileId) return;
+
+    try {
+      setSending(true);
+      const newMessage = await chatsApi.sendMessage({
+        chat_id: activeChatId,
+        profile_id: currentProfileId,
+        content: input,
+      });
+      if (newMessage) {
+        setMessages((prev) => [...prev, newMessage]);
+      }
+      setInput('');
+    } catch {
+      message.error('Не удалось отправить сообщение');
+    } finally {
+      setSending(false);
+    }
   };
 
   const handleBackToList = () => {
     navigate(RoutePaths.MATCHES);
   };
 
+  if (error) {
+    return (
+      <div className={isMobile ? styles.chatsMobile : styles.chats}>
+        <Result
+          status="error"
+          title="Не удалось загрузить чат"
+          subTitle={error}
+          extra={
+            <Button type="primary" onClick={() => setLoadKey((k) => k + 1)}>
+              Попробовать снова
+            </Button>
+          }
+        />
+      </div>
+    );
+  }
+
   // Десктоп
   if (!isMobile) {
     return (
       <div className={styles.chats}>
         <aside className={styles.chats__sidebar}>
+          {/* TODO: загрузить список чатов через GET /chats */}
           <div className={styles.chats__title}>Чаты</div>
-          <div className={styles.chats__list}>
-            {chats.map((chat) => (
-              <div
-                key={chat.id}
-                className={`${styles.chatItem} ${chat.id === activeChatId ? styles.active : ''}`}
-                onClick={() => handleSelectChat(chat.id)}
-              >
-                <div className={styles.chatItem__avatar} />
-                <div>
-                  <div className={styles.chatItem__name}>{chat.name}</div>
-                  <div className={styles.chatItem__last}>{chat.messages.at(-1)?.text}</div>
-                </div>
-              </div>
-            ))}
-          </div>
         </aside>
         <main className={styles.chat}>
-          {loading ? (
-            <ChatLoadingState className={styles.chat__empty} />
-          ) : !activeChat ? (
+          {!activeChatId ? (
             <ChatNotFound onBack={handleBackToList} />
+          ) : loading ? (
+            <ChatLoadingState className={styles.chat__empty} />
           ) : (
             <ChatContent
-              chat={activeChat}
+              chatName={chatName}
+              messages={messages}
+              currentProfileId={currentProfileId}
               input={input}
               onInputChange={setInput}
               onSend={sendMessage}
+              sending={sending}
             />
           )}
         </main>
@@ -205,38 +221,27 @@ const ChatsPage = () => {
     <div className={styles.chatsMobile}>
       {showSidebar && (
         <aside className={styles.chats__sidebar}>
+          {/* TODO: загрузить список чатов через GET /chats */}
           <div className={styles.chats__title}>Чаты</div>
-          <div className={styles.chats__list}>
-            {chats.map((chat) => (
-              <div
-                key={chat.id}
-                className={styles.chatItem}
-                onClick={() => handleSelectChat(chat.id)}
-              >
-                <div className={styles.chatItem__avatar} />
-                <div>
-                  <div className={styles.chatItem__name}>{chat.name}</div>
-                  <div className={styles.chatItem__last}>{chat.messages.at(-1)?.text}</div>
-                </div>
-              </div>
-            ))}
-          </div>
         </aside>
       )}
       {showChat && (
         <main className={styles.chatMobile}>
-          {loading ? (
-            <ChatLoadingState className={styles.chat__empty} />
-          ) : !activeChat ? (
+          {!activeChatId ? (
             <ChatNotFound onBack={handleBackToList} />
+          ) : loading ? (
+            <ChatLoadingState className={styles.chat__empty} />
           ) : (
             <ChatContent
-              chat={activeChat}
+              chatName={chatName}
+              messages={messages}
+              currentProfileId={currentProfileId}
               input={input}
               onInputChange={setInput}
               onSend={sendMessage}
               onBack={handleBackToList}
               showBackButton
+              sending={sending}
             />
           )}
         </main>

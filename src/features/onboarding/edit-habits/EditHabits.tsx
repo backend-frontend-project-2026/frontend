@@ -4,6 +4,11 @@ import type { HabitsErrors, HabitsFormValue } from './types';
 import '../onboarding-form.css';
 import { formatQuietInterval, parseQuietInterval } from './lib/quietInterval';
 import { DEFAULT_HABITS_FORM_VALUE } from './constants';
+import {
+  EMPTY_HABIT_REFERENCES,
+  referencesApi,
+  type HabitReferenceMap,
+} from '@/shared/api/services/references';
 
 const { Title } = Typography;
 
@@ -55,6 +60,8 @@ export function EditHabits({
 
   const [formValue, setFormValue] = useState<HabitsFormValue>(mergedInitialValue);
   const [errors, setErrors] = useState<HabitsErrors>({});
+  const [habitReferences, setHabitReferences] =
+    useState<HabitReferenceMap>(EMPTY_HABIT_REFERENCES);
   const [quietInterval, setQuietInterval] = useState(
     mergedInitialValue.quietIntervalDraft ||
       formatQuietInterval(mergedInitialValue.quietFrom, mergedInitialValue.quietTo)
@@ -66,6 +73,27 @@ export function EditHabits({
       quietIntervalDraft: quietInterval,
     });
   }, [formValue, quietInterval, onChange]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    referencesApi
+      .listHabitReferences()
+      .then((nextReferences) => {
+        if (isMounted) {
+          setHabitReferences(nextReferences);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setHabitReferences(EMPTY_HABIT_REFERENCES);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const selectedCount = [
     formValue.sleepSchedule,
@@ -99,6 +127,7 @@ export function EditHabits({
     setFormValue((current) => ({
       ...current,
       petPreference: value,
+      hasPets: value === 'has_pets',
     }));
     setErrors((current) => ({ ...current, petPreference: undefined }));
   }
@@ -225,8 +254,9 @@ export function EditHabits({
           value={formValue.sleepSchedule}
           onChange={(event) => setField('sleepSchedule', event.target.value)}
         >
-          <HabitPill value="early_bird" label="Ложусь рано" />
-          <HabitPill value="night_owl" label="Ложусь позже" />
+          {habitReferences.sleepSchedule.map((option) => (
+            <HabitPill key={option.value} value={option.value} label={option.label} />
+          ))}
         </Radio.Group>
         {errors.sleepSchedule ? (
           <small className="rm-form-error">{errors.sleepSchedule}</small>
@@ -244,9 +274,9 @@ export function EditHabits({
             setSmoking(event.target.value as HabitsFormValue['smokingPreference'])
           }
         >
-          <HabitPill compact value="no" label="Нет" />
-          <HabitPill compact value="yes" label="Да" />
-          <HabitPill compact value="outside_only" label="Только на улице" />
+          {habitReferences.smokingPreference.map((option) => (
+            <HabitPill compact key={option.value} value={option.value} label={option.label} />
+          ))}
         </Radio.Group>
         {errors.smokingPreference ? (
           <small className="rm-form-error">{errors.smokingPreference}</small>
@@ -262,10 +292,9 @@ export function EditHabits({
           value={formValue.alcoholPreference}
           onChange={(event) => setField('alcoholPreference', event.target.value)}
         >
-          <HabitPill compact value="no" label="Не пью" />
-          <HabitPill compact value="rarely" label="Редко" />
-          <HabitPill compact value="socially" label="Иногда" />
-          <HabitPill compact value="yes" label="Нормально" />
+          {habitReferences.alcoholPreference.map((option) => (
+            <HabitPill compact key={option.value} value={option.value} label={option.label} />
+          ))}
         </Radio.Group>
         {errors.alcoholPreference ? (
           <small className="rm-form-error">{errors.alcoholPreference}</small>
@@ -285,9 +314,9 @@ export function EditHabits({
               value={formValue.noiseLevel}
               onChange={(event) => setField('noiseLevel', event.target.value)}
             >
-              <HabitPill compact value="quiet" label="Тишина" />
-              <HabitPill compact value="moderate" label="Норм" />
-              <HabitPill compact value="social" label="Шумно" />
+              {habitReferences.noiseLevel.map((option) => (
+                <HabitPill compact key={option.value} value={option.value} label={option.label} />
+              ))}
             </Radio.Group>
           </div>
           {errors.noiseLevel ? <small className="rm-form-error">{errors.noiseLevel}</small> : null}
@@ -299,9 +328,9 @@ export function EditHabits({
               value={formValue.cleanliness}
               onChange={(event) => setField('cleanliness', event.target.value)}
             >
-              <HabitPill compact value="high" label="Аккуратно" />
-              <HabitPill compact value="medium" label="Средне" />
-              <HabitPill compact value="low" label="Не важно" />
+              {habitReferences.cleanliness.map((option) => (
+                <HabitPill compact key={option.value} value={option.value} label={option.label} />
+              ))}
             </Radio.Group>
           </div>
           {errors.cleanliness ? (
@@ -315,9 +344,9 @@ export function EditHabits({
               value={formValue.guestFrequency}
               onChange={(event) => setField('guestFrequency', event.target.value)}
             >
-              <HabitPill compact value="rarely" label="Редко" />
-              <HabitPill compact value="sometimes" label="Иногда" />
-              <HabitPill compact value="often" label="Часто" />
+              {habitReferences.guestFrequency.map((option) => (
+                <HabitPill compact key={option.value} value={option.value} label={option.label} />
+              ))}
             </Radio.Group>
           </div>
           {errors.guestFrequency ? (
@@ -335,9 +364,9 @@ export function EditHabits({
           value={formValue.roomOrderPreference}
           onChange={(event) => setField('roomOrderPreference', event.target.value)}
         >
-          <HabitPill compact value="strict" label="Строго" />
-          <HabitPill compact value="balanced" label="Баланс" />
-          <HabitPill compact value="flexible" label="Гибко" />
+          {habitReferences.roomOrderPreference.map((option) => (
+            <HabitPill compact key={option.value} value={option.value} label={option.label} />
+          ))}
         </Radio.Group>
         {errors.roomOrderPreference ? (
           <small className="rm-form-error">{errors.roomOrderPreference}</small>
@@ -355,8 +384,9 @@ export function EditHabits({
             setPetPreference(event.target.value as HabitsFormValue['petPreference'])
           }
         >
-          <HabitPill compact value="pet_friendly" label="Ок" />
-          <HabitPill compact value="no_pets" label="Не ок" />
+          {habitReferences.petPreference.map((option) => (
+            <HabitPill compact key={option.value} value={option.value} label={option.label} />
+          ))}
         </Radio.Group>
         {errors.petPreference ? (
           <small className="rm-form-error">{errors.petPreference}</small>

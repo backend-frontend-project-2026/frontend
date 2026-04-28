@@ -23,6 +23,7 @@ type OnboardingSummaryPageProps = {
   onEditLiving: () => void;
   onEditInterests: () => void;
   onComplete: () => void;
+  isCompleting?: boolean;
 };
 
 const GENDER_LABELS: Record<'female' | 'male', string> = {
@@ -116,6 +117,7 @@ export function OnboardingSummaryPage({
   onEditLiving,
   onEditInterests,
   onComplete,
+  isCompleting = false,
 }: OnboardingSummaryPageProps) {
   const mediaLabel = basicInfo.avatar
     ? `Аватар + ${basicInfo.photos.length} доп. фото`
@@ -346,8 +348,10 @@ export function OnboardingSummaryPage({
               htmlType="button"
               className="rm-nav-button rm-nav-button--primary"
               onClick={onComplete}
+              loading={isCompleting}
+              disabled={isCompleting}
             >
-              <span>Завершить онбординг</span>
+              <span>{isCompleting ? 'Сохраняем…' : 'Завершить онбординг'}</span>
               <span className="rm-nav-button__icon rm-nav-button__icon--lime">↗</span>
             </Button>
           </div>

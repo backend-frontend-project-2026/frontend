@@ -5,6 +5,7 @@ import { RoutePaths } from '@/app/router/routePaths';
 import { getStoredUser } from '@/shared/api/auth/session';
 import { complaintsApi } from '@/shared/api/services/complaints';
 import { authApi } from '@/shared/api/services/auth';
+import { blocksApi } from '@/shared/api/services/blocks';
 import { resolveRouteUserId } from '@/shared/utils/route';
 import styles from './ReportPage.module.css';
 
@@ -22,7 +23,9 @@ export const ReportPage = () => {
 
   const [selected, setSelected] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isBlocking, setIsBlocking] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isBlocked, setIsBlocked] = useState(false);
 
   const storedUserId = getStoredUser()?.id ?? null;
   const routeUserId = userId;
@@ -36,6 +39,7 @@ export const ReportPage = () => {
     : null;
 
   const canSubmit = Boolean(selected) && hasValidReportedUser && !isSubmitting;
+  const canBlock = hasValidReportedUser && !isBlocking && !isBlocked;
 
   const resolveCurrentUserId = async (): Promise<number> => {
     if (storedUserId) {
@@ -75,6 +79,27 @@ export const ReportPage = () => {
     }
   };
 
+  const handleBlockUser = async () => {
+    if (reportedUserId === null || isBlocking || isBlocked) {
+      return;
+    }
+
+    try {
+      setIsBlocking(true);
+
+      const blockerUserId = await resolveCurrentUserId();
+
+      await blocksApi.block(reportedUserId, blockerUserId);
+
+      setIsBlocked(true);
+      message.success('Пользователь заблокирован');
+    } catch {
+      message.error('Не удалось заблокировать пользователя. Попробуй ещё раз.');
+    } finally {
+      setIsBlocking(false);
+    }
+  };
+
   const handleBack = () => {
     if (routeUserId) {
       navigate(RoutePaths.userProfile(routeUserId));
@@ -104,6 +129,7 @@ export const ReportPage = () => {
             <span className={styles.successReasonLabel}>Причина</span>
             <strong>{selected ?? 'Не указана'}</strong>
             <span>Профиль: {reportTargetLabel}</span>
+            {isBlocked && <span>Пользователь заблокирован</span>}
           </div>
 
           <div className={styles.actions}>
@@ -111,14 +137,26 @@ export const ReportPage = () => {
               type="button"
               className={`${styles.btn} ${styles.secondary}`}
               onClick={handleBack}
+              disabled={isBlocking}
             >
               Назад <span className={styles.arrow}>↗</span>
             </button>
 
             <button
               type="button"
+              className={`${styles.btn} ${styles.secondary}`}
+              onClick={handleBlockUser}
+              disabled={!canBlock}
+            >
+              {isBlocked ? 'Заблокирован' : isBlocking ? 'Блокировка…' : 'Заблокировать'}
+              <span className={styles.arrow}>↗</span>
+            </button>
+
+            <button
+              type="button"
               className={`${styles.btn} ${styles.primary}`}
               onClick={handleGoToDiscover}
+              disabled={isBlocking}
             >
               В поиск <span className={styles.arrow}>↗</span>
             </button>
@@ -161,15 +199,25 @@ export const ReportPage = () => {
             type="button"
             className={`${styles.btn} ${styles.secondary}`}
             onClick={handleBack}
-            disabled={isSubmitting}
+            disabled={isSubmitting || isBlocking}
           >
             Назад <span className={styles.arrow}>↗</span>
           </button>
 
           <button
             type="button"
+            className={`${styles.btn} ${styles.secondary}`}
+            disabled={!canBlock || isSubmitting}
+            onClick={handleBlockUser}
+          >
+            {isBlocked ? 'Заблокирован' : isBlocking ? 'Блокировка…' : 'Заблокировать'}
+            <span className={styles.arrow}>↗</span>
+          </button>
+
+          <button
+            type="button"
             className={`${styles.btn} ${styles.primary}`}
-            disabled={!canSubmit}
+            disabled={!canSubmit || isBlocking}
             onClick={handleSubmit}
           >
             {isSubmitting ? 'Отправка…' : 'Отправить'} <span className={styles.arrow}>↗</span>

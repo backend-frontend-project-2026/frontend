@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { message } from 'antd';
 import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { RoutePaths } from '@/app/router/routePaths';
 import { withEditMode } from '@/shared/utils/route';
@@ -24,6 +25,7 @@ import {
   isHabitsStepComplete,
   isInterestsStepComplete,
   isLivingStepComplete,
+  saveOnboardingProfile,
 } from '@/features/onboarding';
 
 type ResumeDraft = {
@@ -179,11 +181,29 @@ export function OnboardingStep3Route() {
 export function OnboardingStep4Route() {
   const navigate = useNavigate();
   const isEditMode = useIsProfileEditMode();
+  const [isCompleting, setIsCompleting] = useState(false);
   const { completed, draft, setCurrentStep, updateInterests, finishOnboarding } = useRoomieFlow();
 
   useEffect(() => {
     setCurrentStep(4);
   }, [setCurrentStep]);
+
+  const handleFinishOnboarding = async () => {
+    if (isCompleting) {
+      return;
+    }
+
+    try {
+      setIsCompleting(true);
+      await saveOnboardingProfile(draft);
+      finishOnboarding();
+      navigate(isEditMode ? RoutePaths.PROFILE : RoutePaths.DISCOVER);
+    } catch {
+      message.error('Не удалось сохранить анкету на сервере. Проверь вуз и факультет.');
+    } finally {
+      setIsCompleting(false);
+    }
+  };
 
   if (completed && !isEditMode) {
     return <Navigate to={RoutePaths.DISCOVER} replace />;
@@ -206,8 +226,7 @@ export function OnboardingStep4Route() {
       }
       onChange={updateInterests}
       onSkip={() => {
-        finishOnboarding();
-        navigate(isEditMode ? RoutePaths.PROFILE : RoutePaths.DISCOVER);
+        void handleFinishOnboarding();
       }}
       onComplete={(value) => {
         updateInterests(value);
@@ -220,6 +239,7 @@ export function OnboardingStep4Route() {
 export function OnboardingSummaryRoute() {
   const navigate = useNavigate();
   const isEditMode = useIsProfileEditMode();
+  const [isCompleting, setIsCompleting] = useState(false);
   const { completed, draft, setCurrentStep, finishOnboarding } = useRoomieFlow();
 
   useEffect(() => {
@@ -266,6 +286,23 @@ export function OnboardingSummaryRoute() {
     );
   }
 
+  const handleComplete = async () => {
+    if (isCompleting) {
+      return;
+    }
+
+    try {
+      setIsCompleting(true);
+      await saveOnboardingProfile(draft);
+      finishOnboarding();
+      navigate(isEditMode ? RoutePaths.PROFILE : RoutePaths.ONBOARDING_SUCCESS);
+    } catch {
+      message.error('Не удалось сохранить анкету на сервере. Проверь вуз и факультет.');
+    } finally {
+      setIsCompleting(false);
+    }
+  };
+
   return (
     <OnboardingSummaryPage
       basicInfo={draft.basicInfo}
@@ -287,10 +324,8 @@ export function OnboardingSummaryRoute() {
       onEditInterests={() =>
         navigate(withEditMode(RoutePaths.ONBOARDING_STEP_4, isEditMode))
       }
-      onComplete={() => {
-        finishOnboarding();
-        navigate(isEditMode ? RoutePaths.PROFILE : RoutePaths.ONBOARDING_SUCCESS);
-      }}
+      onComplete={handleComplete}
+      isCompleting={isCompleting}
     />
   );
 }

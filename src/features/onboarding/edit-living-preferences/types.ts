@@ -18,7 +18,12 @@ export type LivingPreferencesFormValue = {
 
 export type LivingPreferencesErrors = Partial<
   Record<
-    'budgetRange' | 'moveInDate' | 'stayDuration' | 'idealRoommateDescription' | 'rentalCriteria',
+    | 'budgetRange'
+    | 'housingType'
+    | 'moveInDate'
+    | 'stayDuration'
+    | 'idealRoommateDescription'
+    | 'rentalCriteria',
     string
   >
 >;

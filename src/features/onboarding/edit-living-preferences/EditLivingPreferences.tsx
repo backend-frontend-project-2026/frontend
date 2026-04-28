@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type FormEvent } from 'react';
 
 import '../onboarding-form.css';
 import type { LivingPreferencesErrors, LivingPreferencesFormValue } from './types';
-import { Button, Checkbox, Input, Typography } from 'antd';
+import { Button, Checkbox, Input, Select, Typography } from 'antd';
 
 import {
   DESKTOP_CONDITIONS,
@@ -14,6 +14,7 @@ import {
   parseStayDuration,
 } from './lib/livingPreferencesHelpers';
 import { DEFAULT_LIVING_PREFERENCES_FORM_VALUE } from './constants';
+import { referencesApi, type ReferenceSelectOption } from '@/shared/api/services/references';
 
 const { Title } = Typography;
 
@@ -37,6 +38,10 @@ function ConditionItem({ value, label }: { value: string; label: string }) {
   );
 }
 
+function isIsoDate(value: string) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(value);
+}
+
 export function EditLivingPreferences({
   initialValue,
   onBack,
@@ -52,6 +57,9 @@ export function EditLivingPreferences({
     [initialValue]
   );
   const [formValue, setFormValue] = useState<LivingPreferencesFormValue>(mergedInitialValue);
+  const [housingTypeOptions, setHousingTypeOptions] = useState<ReferenceSelectOption[]>([]);
+  const [isHousingTypesLoading, setIsHousingTypesLoading] = useState(false);
+  const [housingTypesError, setHousingTypesError] = useState<string | null>(null);
   const [budgetRange, setBudgetRange] = useState(
     formatBudgetRange(mergedInitialValue.budgetMin, mergedInitialValue.budgetMax)
   );
@@ -67,7 +75,40 @@ export function EditLivingPreferences({
     onChange?.(formValue);
   }, [formValue, onChange]);
 
+  useEffect(() => {
+    let isMounted = true;
+
+    setIsHousingTypesLoading(true);
+    setHousingTypesError(null);
+
+    referencesApi
+      .listHousingTypes()
+      .then(({ items }) => {
+        if (!isMounted) {
+          return;
+        }
+
+        setHousingTypeOptions(items);
+      })
+      .catch(() => {
+        if (isMounted) {
+          setHousingTypeOptions([]);
+          setHousingTypesError('Не удалось загрузить типы жилья. Попробуй обновить страницу.');
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsHousingTypesLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const filledCount = [
+    formValue.housingType,
     budgetRange,
     formValue.moveInDate,
     stayDurationText,
@@ -76,7 +117,7 @@ export function EditLivingPreferences({
   ].filter((value) => String(value ?? '').trim()).length;
 
   const isStepEmpty = filledCount === 0;
-  const isStepIncomplete = !isStepEmpty && filledCount < 5;
+  const isStepIncomplete = !isStepEmpty && filledCount < 6;
 
   function setField<K extends keyof LivingPreferencesFormValue>(
     field: K,
@@ -91,12 +132,18 @@ export function EditLivingPreferences({
     const parsedBudget = parseBudgetRange(budgetRange);
     const parsedDuration = parseStayDuration(stayDurationText);
 
+    if (!formValue.housingType) {
+      nextErrors.housingType = 'Выбери тип жилья.';
+    }
+
     if (!parsedBudget) {
       nextErrors.budgetRange = 'Укажи диапазон бюджета.';
     }
 
     if (!formValue.moveInDate.trim()) {
       nextErrors.moveInDate = 'Укажи дату заезда.';
+    } else if (!isIsoDate(formValue.moveInDate.trim())) {
+      nextErrors.moveInDate = 'Выбери дату в формате ГГГГ-ММ-ДД.';
     }
 
     if (!parsedDuration) {
@@ -196,6 +243,33 @@ export function EditLivingPreferences({
 
       <section className="step-3-group">
         <label className="step-3-field">
+          <span className="step-3-label">Тип жилья</span>
+          <Select
+            className="step-3-input"
+            value={formValue.housingType || undefined}
+            onChange={(value) => {
+              const nextValue = (value ?? '') as LivingPreferencesFormValue['housingType'] | '';
+              setField('housingType', nextValue);
+            }}
+            placeholder="Выбери тип жилья"
+            options={housingTypeOptions}
+            loading={isHousingTypesLoading}
+            allowClear
+            optionFilterProp="label"
+            notFoundContent={
+              isHousingTypesLoading
+                ? 'Загрузка...'
+                : housingTypesError || 'Типы жилья не найдены'
+            }
+          />
+          {housingTypesError ? <small className="rm-form-error">{housingTypesError}</small> : null}
+        </label>
+
+        {errors.housingType ? <small className="rm-form-error">{errors.housingType}</small> : null}
+      </section>
+
+      <section className="step-3-group">
+        <label className="step-3-field">
           <span className="step-3-label">Бюджет (диапазон)</span>
 
           <Input
@@ -221,9 +295,10 @@ export function EditLivingPreferences({
           <span className="step-3-label">Дата заезда</span>
           <Input
             className="step-3-input"
+            type="date"
             value={formValue.moveInDate}
             onChange={(event) => setField('moveInDate', event.target.value)}
-            placeholder="с 15 марта"
+            placeholder="2026-03-15"
             autoComplete="off"
           />
         </label>

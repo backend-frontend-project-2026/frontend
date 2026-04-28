@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { message, Spin } from 'antd';
-import { useBeforeUnload, useNavigate, useSearchParams } from 'react-router-dom';
+import { useBeforeUnload, useBlocker, useNavigate, useSearchParams } from 'react-router-dom';
 import type { ProfileResponse } from '@/shared/api/generated';
 import { RoutePaths } from '@/app/router/routePaths';
 import { clearAuthSession, getStoredUser } from '@/shared/api/auth/session';
@@ -67,9 +67,7 @@ const createSettingsComparableSnapshot = (values: SettingsFormValues) =>
     ),
     habits: [...values.habits].sort(),
     interests: [...values.interests].sort(),
-    blockedUsers: values.blockedUsers
-      .map((user) => user.blockedUserId)
-      .sort((a, b) => a - b),
+    blockedUsers: values.blockedUsers.map((user) => user.blockedUserId).sort((a, b) => a - b),
   });
 
 const createDefaultSettingsFormValues = (): SettingsFormValues => ({
@@ -166,7 +164,6 @@ const HABIT_LABEL_UPDATE_VALUES: Record<string, ProfileHabitsPayload> = {
     pet_preference: 'pet_friendly',
   },
 };
-
 
 const HABIT_VALUE_LABELS: Record<string, string> = {
   early_bird: 'Рано встаю',
@@ -323,9 +320,7 @@ const createProfileHabitsPayload = (habits: string[]): ProfileHabitsPayload =>
 const parseQuietHoursValue = (
   value: string
 ): Pick<ProfileUpdatePayload, 'has_quiet_hours' | 'quiet_from' | 'quiet_to'> => {
-  const [quietFrom = '', quietTo = ''] = value
-    .split(/\s*[—-]\s*/)
-    .map((part) => part.trim());
+  const [quietFrom = '', quietTo = ''] = value.split(/\s*[—-]\s*/).map((part) => part.trim());
 
   return {
     has_quiet_hours: Boolean(quietFrom && quietTo),
@@ -495,6 +490,31 @@ const SettingsPage: React.FC = () => {
     event.returnValue = '';
   });
 
+  const navigationBlocker = useBlocker(({ currentLocation, nextLocation }) => {
+    if (!isDirty || allowImmediateNavigationRef.current) {
+      return false;
+    }
+
+    return (
+      currentLocation.pathname !== nextLocation.pathname ||
+      currentLocation.search !== nextLocation.search ||
+      currentLocation.hash !== nextLocation.hash
+    );
+  });
+
+  useEffect(() => {
+    if (navigationBlocker.state !== 'blocked') {
+      return;
+    }
+
+    if (window.confirm(LEAVE_MESSAGE)) {
+      navigationBlocker.proceed();
+      return;
+    }
+
+    navigationBlocker.reset();
+  }, [navigationBlocker]);
+
   const restoreSavedForm = useCallback(() => {
     applyFormValues(savedFormValues);
   }, [applyFormValues, savedFormValues]);
@@ -511,6 +531,10 @@ const SettingsPage: React.FC = () => {
 
       allowImmediateNavigationRef.current = true;
       action();
+
+      window.setTimeout(() => {
+        allowImmediateNavigationRef.current = false;
+      }, 0);
     },
     [isDirty]
   );

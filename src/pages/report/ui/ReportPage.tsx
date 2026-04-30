@@ -2,9 +2,9 @@ import { message } from 'antd';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { RoutePaths } from '@/app/router/routePaths';
-import { getStoredUser } from '@/shared/api/auth/session';
+import { requireCurrentUserId } from '@/shared/api/auth/currentUser';
 import { complaintsApi } from '@/shared/api/services/complaints';
-import { authApi } from '@/shared/api/services/auth';
+import { blocksApi } from '@/shared/api/services/blocks';
 import { resolveRouteUserId } from '@/shared/utils/route';
 import styles from './ReportPage.module.css';
 
@@ -22,9 +22,10 @@ export const ReportPage = () => {
 
   const [selected, setSelected] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isBlocking, setIsBlocking] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isBlocked, setIsBlocked] = useState(false);
 
-  const storedUserId = getStoredUser()?.id ?? null;
   const routeUserId = userId;
   const reportedUserId = resolveRouteUserId(routeUserId);
   const hasValidReportedUser = reportedUserId !== null;
@@ -32,24 +33,11 @@ export const ReportPage = () => {
   const reportTargetLabel = hasValidReportedUser ? `на профиль #${routeUserId}` : 'на профиль';
 
   const missingTargetText = !hasValidReportedUser
-    ? 'Жалобу можно отправить только из анкеты пользователя. Открой профиль и нажми «Пожаловаться».'
+    ? 'Жалобу можно отправить только из анкеты пользователя. Откройте профиль и нажмите «Пожаловаться».'
     : null;
 
   const canSubmit = Boolean(selected) && hasValidReportedUser && !isSubmitting;
-
-  const resolveCurrentUserId = async (): Promise<number> => {
-    if (storedUserId) {
-      return storedUserId;
-    }
-
-    const me = await authApi.getMe();
-
-    if (!me.id) {
-      throw new Error('current_user_not_found');
-    }
-
-    return me.id;
-  };
+  const canBlock = hasValidReportedUser && !isBlocking && !isBlocked;
 
   const handleSubmit = async () => {
     if (!selected || reportedUserId === null || isSubmitting) {
@@ -59,7 +47,7 @@ export const ReportPage = () => {
     try {
       setIsSubmitting(true);
 
-      const complainantId = await resolveCurrentUserId();
+      const complainantId = await requireCurrentUserId();
 
       await complaintsApi.create({
         complainant_id: complainantId,
@@ -69,9 +57,30 @@ export const ReportPage = () => {
 
       setIsSubmitted(true);
     } catch {
-      message.error('Не удалось отправить жалобу. Попробуй ещё раз.');
+      message.error('Не удалось отправить жалобу. Попробуйте ещё раз.');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleBlockUser = async () => {
+    if (reportedUserId === null || isBlocking || isBlocked) {
+      return;
+    }
+
+    try {
+      setIsBlocking(true);
+
+      const blockerUserId = await requireCurrentUserId();
+
+      await blocksApi.block(reportedUserId, blockerUserId);
+
+      setIsBlocked(true);
+      message.success('Пользователь заблокирован');
+    } catch {
+      message.error('Не удалось заблокировать пользователя. Попробуйте ещё раз.');
+    } finally {
+      setIsBlocking(false);
     }
   };
 
@@ -104,6 +113,7 @@ export const ReportPage = () => {
             <span className={styles.successReasonLabel}>Причина</span>
             <strong>{selected ?? 'Не указана'}</strong>
             <span>Профиль: {reportTargetLabel}</span>
+            {isBlocked && <span>Пользователь заблокирован</span>}
           </div>
 
           <div className={styles.actions}>
@@ -111,14 +121,26 @@ export const ReportPage = () => {
               type="button"
               className={`${styles.btn} ${styles.secondary}`}
               onClick={handleBack}
+              disabled={isBlocking}
             >
               Назад <span className={styles.arrow}>↗</span>
             </button>
 
             <button
               type="button"
+              className={`${styles.btn} ${styles.secondary}`}
+              onClick={handleBlockUser}
+              disabled={!canBlock}
+            >
+              {isBlocked ? 'Заблокирован' : isBlocking ? 'Блокировка…' : 'Заблокировать'}
+              <span className={styles.arrow}>↗</span>
+            </button>
+
+            <button
+              type="button"
               className={`${styles.btn} ${styles.primary}`}
               onClick={handleGoToDiscover}
+              disabled={isBlocking}
             >
               В поиск <span className={styles.arrow}>↗</span>
             </button>
@@ -161,15 +183,25 @@ export const ReportPage = () => {
             type="button"
             className={`${styles.btn} ${styles.secondary}`}
             onClick={handleBack}
-            disabled={isSubmitting}
+            disabled={isSubmitting || isBlocking}
           >
             Назад <span className={styles.arrow}>↗</span>
           </button>
 
           <button
             type="button"
+            className={`${styles.btn} ${styles.secondary}`}
+            disabled={!canBlock || isSubmitting}
+            onClick={handleBlockUser}
+          >
+            {isBlocked ? 'Заблокирован' : isBlocking ? 'Блокировка…' : 'Заблокировать'}
+            <span className={styles.arrow}>↗</span>
+          </button>
+
+          <button
+            type="button"
             className={`${styles.btn} ${styles.primary}`}
-            disabled={!canSubmit}
+            disabled={!canSubmit || isBlocking}
             onClick={handleSubmit}
           >
             {isSubmitting ? 'Отправка…' : 'Отправить'} <span className={styles.arrow}>↗</span>

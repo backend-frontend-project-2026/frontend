@@ -86,7 +86,7 @@ const AuthPage = ({ mode: initialMode }: AuthPageProps) => {
 
   const hint = (
     <div className={styles.hint}>
-      Пароль можно восстановить. Данные анкеты видны только тем, кому ты поставил(а) лайк.
+      Пароль можно восстановить. Данные анкеты видны только пользователям со взаимным лайком.
     </div>
   );
 
@@ -239,9 +239,9 @@ const AuthPage = ({ mode: initialMode }: AuthPageProps) => {
           <Card variant="outlined" className={styles.card}>
             <h3 className={styles.rightTitle}>Как это работает</h3>
             <p className={styles.rightText}>
-              1) Заполни привычки
+              1) Заполните привычки
               <br />
-              2) Лайкай подходящих
+              2) Ставьте лайки подходящим анкетам
               <br />
               3) Совпадение → чат
             </p>

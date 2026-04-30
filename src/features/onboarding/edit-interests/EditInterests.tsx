@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState, type FormEvent, type KeyboardEvent } from 'react';
 import { Button, Input, Tag, Typography } from 'antd';
 import '../onboarding-form.css';
-import { DESKTOP_PREVIEW_TEXT, normalizeTag, PRESET_INTERESTS } from './lib/interestsConfig';
+import { DESKTOP_PREVIEW_TEXT, normalizeTag } from './lib/interestsConfig';
 import type { InterestsErrors, InterestsFormValue } from './types';
 import { DEFAULT_INTERESTS_FORM_VALUE } from './constants';
+import { referencesApi, type ReferenceSelectOption } from '@/shared/api/services/references';
 
 const { Title } = Typography;
 
@@ -38,6 +39,7 @@ export function EditInterests({
   const [customTag, setCustomTag] = useState(mergedInitialValue.customTagDraft);
   const [bio, setBio] = useState(mergedInitialValue.compatibilityNote);
   const [errors, setErrors] = useState<InterestsErrors>({});
+  const [interestOptions, setInterestOptions] = useState<ReferenceSelectOption[]>([]);
 
   useEffect(() => {
     onChange?.({
@@ -46,6 +48,27 @@ export function EditInterests({
       customTagDraft: customTag,
     });
   }, [selectedInterests, bio, customTag, onChange]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    referencesApi
+      .listInterestOptions()
+      .then((options) => {
+        if (isMounted) {
+          setInterestOptions(options);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setInterestOptions([]);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const hasBio = Boolean(bio.trim());
   const isStepEmpty = selectedInterests.length === 0 && !hasBio;
@@ -172,18 +195,18 @@ export function EditInterests({
         </div>
 
         <div className="step-4-tags-track">
-          {PRESET_INTERESTS.map((interest) => {
-            const selected = selectedInterests.includes(interest);
+          {interestOptions.map((interest) => {
+            const selected = selectedInterests.includes(interest.value);
 
             return (
               <Tag.CheckableTag
-                key={interest}
+                key={interest.value}
                 checked={selected}
                 className="step-4-tag step-4-tag-checkable"
-                onChange={() => toggleInterest(interest)}
+                onChange={() => toggleInterest(interest.value)}
               >
                 <span className="step-4-tag__dot" />
-                <span className="step-4-tag__label">{interest}</span>
+                <span className="step-4-tag__label">{interest.label}</span>
               </Tag.CheckableTag>
             );
           })}

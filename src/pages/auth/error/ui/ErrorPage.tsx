@@ -6,7 +6,7 @@ import styles from './ErrorPage.module.css';
 
 const errorMessages: Record<string, string> = {
   invalid_token: 'Ссылка недействительна.',
-  token_expired: 'Ссылка устарела. Запроси новую.',
+  token_expired: 'Ссылка устарела. Запросите новую.',
   already_verified: 'Email уже подтверждён.',
 };
 
@@ -14,7 +14,7 @@ const ErrorPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const reason = searchParams.get('reason') ?? 'unknown';
-  const subTitle = errorMessages[reason] ?? 'Что-то пошло не так. Попробуй снова.';
+  const subTitle = errorMessages[reason] ?? 'Что-то пошло не так. Попробуйте снова.';
 
   return (
     <div className={styles.page}>

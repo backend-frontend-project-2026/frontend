@@ -9,6 +9,7 @@ import {
   parseBudgetRange,
   parseStayDuration,
 } from '@/features/onboarding/edit-living-preferences/lib/livingPreferencesHelpers';
+import { isIsoDate } from '@/shared/utils/date';
 
 export function isBasicInfoStepComplete(value?: Partial<BasicInfoFormValue>) {
   const nextValue: BasicInfoFormValue = {
@@ -91,11 +92,12 @@ export function isLivingStepComplete(value?: Partial<LivingPreferencesFormValue>
   };
 
   const hasValidBudget = Boolean(parseBudgetRange(`${nextValue.budgetMin}-${nextValue.budgetMax}`));
+  const hasValidMoveInDate = isIsoDate(nextValue.moveInDate.trim());
   const hasValidStayDuration = Boolean(parseStayDuration(nextValue.stayDuration));
 
   return Boolean(
     hasValidBudget &&
-    nextValue.moveInDate.trim() &&
+    hasValidMoveInDate &&
     hasValidStayDuration &&
     nextValue.idealRoommateDescription.trim() &&
     nextValue.rentalCriteria.trim()

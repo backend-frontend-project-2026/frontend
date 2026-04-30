@@ -1,9 +1,19 @@
 import { useEffect, useMemo, useState, type FormEvent, useRef } from 'react';
-import { Button, Input, Radio, Typography, Upload, type RadioChangeEvent } from 'antd';
-import type { BasicInfoErrors, BasicInfoFormValue } from './types';
+import {
+  Button,
+  Input,
+  message,
+  Radio,
+  Select,
+  Typography,
+  Upload,
+  type RadioChangeEvent,
+} from 'antd';import type { BasicInfoErrors, BasicInfoFormValue } from './types';
 import './edit-basic-info.css';
 import { DEFAULT_BASIC_INFO_FORM_VALUE } from './constants';
-import { readFileAsDataUrl, revokeObjectUrl, validateImageFile } from './lib/basicInfoHelpers';
+import { mediaApi, type MediaUploadKind } from '@/shared/api/services/media';
+import { referencesApi } from '@/shared/api/services/references';
+import { revokeObjectUrl, validateImageFile } from './lib/basicInfoHelpers';
 
 const { TextArea } = Input;
 const { Title } = Typography;
@@ -37,16 +47,55 @@ export function EditBasicInfo({
     }),
     [initialValue]
   );
-
   const [formValue, setFormValue] = useState<BasicInfoFormValue>(mergedInitialValue);
   const [errors, setErrors] = useState<BasicInfoErrors>({});
+  const [isAvatarUploading, setIsAvatarUploading] = useState(false);
+  const [isPhotoUploading, setIsPhotoUploading] = useState(false);
+  const [cityOptions, setCityOptions] = useState<{ value: string; label: string }[]>([]);
+  const [isCitiesLoading, setIsCitiesLoading] = useState(false);
   const objectUrlsRef = useRef<string[]>([]);
+  const uploadedMediaIdsByUrlRef = useRef<Record<string, number>>({});
 
   useEffect(() => {
     objectUrlsRef.current = [formValue.avatar, ...formValue.photos].filter((url) =>
       url.startsWith('blob:')
     );
   }, [formValue.avatar, formValue.photos]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    setIsCitiesLoading(true);
+
+    referencesApi
+      .listCities({ page: 1, page_size: 100 })
+      .then(({ items }) => {
+        if (!isMounted) {
+          return;
+        }
+
+        setCityOptions(
+          items.map((city) => ({
+            value: city.name,
+            label: city.name,
+          }))
+        );
+      })
+      .catch(() => {
+        if (isMounted) {
+          setCityOptions([]);
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsCitiesLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -77,11 +126,29 @@ export function EditBasicInfo({
     setErrors((current) => ({ ...current, [field]: undefined }));
   }
 
+  function removeUploadedMedia(mediaId: number) {
+    void mediaApi.remove(mediaId).catch(() => {
+      message.warning('Фото убрано из анкеты, но не удалилось с сервера.');
+    });
+  }
+
+  function removeUploadedMediaByUrl(url: string) {
+    const mediaId = uploadedMediaIdsByUrlRef.current[url];
+
+    if (!mediaId) {
+      return;
+    }
+
+    removeUploadedMedia(mediaId);
+    delete uploadedMediaIdsByUrlRef.current[url];
+  }
+
   function removePhoto(index: number) {
     setFormValue((current) => {
       const removedPhoto = current.photos[index];
 
       if (removedPhoto) {
+        removeUploadedMediaByUrl(removedPhoto);
         revokeObjectUrl(removedPhoto);
       }
 
@@ -95,6 +162,7 @@ export function EditBasicInfo({
   function clearAvatar() {
     setFormValue((current) => {
       if (current.avatar) {
+        removeUploadedMediaByUrl(current.avatar);
         revokeObjectUrl(current.avatar);
       }
 
@@ -120,6 +188,97 @@ export function EditBasicInfo({
       avatar: undefined,
       photos: undefined,
     }));
+  }
+
+  async function uploadProfileImage(file: File, kind: MediaUploadKind) {
+    const validationError = validateImageFile(file);
+
+    if (validationError) {
+      setUploadError(validationError);
+      return null;
+    }
+
+    try {
+      const uploadedMedia = await mediaApi.upload(file, kind);
+      clearUploadErrors();
+
+      uploadedMediaIdsByUrlRef.current[uploadedMedia.url] = uploadedMedia.id;
+
+      return uploadedMedia;
+    } catch {
+      setUploadError('Не удалось загрузить изображение на сервер. Попробуйте другой файл.');
+      message.error('Не удалось загрузить изображение на сервер.');
+      return null;
+    }
+  }
+
+  async function handleAvatarUpload(file: File) {
+    if (isAvatarUploading) {
+      return;
+    }
+
+    setIsAvatarUploading(true);
+
+    try {
+      const uploadedMedia = await uploadProfileImage(file, 'avatar');
+
+      if (!uploadedMedia) {
+        return;
+      }
+
+      setFormValue((current) => {
+        if (current.avatar) {
+          removeUploadedMediaByUrl(current.avatar);
+          revokeObjectUrl(current.avatar);
+        }
+
+        return {
+          ...current,
+          avatar: uploadedMedia.url,
+        };
+      });
+    } finally {
+      setIsAvatarUploading(false);
+    }
+  }
+
+  async function handlePhotoUpload(file: File) {
+    if (isPhotoUploading) {
+      return;
+    }
+
+    if (formValue.photos.length >= 6) {
+      setUploadError('Можно загрузить не больше 6 дополнительных фото.');
+      return;
+    }
+
+    setIsPhotoUploading(true);
+
+    try {
+      const uploadedMedia = await uploadProfileImage(file, 'profile_photo');
+
+      if (!uploadedMedia) {
+        return;
+      }
+
+      setFormValue((current) => {
+        const remainingSlots = Math.max(0, 6 - current.photos.length);
+
+        if (remainingSlots === 0) {
+          removeUploadedMedia(uploadedMedia.id);
+          delete uploadedMediaIdsByUrlRef.current[uploadedMedia.url];
+
+          return current;
+        }
+
+        return {
+          ...current,
+          photos: [...current.photos, uploadedMedia.url].slice(0, 6),
+        };
+      });
+    } finally {
+      setIsPhotoUploading(false);
+    }
   }
 
   function validate(value: BasicInfoFormValue) {
@@ -325,12 +484,18 @@ export function EditBasicInfo({
         </label>
 
         <label className="rm-form-field rm-form-field--location">
-          <span className="rm-form-label">Город/район/общежитие</span>
-          <Input
+          <span className="rm-form-label">Город</span>
+          <Select
             className="rm-form-input"
-            value={formValue.location}
-            onChange={(event) => setField('location', event.target.value)}
-            placeholder="Казань, Приволжский, Д-3"
+            value={formValue.location || undefined}
+            onChange={(value) => setField('location', value ?? '')}
+            placeholder="Выбери город"
+            options={cityOptions}
+            loading={isCitiesLoading}
+            showSearch
+            allowClear
+            optionFilterProp="label"
+            notFoundContent={isCitiesLoading ? 'Загрузка...' : 'Города не найдены'}
           />
           {errors.location ? <small className="rm-form-error">{errors.location}</small> : null}
         </label>
@@ -363,31 +528,15 @@ export function EditBasicInfo({
             accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
             showUploadList={false}
             beforeUpload={(file) => {
-              const validationError = validateImageFile(file);
-
-              if (validationError) {
-                setUploadError(validationError);
-                return false;
-              }
-
-              void readFileAsDataUrl(file)
-                .then((nextAvatar) => {
-                  clearUploadErrors();
-
-                  if (formValue.avatar) {
-                    revokeObjectUrl(formValue.avatar);
-                  }
-
-                  setField('avatar', nextAvatar);
-                })
-                .catch(() => {
-                  setUploadError('Не удалось прочитать изображение. Попробуй другой файл.');
-                });
-
+              void handleAvatarUpload(file);
               return false;
             }}
           >
-            <Button htmlType="button" className="rm-form-upload-button rm-form-upload-button--ant">
+            <Button
+              htmlType="button"
+              loading={isAvatarUploading}
+              className="rm-form-upload-button rm-form-upload-button--ant"
+            >
               {formValue.avatar ? 'Заменить аватар' : 'Загрузить аватар'}
             </Button>
           </Upload>
@@ -397,39 +546,14 @@ export function EditBasicInfo({
             multiple
             showUploadList={false}
             beforeUpload={(file) => {
-              const validationError = validateImageFile(file);
-
-              if (validationError) {
-                setUploadError(validationError);
-                return false;
-              }
-
-              void readFileAsDataUrl(file)
-                .then((nextPhoto) => {
-                  clearUploadErrors();
-
-                  setFormValue((current) => {
-                    const remainingSlots = Math.max(0, 6 - current.photos.length);
-
-                    if (remainingSlots === 0) {
-                      return current;
-                    }
-
-                    return {
-                      ...current,
-                      photos: [...current.photos, nextPhoto].slice(0, 6),
-                    };
-                  });
-                })
-                .catch(() => {
-                  setUploadError('Не удалось прочитать изображение. Попробуй другой файл.');
-                });
-
+              void handlePhotoUpload(file);
               return false;
             }}
           >
             <Button
               htmlType="button"
+              loading={isPhotoUploading}
+              disabled={formValue.photos.length >= 6}
               className="rm-form-upload-button rm-form-upload-button--secondary rm-form-upload-button--ant"
             >
               Добавить фото

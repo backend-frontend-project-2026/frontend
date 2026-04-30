@@ -15,7 +15,7 @@ export function getDiscoverEmptyState({
   if (matchingUsersCount === 0 && hasActiveFilters) {
     return {
       title: 'Ничего не найдено',
-      text: 'По выбранным фильтрам никто не подошёл. Попробуй ослабить условия.',
+      text: 'По выбранным фильтрам никто не подошёл. Попробуйте ослабить условия.',
       buttonText: 'Открыть фильтры',
     };
   }

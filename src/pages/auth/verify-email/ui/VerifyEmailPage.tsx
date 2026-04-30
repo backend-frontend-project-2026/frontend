@@ -38,14 +38,14 @@ const VerifyEmailPage = () => {
     <div className={shared.pageWrapper}>
       <div className={shared.left}>
         <Card variant="outlined">
-          <Title level={2}>Проверь почту</Title>
+          <Title level={2}>Проверьте почту</Title>
           <Paragraph type="secondary">
             Мы отправили ссылку на {email}.
             <br />
-            Перейди по ней, чтобы активировать профиль.
+            Перейдите по ней, чтобы активировать профиль.
           </Paragraph>
 
-          <div className={shared.hint}>Если письма нет — проверь «Спам».</div>
+          <div className={shared.hint}>Если письма нет — проверьте папку «Спам».</div>
 
           <RoundedButton
             block
@@ -70,7 +70,7 @@ const VerifyEmailPage = () => {
 
           <div className={shared.linkRow}>
             <Text type="secondary">
-              Ошиблась(ся) почтой? <Link to={RoutePaths.AUTH}>Изменить</Link>
+              Неверная почта? <Link to={RoutePaths.AUTH}>Изменить</Link>
             </Text>
           </div>
         </Card>

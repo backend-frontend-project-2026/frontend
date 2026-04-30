@@ -93,6 +93,7 @@ async function resolveFacultyId(universityId: number, facultyName: string): Prom
   const normalizedFacultyName = normalizeLookupValue(facultyName);
   const facultySearchName = normalizeText(facultyName);
 
+  // TODO: подумать над полноценной пагинацией, чтобы при необходимости получать запись со следующих страниц.
   const facultiesResult = await referencesApi.listFaculties(universityId, {
     page: 1,
     page_size: 10,

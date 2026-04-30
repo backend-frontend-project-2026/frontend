@@ -26,5 +26,5 @@ export function getApiErrorMessage(error: unknown): string {
     return error;
   }
 
-  return 'Что-то пошло не так. Попробуй ещё раз.';
+  return 'Что-то пошло не так. Попробуйте ещё раз.';
 }

@@ -48,7 +48,7 @@ const ResetPasswordPage = () => {
             Пароль изменён
           </Title>
           <Text type="secondary" className={styles.subtitle}>
-            Теперь можешь войти с новым паролем.
+            Теперь можно войти с новым паролем.
           </Text>
           <RoundedButton variant="dark" size="large" onClick={() => navigate(RoutePaths.LOGIN)}>
             Войти
@@ -60,7 +60,7 @@ const ResetPasswordPage = () => {
             Новый пароль
           </Title>
           <Text type="secondary" className={styles.subtitle}>
-            Задай новый пароль для аккаунта.
+            Задайте новый пароль для аккаунта.
           </Text>
 
           <Form form={form} onFinish={handleSubmit} layout="vertical" requiredMark={false}>
@@ -95,7 +95,7 @@ const ResetPasswordPage = () => {
                 ]}
               >
                 <Input.Password
-                  placeholder="Повтори пароль"
+                  placeholder="Повторите пароль"
                   className={styles.input}
                   size="large"
                 />

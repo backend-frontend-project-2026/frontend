@@ -28,6 +28,9 @@ import {
   saveOnboardingProfile,
 } from '@/features/onboarding';
 
+const ONBOARDING_SAVE_ERROR_MESSAGE =
+  'Не удалось сохранить анкету на сервере. Возможна ошибка в вузе или факультете.';
+
 type ResumeDraft = {
   basicInfo: BasicInfoFormValue;
   habits: HabitsFormValue;
@@ -199,7 +202,7 @@ export function OnboardingStep4Route() {
       finishOnboarding();
       navigate(isEditMode ? RoutePaths.PROFILE : RoutePaths.DISCOVER);
     } catch {
-      message.error('Не удалось сохранить анкету на сервере. Проверь вуз и факультет.');
+      message.error(ONBOARDING_SAVE_ERROR_MESSAGE);
     } finally {
       setIsCompleting(false);
     }
@@ -297,7 +300,7 @@ export function OnboardingSummaryRoute() {
       finishOnboarding();
       navigate(isEditMode ? RoutePaths.PROFILE : RoutePaths.ONBOARDING_SUCCESS);
     } catch {
-      message.error('Не удалось сохранить анкету на сервере. Проверь вуз и факультет.');
+      message.error(ONBOARDING_SAVE_ERROR_MESSAGE);
     } finally {
       setIsCompleting(false);
     }

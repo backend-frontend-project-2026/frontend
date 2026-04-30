@@ -135,7 +135,7 @@ export function OnboardingSummaryPage({
         <div className="rm-form-head">
           <p className="rm-form-step">Финальная проверка</p>
           <Title level={3} className="rm-form-title">
-            Проверь анкету перед завершением
+            Проверьте анкету перед завершением
           </Title>
           <p className="rm-form-description">Всё можно исправить до перехода в discover.</p>
         </div>

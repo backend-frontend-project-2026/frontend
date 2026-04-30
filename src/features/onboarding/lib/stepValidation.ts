@@ -9,10 +9,7 @@ import {
   parseBudgetRange,
   parseStayDuration,
 } from '@/features/onboarding/edit-living-preferences/lib/livingPreferencesHelpers';
-
-function isIsoDate(value: string) {
-  return /^\d{4}-\d{2}-\d{2}$/.test(value);
-}
+import { isIsoDate } from '@/shared/utils/date';
 
 export function isBasicInfoStepComplete(value?: Partial<BasicInfoFormValue>) {
   const nextValue: BasicInfoFormValue = {

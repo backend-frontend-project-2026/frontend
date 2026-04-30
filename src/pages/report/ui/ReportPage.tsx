@@ -2,9 +2,8 @@ import { message } from 'antd';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { RoutePaths } from '@/app/router/routePaths';
-import { getStoredUser } from '@/shared/api/auth/session';
+import { requireCurrentUserId } from '@/shared/api/auth/currentUser';
 import { complaintsApi } from '@/shared/api/services/complaints';
-import { authApi } from '@/shared/api/services/auth';
 import { blocksApi } from '@/shared/api/services/blocks';
 import { resolveRouteUserId } from '@/shared/utils/route';
 import styles from './ReportPage.module.css';
@@ -27,7 +26,6 @@ export const ReportPage = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
 
-  const storedUserId = getStoredUser()?.id ?? null;
   const routeUserId = userId;
   const reportedUserId = resolveRouteUserId(routeUserId);
   const hasValidReportedUser = reportedUserId !== null;
@@ -35,25 +33,11 @@ export const ReportPage = () => {
   const reportTargetLabel = hasValidReportedUser ? `на профиль #${routeUserId}` : 'на профиль';
 
   const missingTargetText = !hasValidReportedUser
-    ? 'Жалобу можно отправить только из анкеты пользователя. Открой профиль и нажми «Пожаловаться».'
+    ? 'Жалобу можно отправить только из анкеты пользователя. Откройте профиль и нажмите «Пожаловаться».'
     : null;
 
   const canSubmit = Boolean(selected) && hasValidReportedUser && !isSubmitting;
   const canBlock = hasValidReportedUser && !isBlocking && !isBlocked;
-
-  const resolveCurrentUserId = async (): Promise<number> => {
-    if (storedUserId) {
-      return storedUserId;
-    }
-
-    const me = await authApi.getMe();
-
-    if (!me.id) {
-      throw new Error('current_user_not_found');
-    }
-
-    return me.id;
-  };
 
   const handleSubmit = async () => {
     if (!selected || reportedUserId === null || isSubmitting) {
@@ -63,7 +47,7 @@ export const ReportPage = () => {
     try {
       setIsSubmitting(true);
 
-      const complainantId = await resolveCurrentUserId();
+      const complainantId = await requireCurrentUserId();
 
       await complaintsApi.create({
         complainant_id: complainantId,
@@ -73,7 +57,7 @@ export const ReportPage = () => {
 
       setIsSubmitted(true);
     } catch {
-      message.error('Не удалось отправить жалобу. Попробуй ещё раз.');
+      message.error('Не удалось отправить жалобу. Попробуйте ещё раз.');
     } finally {
       setIsSubmitting(false);
     }
@@ -87,14 +71,14 @@ export const ReportPage = () => {
     try {
       setIsBlocking(true);
 
-      const blockerUserId = await resolveCurrentUserId();
+      const blockerUserId = await requireCurrentUserId();
 
       await blocksApi.block(reportedUserId, blockerUserId);
 
       setIsBlocked(true);
       message.success('Пользователь заблокирован');
     } catch {
-      message.error('Не удалось заблокировать пользователя. Попробуй ещё раз.');
+      message.error('Не удалось заблокировать пользователя. Попробуйте ещё раз.');
     } finally {
       setIsBlocking(false);
     }

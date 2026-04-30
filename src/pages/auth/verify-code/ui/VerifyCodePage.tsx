@@ -104,7 +104,7 @@ const VerifyCodePage = () => {
         <Card variant="outlined">
           <Typography.Title level={4}>Совет</Typography.Title>
           <Typography.Paragraph type="secondary">
-            Если письмо не приходит, проверь правильность адреса и папку «Спам».
+            Если письмо не приходит, проверьте правильность адреса и папку «Спам».
           </Typography.Paragraph>
           <div className={shared.hint}>Можно запросить повторную отправку через 60 секунд.</div>
         </Card>

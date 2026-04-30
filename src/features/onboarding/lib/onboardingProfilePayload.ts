@@ -1,5 +1,6 @@
 import type { ProfileCreate, UniversityResponse, FacultyResponse } from '@/shared/api/generated';
 import { referencesApi } from '@/shared/api/services/references';
+import { isIsoDate } from '@/shared/utils/date';
 import type { OnboardingProfilePayload } from '@/shared/api/services/profiles';
 import type { BasicInfoFormValue } from '../edit-basic-info';
 import type { HabitsFormValue } from '../edit-habits';
@@ -11,6 +12,11 @@ export type OnboardingProfileDraft = {
   habits: HabitsFormValue;
   living: LivingPreferencesFormValue;
   interests: InterestsFormValue;
+};
+
+type OnboardingReferenceIds = {
+  universityId: number;
+  facultyId: number;
 };
 
 function normalizeText(value?: string): string {
@@ -53,10 +59,6 @@ function parseNullableInteger(value: string): number | undefined {
   return parseOptionalInteger(value);
 }
 
-function isIsoDate(value: string): boolean {
-  return /^\d{4}-\d{2}-\d{2}$/.test(value);
-}
-
 function createMoveInDate(value: string): string | undefined {
   const normalizedValue = normalizeText(value);
 
@@ -69,10 +71,12 @@ function createMoveInDate(value: string): string | undefined {
 
 async function resolveUniversityId(universityName: string): Promise<number> {
   const normalizedUniversityName = normalizeLookupValue(universityName);
+  const universitySearchName = normalizeText(universityName);
 
   const universitiesResult = await referencesApi.listUniversities({
     page: 1,
-    page_size: 1000,
+    page_size: 10,
+    name: universitySearchName,
   });
 
   const matchedUniversity = universitiesResult.data?.items?.find(
@@ -85,13 +89,14 @@ async function resolveUniversityId(universityName: string): Promise<number> {
 
   return matchedUniversity.id;
 }
-
 async function resolveFacultyId(universityId: number, facultyName: string): Promise<number> {
   const normalizedFacultyName = normalizeLookupValue(facultyName);
+  const facultySearchName = normalizeText(facultyName);
 
   const facultiesResult = await referencesApi.listFaculties(universityId, {
     page: 1,
-    page_size: 1000,
+    page_size: 10,
+    name: facultySearchName,
   });
 
   const matchedFaculty = facultiesResult.data?.items?.find(
@@ -105,48 +110,83 @@ async function resolveFacultyId(universityId: number, facultyName: string): Prom
   return matchedFaculty.id;
 }
 
+function mapBasicInfoToPayload(
+  basicInfo: BasicInfoFormValue,
+  referenceIds: OnboardingReferenceIds
+) {
+  const avatarUrl = emptyToUndefined(basicInfo.avatar);
+  const photoUrls = basicInfo.photos.map(normalizeText).filter(Boolean);
+
+  return {
+    name: normalizeText(basicInfo.name),
+    sex: basicInfo.gender as ProfileCreate['sex'],
+    age: parseRequiredInteger(basicInfo.age, 'age_invalid'),
+    profile_description: normalizeText(basicInfo.bio),
+    uni_id: referenceIds.universityId,
+    faculty_id: referenceIds.facultyId,
+    course: parseOptionalInteger(basicInfo.course),
+    city: normalizeText(basicInfo.location),
+    profile_picture_url: avatarUrl,
+    avatar_url: avatarUrl,
+    photo_urls: photoUrls,
+  };
+}
+
+function mapHabitsToPayload(habits: HabitsFormValue) {
+  return {
+    sleep_schedule: emptyToUndefined(habits.sleepSchedule),
+    cleanliness: emptyToUndefined(habits.cleanliness),
+    noise_level: emptyToUndefined(habits.noiseLevel),
+    guest_frequency: emptyToUndefined(habits.guestFrequency),
+    smoking_preference: emptyToUndefined(habits.smokingPreference),
+    alcohol_preference: emptyToUndefined(habits.alcoholPreference),
+    room_order_preference: emptyToUndefined(habits.roomOrderPreference),
+    pet_preference: emptyToUndefined(habits.petPreference),
+    has_quiet_hours: habits.hasQuietHours,
+    quiet_from: habits.hasQuietHours ? emptyToUndefined(habits.quietFrom) : undefined,
+    quiet_to: habits.hasQuietHours ? emptyToUndefined(habits.quietTo) : undefined,
+    is_smoking_allowed: habits.isSmokingAllowed,
+    has_pets: habits.hasPets,
+  };
+}
+
+function mapLivingToPayload(living: LivingPreferencesFormValue) {
+  return {
+    budget_min: parseNullableInteger(living.budgetMin),
+    budget_max: parseNullableInteger(living.budgetMax),
+    move_in_date: createMoveInDate(living.moveInDate),
+    stay_duration: emptyToUndefined(living.stayDuration),
+    housing_type: emptyToUndefined(living.housingType),
+    living_notes: emptyToUndefined(living.livingNotes),
+    ideal_roommate_description: emptyToUndefined(living.idealRoommateDescription),
+    rental_criteria: emptyToUndefined(living.rentalCriteria),
+  };
+}
+
+function mapInterestsToPayload(interests: InterestsFormValue) {
+  return {
+    interests: interests.interests.map(normalizeText).filter(Boolean),
+    compatibility_note: emptyToUndefined(interests.compatibilityNote),
+  };
+}
+
+function mapDraftToPayload(
+  draft: OnboardingProfileDraft,
+  referenceIds: OnboardingReferenceIds
+): OnboardingProfilePayload {
+  return {
+    ...mapBasicInfoToPayload(draft.basicInfo, referenceIds),
+    ...mapHabitsToPayload(draft.habits),
+    ...mapLivingToPayload(draft.living),
+    ...mapInterestsToPayload(draft.interests),
+  };
+}
+
 export async function createOnboardingProfilePayload(
   draft: OnboardingProfileDraft
 ): Promise<OnboardingProfilePayload> {
   const universityId = await resolveUniversityId(draft.basicInfo.university);
   const facultyId = await resolveFacultyId(universityId, draft.basicInfo.faculty);
-  const avatarUrl = emptyToUndefined(draft.basicInfo.avatar);
-  const photoUrls = draft.basicInfo.photos.map(normalizeText).filter(Boolean);
 
-  return {
-    name: normalizeText(draft.basicInfo.name),
-    sex: draft.basicInfo.gender as ProfileCreate['sex'],
-    age: parseRequiredInteger(draft.basicInfo.age, 'age_invalid'),
-    profile_description: normalizeText(draft.basicInfo.bio),
-    uni_id: universityId,
-    faculty_id: facultyId,
-    course: parseOptionalInteger(draft.basicInfo.course),
-    city: normalizeText(draft.basicInfo.location),
-    profile_picture_url: avatarUrl,
-    avatar_url: avatarUrl,
-    photo_urls: photoUrls,
-    sleep_schedule: emptyToUndefined(draft.habits.sleepSchedule),
-    cleanliness: emptyToUndefined(draft.habits.cleanliness),
-    noise_level: emptyToUndefined(draft.habits.noiseLevel),
-    guest_frequency: emptyToUndefined(draft.habits.guestFrequency),
-    smoking_preference: emptyToUndefined(draft.habits.smokingPreference),
-    alcohol_preference: emptyToUndefined(draft.habits.alcoholPreference),
-    room_order_preference: emptyToUndefined(draft.habits.roomOrderPreference),
-    pet_preference: emptyToUndefined(draft.habits.petPreference),
-    has_quiet_hours: draft.habits.hasQuietHours,
-    quiet_from: draft.habits.hasQuietHours ? emptyToUndefined(draft.habits.quietFrom) : undefined,
-    quiet_to: draft.habits.hasQuietHours ? emptyToUndefined(draft.habits.quietTo) : undefined,
-    is_smoking_allowed: draft.habits.isSmokingAllowed,
-    has_pets: draft.habits.hasPets,
-    budget_min: parseNullableInteger(draft.living.budgetMin),
-    budget_max: parseNullableInteger(draft.living.budgetMax),
-    move_in_date: createMoveInDate(draft.living.moveInDate),
-    stay_duration: emptyToUndefined(draft.living.stayDuration),
-    housing_type: emptyToUndefined(draft.living.housingType),
-    living_notes: emptyToUndefined(draft.living.livingNotes),
-    ideal_roommate_description: emptyToUndefined(draft.living.idealRoommateDescription),
-    rental_criteria: emptyToUndefined(draft.living.rentalCriteria),
-    interests: draft.interests.interests.map(normalizeText).filter(Boolean),
-    compatibility_note: emptyToUndefined(draft.interests.compatibilityNote),
-  };
+  return mapDraftToPayload(draft, { universityId, facultyId });
 }

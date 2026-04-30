@@ -206,7 +206,7 @@ export function EditBasicInfo({
 
       return uploadedMedia;
     } catch {
-      setUploadError('Не удалось загрузить изображение на сервер. Попробуй другой файл.');
+      setUploadError('Не удалось загрузить изображение на сервер. Попробуйте другой файл.');
       message.error('Не удалось загрузить изображение на сервер.');
       return null;
     }

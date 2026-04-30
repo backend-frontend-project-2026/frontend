@@ -41,10 +41,10 @@ const ForgotPasswordPage = () => {
             <Paragraph type="secondary">
               Мы отправили ссылку для сброса пароля на {submittedEmail}.
               <br />
-              Перейди по ней — ссылка действует 30 минут.
+              Перейдите по ней — ссылка действует 30 минут.
             </Paragraph>
 
-            <div className={shared.hint}>Если письма нет — проверь «Спам».</div>
+            <div className={shared.hint}>Если письма нет — проверьте папку «Спам».</div>
 
             <RoundedButton block size="large" href="https://mail.google.com" target="_blank">
               Открыть почту
@@ -59,7 +59,7 @@ const ForgotPasswordPage = () => {
         ) : (
           <Card variant="outlined">
             <Title level={2}>Восстановление пароля</Title>
-            <Paragraph type="secondary">Введи почту — отправим ссылку для сброса.</Paragraph>
+            <Paragraph type="secondary">Введите почту — отправим ссылку для сброса.</Paragraph>
 
             <Form form={form} onFinish={handleSubmit} layout="vertical" requiredMark={false}>
               <Form.Item

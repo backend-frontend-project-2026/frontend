@@ -4,8 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { RoutePaths } from '@/app/router/routePaths';
 import { withModeEdit } from '@/shared/utils/route';
 import { useRoomieFlow } from '@/app/providers/roomie-flow';
-import { getStoredUser } from '@/shared/api/auth/session';
-import { authApi } from '@/shared/api/services/auth';
+import { getCurrentUserId } from '@/shared/api/auth/currentUser';
 import { profilesApi } from '@/shared/api/services/profiles';
 import { referencesApi } from '@/shared/api/services/references';
 import type { ProfileResponse } from '@/shared/api/generated';
@@ -34,17 +33,6 @@ const getProfilePhotoUrls = (profile: ProfileResponse) =>
 const getProfileAvatar = (profile?: ProfileResponse | null) =>
   getTrimmedValue(profile?.avatar_url) || getTrimmedValue(profile?.profile_picture_url);
 
-const getCurrentUserId = async (): Promise<number | null> => {
-  const storedUserId = getStoredUser()?.id;
-
-  if (storedUserId) {
-    return storedUserId;
-  }
-
-  const me = await authApi.getMe();
-
-  return me.id ?? null;
-};
 
 async function resolveProfileReferenceNames(profile: ProfileResponse) {
   const referenceNames = { ...DEFAULT_PROFILE_REFERENCE_NAMES };

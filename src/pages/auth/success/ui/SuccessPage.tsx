@@ -12,7 +12,7 @@ const SuccessPage = () => {
       <Result
         status="success"
         title="Email подтверждён!"
-        subTitle="Твой аккаунт активирован. Теперь можешь войти и найти соседа."
+        subTitle="Аккаунт активирован. Теперь можно войти и найти соседа."
         extra={
           <RoundedButton variant="dark" onClick={() => navigate(RoutePaths.LOGIN)}>
             Войти

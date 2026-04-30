@@ -120,18 +120,17 @@ export const referencesApi = {
   },
 
   listHabitReferences: async (): Promise<HabitReferenceMap> => {
-    const entries = await Promise.all(
-      HABIT_REFERENCE_CATEGORIES.map(async ([key, category]) => {
-        const options = await referencesApi.listTagOptionsByCategory(category);
+    const tags = await referencesApi.listTags({
+      page: 1,
+      page_size: 1000,
+    });
 
-        return [key, options] as const;
-      })
-    );
-
-    return entries.reduce<HabitReferenceMap>(
-      (acc, [key, options]) => ({
+    return HABIT_REFERENCE_CATEGORIES.reduce<HabitReferenceMap>(
+      (acc, [key, category]) => ({
         ...acc,
-        [key]: options,
+        [key]: tags.items
+          .filter((tag) => tag.category === category)
+          .map(mapTagToReferenceOption),
       }),
       { ...EMPTY_HABIT_REFERENCES }
     );

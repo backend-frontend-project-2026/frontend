@@ -3,14 +3,13 @@ import { message, Spin } from 'antd';
 import { useBeforeUnload, useBlocker, useNavigate, useSearchParams } from 'react-router-dom';
 import type { ProfileResponse } from '@/shared/api/generated';
 import { RoutePaths } from '@/app/router/routePaths';
+import { getCurrentUserId } from '@/shared/api/auth/currentUser';
 import { clearAuthSession, getStoredUser } from '@/shared/api/auth/session';
-import { authApi } from '@/shared/api/services/auth';
 import { profilesApi, type ProfileUpdatePayload } from '@/shared/api/services/profiles';
 import { mediaApi } from '@/shared/api/services/media';
 import { blocksApi } from '@/shared/api/services/blocks';
 import styles from './SettingsPage.module.css';
 
-const DEFAULT_HABITS_OPTIONS = ['Тишина', 'Не курю', 'Аккуратно'];
 const DEFAULT_INTERESTS_OPTIONS = ['Учёба', 'Спорт', 'Кино', 'Музыка'];
 
 type SettingsPhoto = File | string | null;
@@ -34,6 +33,11 @@ type ProfileHabitsPayload = Pick<
   | 'is_smoking_allowed'
   | 'has_pets'
 >;
+
+type HabitOption = {
+  label: string;
+  payload: Partial<ProfileHabitsPayload>;
+};
 
 const DEFAULT_PHOTOS: SettingsPhoto[] = [null, null, null];
 
@@ -95,102 +99,118 @@ const EMPTY_PROFILE_HABIT_PAYLOAD: ProfileHabitsPayload = {
   has_pets: null,
 };
 
-const HABIT_LABEL_UPDATE_VALUES: Record<string, ProfileHabitsPayload> = {
-  'Рано встаю': {
-    sleep_schedule: 'early_bird',
+const HABIT_OPTIONS: HabitOption[] = [
+  {
+    label: 'Рано встаю',
+    payload: { sleep_schedule: 'early_bird' },
   },
-  'Поздно ложусь': {
-    sleep_schedule: 'night_owl',
+  {
+    label: 'Поздно ложусь',
+    payload: { sleep_schedule: 'night_owl' },
   },
-  'Гибкий режим': {
-    sleep_schedule: 'flexible',
-  },
-
-  'Чистота: базово': {
-    cleanliness: 'low',
-  },
-  'Чистота: средне': {
-    cleanliness: 'medium',
-  },
-  Аккуратно: {
-    cleanliness: 'high',
+  {
+    label: 'Гибкий режим',
+    payload: { sleep_schedule: 'flexible' },
   },
 
-  Тишина: {
-    noise_level: 'quiet',
+  {
+    label: 'Чистота: базово',
+    payload: { cleanliness: 'low' },
   },
-  'Умеренный шум': {
-    noise_level: 'moderate',
+  {
+    label: 'Чистота: средне',
+    payload: { cleanliness: 'medium' },
   },
-  'Активный ритм': {
-    noise_level: 'social',
-  },
-
-  'Без гостей': {
-    guest_frequency: 'never',
-  },
-  'Гости редко': {
-    guest_frequency: 'rarely',
-  },
-  'Гости иногда': {
-    guest_frequency: 'sometimes',
-  },
-  'Гости часто': {
-    guest_frequency: 'often',
+  {
+    label: 'Аккуратно',
+    payload: { cleanliness: 'high' },
   },
 
-  'Не курю': {
-    smoking_preference: 'no',
-    is_smoking_allowed: false,
+  {
+    label: 'Тишина',
+    payload: { noise_level: 'quiet' },
   },
-  'Курение только вне дома': {
-    smoking_preference: 'outside_only',
-    is_smoking_allowed: false,
+  {
+    label: 'Умеренный шум',
+    payload: { noise_level: 'moderate' },
   },
-  'Курение допустимо': {
-    smoking_preference: 'yes',
-    is_smoking_allowed: true,
+  {
+    label: 'Активный ритм',
+    payload: { noise_level: 'social' },
   },
 
-  'Без животных': {
-    pet_preference: 'no_pets',
-    has_pets: false,
+  {
+    label: 'Без гостей',
+    payload: { guest_frequency: 'never' },
   },
-  'Есть питомец': {
-    pet_preference: 'has_pets',
-    has_pets: true,
+  {
+    label: 'Гости редко',
+    payload: { guest_frequency: 'rarely' },
   },
-  'Люблю животных': {
-    pet_preference: 'pet_friendly',
+  {
+    label: 'Гости иногда',
+    payload: { guest_frequency: 'sometimes' },
   },
-};
+  {
+    label: 'Гости часто',
+    payload: { guest_frequency: 'often' },
+  },
 
-const HABIT_VALUE_LABELS: Record<string, string> = {
-  early_bird: 'Рано встаю',
-  night_owl: 'Поздно ложусь',
-  flexible: 'Гибкий режим',
+  {
+    label: 'Не курю',
+    payload: {
+      smoking_preference: 'no',
+      is_smoking_allowed: false,
+    },
+  },
+  {
+    label: 'Курение только вне дома',
+    payload: {
+      smoking_preference: 'outside_only',
+      is_smoking_allowed: false,
+    },
+  },
+  {
+    label: 'Курение допустимо',
+    payload: {
+      smoking_preference: 'yes',
+      is_smoking_allowed: true,
+    },
+  },
 
-  low: 'Чистота: базово',
-  medium: 'Чистота: средне',
-  high: 'Аккуратно',
+  {
+    label: 'Без животных',
+    payload: {
+      pet_preference: 'no_pets',
+      has_pets: false,
+    },
+  },
+  {
+    label: 'Есть питомец',
+    payload: {
+      pet_preference: 'has_pets',
+      has_pets: true,
+    },
+  },
+  {
+    label: 'Люблю животных',
+    payload: { pet_preference: 'pet_friendly' },
+  },
+];
 
-  quiet: 'Тишина',
-  moderate: 'Умеренный шум',
-  social: 'Активный ритм',
+const HABIT_LABEL_UPDATE_VALUES = Object.fromEntries(
+  HABIT_OPTIONS.map((option) => [option.label, option.payload])
+) as Record<string, Partial<ProfileHabitsPayload>>;
 
-  never: 'Без гостей',
-  rarely: 'Гости редко',
-  sometimes: 'Гости иногда',
-  often: 'Гости часто',
+const HABIT_VALUE_LABELS = Object.fromEntries(
+  HABIT_OPTIONS.flatMap((option) =>
+    Object.values(option.payload)
+      .filter((value): value is string => typeof value === 'string')
+      .map((value) => [value, option.label])
+  )
+) as Record<string, string>;
 
-  no: 'Не курю',
-  outside_only: 'Курение только вне дома',
-  yes: 'Курение допустимо',
-
-  no_pets: 'Без животных',
-  has_pets: 'Есть питомец',
-  pet_friendly: 'Люблю животных',
-};
+const DEFAULT_HABITS_OPTIONS = HABIT_OPTIONS.map((option) => option.label);
 
 const getTrimmedString = (value?: string | null) => value?.trim() || '';
 
@@ -546,14 +566,9 @@ const SettingsPage: React.FC = () => {
       try {
         setIsLoading(true);
 
-        let resolvedUserId = getStoredUser()?.id ?? null;
+        const resolvedUserId = await getCurrentUserId();
 
-        if (!resolvedUserId) {
-          const me = await authApi.getMe();
-          resolvedUserId = me.id ?? null;
-        }
-
-        if (!resolvedUserId) {
+        if (resolvedUserId === null) {
           throw new Error('current_user_not_found');
         }
 

@@ -15,6 +15,7 @@ import {
 } from './lib/livingPreferencesHelpers';
 import { DEFAULT_LIVING_PREFERENCES_FORM_VALUE } from './constants';
 import { referencesApi, type ReferenceSelectOption } from '@/shared/api/services/references';
+import { isIsoDate } from '@/shared/utils/date';
 
 const { Title } = Typography;
 
@@ -36,10 +37,6 @@ function ConditionItem({ value, label }: { value: string; label: string }) {
       <span className="step-3-condition__text">{label}</span>
     </Checkbox>
   );
-}
-
-function isIsoDate(value: string) {
-  return /^\d{4}-\d{2}-\d{2}$/.test(value);
 }
 
 export function EditLivingPreferences({
@@ -93,7 +90,7 @@ export function EditLivingPreferences({
       .catch(() => {
         if (isMounted) {
           setHousingTypeOptions([]);
-          setHousingTypesError('Не удалось загрузить типы жилья. Попробуй обновить страницу.');
+          setHousingTypesError('Не удалось загрузить типы жилья. Попробуйте обновить страницу.');
         }
       })
       .finally(() => {

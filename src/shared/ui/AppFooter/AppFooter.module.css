@@ -36,13 +36,18 @@
   gap: 20px;
 }
 
-.footerLinks a {
+.footerLinkButton {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font: inherit;
   font-size: 13px;
   color: var(--color-text-secondary);
   text-decoration: none;
+  cursor: pointer;
 }
 
-.footerLinks a:hover {
+.footerLinkButton:hover {
   color: var(--color-dark);
 }
 
@@ -52,7 +57,7 @@
   white-space: nowrap;
 }
 
-@media (--mobile) {
+@media (max-width: 768px) {
   .footerInner {
     flex-direction: column;
     align-items: center;

@@ -6,7 +6,6 @@ import {
   SkipProfileButton,
   SuperLikeProfileButton,
 } from '../../../features/discover';
-import { BottomNav } from '../../../widgets/bottom-nav';
 import { ProfileCard } from '../../../widgets/profile-card';
 import {
   ReactionFeedback,
@@ -317,16 +316,6 @@ export default function DiscoverPage({
             onButtonClick={onOpenFilters}
           />
         ) : null}
-
-        <BottomNav
-          classNamePrefix="discover-mobile"
-          items={[
-            { key: 'discover', label: 'Поиск', active: true },
-            { key: 'matches', label: 'Матчи' },
-            { key: 'chats', label: 'Чаты' },
-            { key: 'profile', label: 'Профиль' },
-          ]}
-        />
       </div>
 
       <div className="discover-page__desktop">

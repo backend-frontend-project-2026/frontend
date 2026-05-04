@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Tag } from 'antd';
 import RoundedButton from '@/shared/ui/RoundedButton/RoundedButton';
-import HabitTag from '@/shared/ui/HabitTag/HabitTag';
 import { RoutePaths } from '@/app/router/routePaths';
 import styles from './LandingPage.module.css';
 
@@ -10,8 +9,6 @@ const badges = [
   { label: 'Безопасно', active: true },
   { label: 'Студентам', active: false },
 ];
-
-const previewTags = ['Тишина', 'Не курю', 'Аккуратно', 'Гости редко'];
 
 const howItWorksCards = [
   {
@@ -110,23 +107,6 @@ const LandingPage = () => {
           <p className={styles.mobileSafetyText}>
             Безопасность: жалобы, блокировка и &quot;тихие часы&quot;.
           </p>
-        </div>
-
-        {/* Карточка Кати — только десктоп */}
-        <div className={styles.heroRight}>
-          <div className={styles.previewCard}>
-            <div className={styles.previewPhoto} />
-            <p className={styles.previewName}>Катя, 20</p>
-            <p className={styles.previewLocation}>КФУ • Приволжский район</p>
-            <div className={styles.previewTags}>
-              {previewTags.map((tag) => (
-                <HabitTag key={tag} label={tag} readonly />
-              ))}
-            </div>
-            <p className={styles.previewBio}>
-              Ищу спокойную соседку. Учусь, люблю порядок и тихие вечера.
-            </p>
-          </div>
         </div>
       </section>
 

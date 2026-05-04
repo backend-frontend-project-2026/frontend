@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { message, Spin } from 'antd';
+import { message, Modal, Spin } from 'antd';
 import { useBeforeUnload, useBlocker, useNavigate, useSearchParams } from 'react-router-dom';
 import type { ProfileResponse } from '@/shared/api/generated';
 import { RoutePaths } from '@/app/router/routePaths';
@@ -527,12 +527,22 @@ const SettingsPage: React.FC = () => {
       return;
     }
 
-    if (window.confirm(LEAVE_MESSAGE)) {
-      navigationBlocker.proceed();
-      return;
-    }
-
-    navigationBlocker.reset();
+    Modal.confirm({
+      title: 'Уйти со страницы?',
+      content: LEAVE_MESSAGE,
+      okText: 'Уйти',
+      cancelText: 'Остаться',
+      centered: true,
+      okButtonProps: {
+        danger: true,
+      },
+      onOk: () => {
+        navigationBlocker.proceed();
+      },
+      onCancel: () => {
+        navigationBlocker.reset();
+      },
+    });
   }, [navigationBlocker]);
 
   const restoreSavedForm = useCallback(() => {
@@ -545,16 +555,31 @@ const SettingsPage: React.FC = () => {
 
   const runConfirmedNavigation = useCallback(
     (action: () => void) => {
-      if (isDirty && !window.confirm(LEAVE_MESSAGE)) {
+      const runNavigation = () => {
+        allowImmediateNavigationRef.current = true;
+        action();
+
+        window.setTimeout(() => {
+          allowImmediateNavigationRef.current = false;
+        }, 0);
+      };
+
+      if (!isDirty) {
+        runNavigation();
         return;
       }
 
-      allowImmediateNavigationRef.current = true;
-      action();
-
-      window.setTimeout(() => {
-        allowImmediateNavigationRef.current = false;
-      }, 0);
+      Modal.confirm({
+        title: 'Уйти со страницы?',
+        content: LEAVE_MESSAGE,
+        okText: 'Уйти',
+        cancelText: 'Остаться',
+        centered: true,
+        okButtonProps: {
+          danger: true,
+        },
+        onOk: runNavigation,
+      });
     },
     [isDirty]
   );
@@ -896,15 +921,17 @@ const SettingsPage: React.FC = () => {
         <div ref={helpRef} className={getSectionClassName('help')}>
           <h4>Помощь</h4>
           <p className={styles.sectionHint}>
-            Если возникла проблема с пользователем, можно открыть экран жалобы и блокировки.
+            Жалобу можно отправить только из профиля конкретного пользователя.
           </p>
 
           <button
             type="button"
             className={styles.inlineAction}
-            onClick={() => navigate(RoutePaths.REPORT)}
+            onClick={() =>
+              message.info('Откройте профиль пользователя и нажмите «Пожаловаться».')
+            }
           >
-            Открыть жалобу
+            Как отправить жалобу
           </button>
         </div>
 

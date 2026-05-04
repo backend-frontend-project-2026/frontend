@@ -137,7 +137,9 @@ export function OnboardingSummaryPage({
           <Title level={3} className="rm-form-title">
             Проверьте анкету перед завершением
           </Title>
-          <p className="rm-form-description">Всё можно исправить до перехода в discover.</p>
+          <p className="rm-form-description">
+            Всё можно исправить до перехода на страницу поиска соседей.
+          </p>
         </div>
 
         <section className="onboarding-summary-section">
@@ -331,7 +333,9 @@ export function OnboardingSummaryPage({
           </div>
         </section>
 
-        <div className="onboarding-summary-note">После подтверждения откроется discover.</div>
+        <div className="onboarding-summary-note">
+          После подтверждения откроется страница поиска соседей.
+        </div>
 
         <div className="rm-form-actions">
           <div className="rm-actions-row">

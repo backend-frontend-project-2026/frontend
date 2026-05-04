@@ -32,7 +32,7 @@ interface AuthPageProps {
 const AuthPage = ({ mode: initialMode }: AuthPageProps) => {
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
-  const [mode, setMode] = useState<AuthMode>(initialMode ?? 'login');
+  const mode = initialMode ?? 'login';
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loginForm] = Form.useForm<LoginFormValues>();
   const [registerForm] = Form.useForm<RegisterFormValues>();
@@ -140,7 +140,7 @@ const AuthPage = ({ mode: initialMode }: AuthPageProps) => {
 
                 <Text type="secondary">
                   Нет аккаунта?{' '}
-                  <Button type="link" onClick={() => setMode('register')} style={{ padding: 0 }}>
+                  <Button type="link" onClick={() => navigate(RoutePaths.REGISTER)} style={{ padding: 0 }}>
                     Зарегистрироваться
                   </Button>
                 </Text>
@@ -224,7 +224,7 @@ const AuthPage = ({ mode: initialMode }: AuthPageProps) => {
 
                 <Text type="secondary">
                   Уже есть аккаунт?{' '}
-                  <Button type="link" onClick={() => setMode('login')} style={{ padding: 0 }}>
+                  <Button type="link" onClick={() => navigate(RoutePaths.LOGIN)} style={{ padding: 0 }}>
                     Войти
                   </Button>
                 </Text>

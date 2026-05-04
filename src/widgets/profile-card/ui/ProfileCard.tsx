@@ -63,6 +63,19 @@ export function ProfileCard({
           ) : null}
 
           <div className="discover-card__fallback" aria-hidden="true" />
+
+          {onOpenProfile ? (
+            <button
+              type="button"
+              className="discover-card__open-profile"
+              onClick={(event) => {
+                event.stopPropagation();
+                onOpenProfile(user);
+              }}
+            >
+              Открыть профиль
+            </button>
+          ) : null}
         </div>
 
         <div className="discover-card__body">

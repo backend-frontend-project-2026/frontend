@@ -1,0 +1,116 @@
+@import '@/shared/styles/breakpoints.css';
+
+.header {
+    height: 64px;
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    background: var(--color-white);
+    border-bottom: 1px solid var(--color-divider);
+}
+
+.headerInner {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.logo {
+    flex-shrink: 0;
+    color: var(--color-dark);
+    font-size: 18px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.nav {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2px;
+}
+
+.navLink {
+    padding: 6px 16px;
+    border-radius: 999px;
+    color: var(--color-dark);
+    font-size: 14px;
+    text-decoration: none;
+    transition: background 0.15s;
+}
+
+.navLink:hover {
+    background: var(--color-bg-page);
+}
+
+.navLinkActive {
+    background: var(--color-accent-light);
+}
+
+.actions {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 12px;
+}
+
+.search {
+    width: 240px;
+    border-radius: 8px !important;
+    background: var(--color-bg-search) !important;
+    border-color: transparent !important;
+}
+
+.search:hover,
+.search:focus-within {
+    border-color: var(--color-accent) !important;
+}
+
+@media (max-width: 768px) {
+    .header {
+        height: auto;
+        min-height: 64px;
+        padding: 10px 0;
+    }
+
+    .headerInner {
+        padding: 0 16px;
+        flex-wrap: wrap;
+        row-gap: 10px;
+    }
+
+    .logo {
+        flex: 1 0 auto;
+    }
+
+    .actions {
+        display: none;
+    }
+
+    .nav {
+        order: 2;
+        display: flex;
+        flex: 0 0 100%;
+        width: 100%;
+        justify-content: space-between;
+        gap: 6px;
+        overflow-x: auto;
+    }
+
+    .navLink {
+        flex: 1;
+        padding: 8px 10px;
+        font-size: 13px;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    .search {
+        display: none;
+    }
+}

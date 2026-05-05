@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { BottomNav } from '../../../widgets/bottom-nav';
 import { Button, ConfigProvider } from 'antd';
 import type { User } from '../../../entities/user';
 import {
@@ -335,16 +334,6 @@ export function UserProfilePage({
               />
             </div>
           </div>
-
-          <BottomNav
-            classNamePrefix="candidate-mobile"
-            items={[
-              { key: 'discover', label: 'Поиск', active: true },
-              { key: 'matches', label: 'Матчи' },
-              { key: 'chats', label: 'Чаты' },
-              { key: 'profile', label: 'Профиль' },
-            ]}
-          />
         </div>
 
         <div className="candidate-page__desktop">

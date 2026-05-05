@@ -35,7 +35,7 @@ export function OnboardingSuccessPage({ onContinue }: OnboardingSuccessPageProps
             Онбординг успешно завершён
           </Title>
           <p className="rm-form-description">
-            Анкета сохранена. Через несколько секунд откроется discover.
+            Анкета сохранена. Через несколько секунд откроется страница поиска соседей.
           </p>
         </div>
 
@@ -48,7 +48,7 @@ export function OnboardingSuccessPage({ onContinue }: OnboardingSuccessPageProps
           className="rm-nav-button rm-nav-button--primary onboarding-success-button"
           onClick={onContinue}
         >
-          <span>Перейти в discover</span>
+          <span>Перейти на страницу поиска соседей</span>
           <span className="rm-nav-button__icon rm-nav-button__icon--lime">↗</span>
         </Button>
       </div>

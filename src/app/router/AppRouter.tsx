@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { RoutePaths } from '@/app/router/routePaths';
 import { ProtectedRoute } from '@/app/router/guards/ProtectedRoute';
 import { RoleRoute } from '@/app/router/guards/RoleRoute';
@@ -28,7 +28,6 @@ import ErrorPage from '@/pages/auth/error/ui/ErrorPage';
 import ForgotPasswordPage from '@/pages/auth/forgot-password/ui/ForgotPasswordPage';
 import ResetPasswordPage from '@/pages/auth/reset-password/ui/ResetPasswordPage';
 
-import UserProfileStatusPage from '@/pages/user-profile/ui/UserProfileStatusPage';
 import MatchesPage from '@/pages/matches/ui/MatchesPage';
 import ProfilePage from '@/pages/profile/ui/ProfilePage';
 import SettingsPage from '@/pages/settings/ui/SettingsPage';
@@ -57,13 +56,21 @@ export const AppRouter = () => {
         </Route>
 
         <Route element={<MainLayout />}>
-          <Route path={RoutePaths.ONBOARDING} element={<OnboardingEntryRoute />} />
-          <Route path={RoutePaths.ONBOARDING_STEP_1} element={<OnboardingStep1Route />} />
-          <Route path={RoutePaths.ONBOARDING_STEP_2} element={<OnboardingStep2Route />} />
-          <Route path={RoutePaths.ONBOARDING_STEP_3} element={<OnboardingStep3Route />} />
-          <Route path={RoutePaths.ONBOARDING_STEP_4} element={<OnboardingStep4Route />} />
-          <Route path={RoutePaths.ONBOARDING_SUMMARY} element={<OnboardingSummaryRoute />} />
-          <Route path={RoutePaths.ONBOARDING_SUCCESS} element={<OnboardingSuccessRoute />} />
+          <Route
+            element={
+              <ProtectedRoute>
+                <Outlet />
+              </ProtectedRoute>
+            }
+          >
+            <Route path={RoutePaths.ONBOARDING} element={<OnboardingEntryRoute />} />
+            <Route path={RoutePaths.ONBOARDING_STEP_1} element={<OnboardingStep1Route />} />
+            <Route path={RoutePaths.ONBOARDING_STEP_2} element={<OnboardingStep2Route />} />
+            <Route path={RoutePaths.ONBOARDING_STEP_3} element={<OnboardingStep3Route />} />
+            <Route path={RoutePaths.ONBOARDING_STEP_4} element={<OnboardingStep4Route />} />
+            <Route path={RoutePaths.ONBOARDING_SUMMARY} element={<OnboardingSummaryRoute />} />
+            <Route path={RoutePaths.ONBOARDING_SUCCESS} element={<OnboardingSuccessRoute />} />
+          </Route>
 
           <Route
             path={RoutePaths.DISCOVER}
@@ -79,15 +86,6 @@ export const AppRouter = () => {
             element={
               <ProtectedRoute>
                 <FiltersRoute />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path={RoutePaths.USER_PROFILE_BASE}
-            element={
-              <ProtectedRoute>
-                <UserProfileStatusPage variant="error" />
               </ProtectedRoute>
             }
           />
@@ -149,15 +147,6 @@ export const AppRouter = () => {
 
           <Route
             path={`${RoutePaths.REPORT}/:userId`}
-            element={
-              <ProtectedRoute>
-                <ReportPage />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path={RoutePaths.REPORT}
             element={
               <ProtectedRoute>
                 <ReportPage />

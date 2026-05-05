@@ -40,6 +40,28 @@
   display: none;
 }
 
+.discover-card__open-profile {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  min-height: 34px;
+  padding: 0 14px;
+  border: 1px solid rgb(255 255 255 / 70%);
+  border-radius: 999px;
+  background: rgb(17 24 39 / 82%);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}
+
+.discover-card__open-profile:hover,
+.discover-card__open-profile:focus-visible {
+  background: rgb(17 24 39 / 94%);
+}
+
 .profile-card-fallback {
   display: flex;
   align-items: center;

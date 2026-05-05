@@ -1,23 +1,41 @@
-import { Link } from 'react-router-dom';
+import { message } from 'antd';
 import styles from './AppFooter.module.css';
-import { RoutePaths } from '@/app/router/routePaths';
 
-const AppFooter = () => (
-  <footer className={styles.footer}>
-    <div className={styles.footerInner}>
-      <div className={styles.footerBrand}>
-        <span className={styles.footerLogo}>RoomieMatch</span>
-        <span className={styles.footerTagline}>Поиск соседа по привычкам</span>
-      </div>
-      <nav className={styles.footerLinks}>
-        <Link to={RoutePaths.LANDING}>О проекте</Link>
-        <Link to="#">Правила</Link>
-        <Link to="#">Конфиденциальность</Link>
-        <Link to="#">Поддержка</Link>
-      </nav>
-      <span className={styles.footerCopy}>© 2026</span>
-    </div>
-  </footer>
-);
+const FOOTER_LINKS = ['О проекте', 'Правила', 'Конфиденциальность', 'Поддержка'];
+
+const AppFooter = () => {
+  const [messageApi, contextHolder] = message.useMessage();
+
+  const handleFooterLinkClick = () => {
+    void messageApi.info('Функционал находится в разработке');
+  };
+
+  return (
+    <>
+      {contextHolder}
+      <footer className={styles.footer}>
+        <div className={styles.footerInner}>
+          <div className={styles.footerBrand}>
+            <span className={styles.footerLogo}>RoomieMatch</span>
+            <span className={styles.footerTagline}>Поиск соседа по привычкам</span>
+          </div>
+          <nav className={styles.footerLinks}>
+            {FOOTER_LINKS.map((link) => (
+              <button
+                key={link}
+                type="button"
+                className={styles.footerLinkButton}
+                onClick={handleFooterLinkClick}
+              >
+                {link}
+              </button>
+            ))}
+          </nav>
+          <span className={styles.footerCopy}>© 2026</span>
+        </div>
+      </footer>
+    </>
+  );
+};
 
 export default AppFooter;

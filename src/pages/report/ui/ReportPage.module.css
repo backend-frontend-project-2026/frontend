@@ -28,6 +28,34 @@
   margin-bottom: 12px;
 }
 
+.targetBox {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--color-light-bg);
+  margin: 12px 0;
+  font-size: 13px;
+  color: var(--color-gray);
+}
+
+.targetBox strong {
+  color: var(--color-dark);
+  font-size: 15px;
+}
+
+.targetLabel {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-gray);
+}
+
+.targetHint {
+  color: var(--color-text-muted);
+}
+
 .radioGroup {
   display: flex;
   flex-direction: column;

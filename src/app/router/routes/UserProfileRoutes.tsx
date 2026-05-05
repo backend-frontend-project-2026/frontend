@@ -171,7 +171,11 @@ export function UserProfileRoute() {
         navigate(RoutePaths.DISCOVER);
       }}
       onReport={() => {
-        navigate(RoutePaths.reportByUser(resolvedUser.id));
+        navigate(RoutePaths.reportByUser(resolvedUser.id), {
+          state: {
+            reportedUserName: resolvedUser.name,
+          },
+        });
       }}
     />
   );

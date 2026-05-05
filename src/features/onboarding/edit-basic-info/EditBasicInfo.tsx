@@ -518,7 +518,9 @@ export function EditBasicInfo({
           <Title level={4} className="rm-form-section__title">
             Фото
           </Title>
-          <p className="rm-form-helper">Аватар и дополнительные фото для профиля</p>
+          <p className="rm-form-helper">
+            Главное фото будет аватаром в карточке профиля, дополнительные фото попадут в галерею.
+          </p>
         </div>
 
         {errors.avatar ? <small className="rm-form-error">{errors.avatar}</small> : null}
@@ -556,7 +558,7 @@ export function EditBasicInfo({
               disabled={formValue.photos.length >= 6}
               className="rm-form-upload-button rm-form-upload-button--secondary rm-form-upload-button--ant"
             >
-              Добавить фото
+              Добавить фото в галерею
             </Button>
           </Upload>
         </div>

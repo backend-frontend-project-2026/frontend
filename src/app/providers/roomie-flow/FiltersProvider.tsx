@@ -1,15 +1,14 @@
 import { useCallback, useMemo, useState, type PropsWithChildren } from 'react';
-import type { UserFilters } from '@/entities/user';
+import type { FilterParams } from '@/entities/user';
 import { createEmptyDiscoverFilters, hasActiveFilters } from '@/features/discover';
 import { FiltersContext } from './filters-context';
 import type { FiltersContextValue } from './types';
 
 export function FiltersProvider({ children }: PropsWithChildren) {
-  const [activeFilters, setActiveFilters] = useState<UserFilters>(createEmptyDiscoverFilters());
+  const [activeFilters, setActiveFilters] = useState<FilterParams>(createEmptyDiscoverFilters());
 
   const filtersAreActive = useMemo(() => hasActiveFilters(activeFilters), [activeFilters]);
-
-  const applyCurrentFilters = useCallback((nextFilters?: UserFilters) => {
+  const applyCurrentFilters = useCallback((nextFilters?: FilterParams) => {
     if (nextFilters) {
       setActiveFilters(nextFilters);
     }

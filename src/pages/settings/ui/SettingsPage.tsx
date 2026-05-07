@@ -6,11 +6,16 @@ import { RoutePaths } from '@/app/router/routePaths';
 import { getCurrentUserId } from '@/shared/api/auth/currentUser';
 import { clearAuthSession, getStoredUser } from '@/shared/api/auth/session';
 import { profilesApi, type ProfileUpdatePayload } from '@/shared/api/services/profiles';
+import {
+  EMPTY_HABIT_REFERENCES,
+  referencesApi,
+  type HabitReferenceKey,
+  type HabitReferenceMap,
+  type ReferenceSelectOption,
+} from '@/shared/api/services/references';
 import { mediaApi } from '@/shared/api/services/media';
 import { blocksApi } from '@/shared/api/services/blocks';
 import styles from './SettingsPage.module.css';
-
-const DEFAULT_INTERESTS_OPTIONS = ['Учёба', 'Спорт', 'Кино', 'Музыка'];
 
 type SettingsPhoto = File | string | null;
 
@@ -99,119 +104,68 @@ const EMPTY_PROFILE_HABIT_PAYLOAD: ProfileHabitsPayload = {
   has_pets: null,
 };
 
-const HABIT_OPTIONS: HabitOption[] = [
-  {
-    label: 'Рано встаю',
-    payload: { sleep_schedule: 'early_bird' },
-  },
-  {
-    label: 'Поздно ложусь',
-    payload: { sleep_schedule: 'night_owl' },
-  },
-  {
-    label: 'Гибкий режим',
-    payload: { sleep_schedule: 'flexible' },
-  },
+type HabitPayloadField = Exclude<keyof ProfileHabitsPayload, 'is_smoking_allowed' | 'has_pets'>;
 
-  {
-    label: 'Чистота: базово',
-    payload: { cleanliness: 'low' },
-  },
-  {
-    label: 'Чистота: средне',
-    payload: { cleanliness: 'medium' },
-  },
-  {
-    label: 'Аккуратно',
-    payload: { cleanliness: 'high' },
-  },
+const HABIT_REFERENCE_PAYLOAD_FIELDS: Record<HabitReferenceKey, HabitPayloadField> = {
+  sleepSchedule: 'sleep_schedule',
+  cleanliness: 'cleanliness',
+  noiseLevel: 'noise_level',
+  guestFrequency: 'guest_frequency',
+  smokingPreference: 'smoking_preference',
+  alcoholPreference: 'alcohol_preference',
+  roomOrderPreference: 'room_order_preference',
+  petPreference: 'pet_preference',
+};
 
-  {
-    label: 'Тишина',
-    payload: { noise_level: 'quiet' },
-  },
-  {
-    label: 'Умеренный шум',
-    payload: { noise_level: 'moderate' },
-  },
-  {
-    label: 'Активный ритм',
-    payload: { noise_level: 'social' },
-  },
+const createExtraHabitPayload = (
+  referenceKey: HabitReferenceKey,
+  value: string
+): Partial<ProfileHabitsPayload> => {
+  if (referenceKey === 'smokingPreference') {
+    return {
+      is_smoking_allowed:
+        value === 'yes' ? true : value === 'no' || value === 'outside_only' ? false : null,
+    };
+  }
 
-  {
-    label: 'Без гостей',
-    payload: { guest_frequency: 'never' },
-  },
-  {
-    label: 'Гости редко',
-    payload: { guest_frequency: 'rarely' },
-  },
-  {
-    label: 'Гости иногда',
-    payload: { guest_frequency: 'sometimes' },
-  },
-  {
-    label: 'Гости часто',
-    payload: { guest_frequency: 'often' },
-  },
+  if (referenceKey === 'petPreference') {
+    return {
+      has_pets: value === 'has_pets' ? true : value === 'no_pets' ? false : null,
+    };
+  }
 
-  {
-    label: 'Не курю',
-    payload: {
-      smoking_preference: 'no',
-      is_smoking_allowed: false,
-    },
-  },
-  {
-    label: 'Курение только вне дома',
-    payload: {
-      smoking_preference: 'outside_only',
-      is_smoking_allowed: false,
-    },
-  },
-  {
-    label: 'Курение допустимо',
-    payload: {
-      smoking_preference: 'yes',
-      is_smoking_allowed: true,
-    },
-  },
+  return {};
+};
 
-  {
-    label: 'Без животных',
-    payload: {
-      pet_preference: 'no_pets',
-      has_pets: false,
-    },
-  },
-  {
-    label: 'Есть питомец',
-    payload: {
-      pet_preference: 'has_pets',
-      has_pets: true,
-    },
-  },
-  {
-    label: 'Люблю животных',
-    payload: { pet_preference: 'pet_friendly' },
-  },
-];
+const createHabitOptionsFromReferences = (habitReferences: HabitReferenceMap): HabitOption[] =>
+  (
+    Object.entries(HABIT_REFERENCE_PAYLOAD_FIELDS) as Array<
+      [HabitReferenceKey, HabitPayloadField]
+    >
+  ).flatMap(([referenceKey, payloadField]) =>
+    habitReferences[referenceKey].map((option) => ({
+      label: option.label,
+      payload: {
+        [payloadField]: option.value,
+        ...createExtraHabitPayload(referenceKey, option.value),
+      } as Partial<ProfileHabitsPayload>,
+    }))
+  );
 
-const HABIT_LABEL_UPDATE_VALUES = Object.fromEntries(
-  HABIT_OPTIONS.map((option) => [option.label, option.payload])
-) as Record<string, Partial<ProfileHabitsPayload>>;
+const createHabitLabelUpdateValues = (habitOptions: HabitOption[]) =>
+  Object.fromEntries(habitOptions.map((option) => [option.label, option.payload])) as Record<
+    string,
+    Partial<ProfileHabitsPayload>
+  >;
 
-const HABIT_VALUE_LABELS = Object.fromEntries(
-  HABIT_OPTIONS.flatMap((option) =>
-    Object.values(option.payload)
-      .filter((value): value is string => typeof value === 'string')
-      .map((value) => [value, option.label])
-  )
-) as Record<string, string>;
-
-const DEFAULT_HABITS_OPTIONS = HABIT_OPTIONS.map((option) => option.label);
-
+const createHabitValueLabels = (habitOptions: HabitOption[]) =>
+  Object.fromEntries(
+    habitOptions.flatMap((option) =>
+      Object.values(option.payload)
+        .filter((value): value is string => typeof value === 'string')
+        .map((value) => [value, option.label])
+    )
+  ) as Record<string, string>;
 const getTrimmedString = (value?: string | null) => value?.trim() || '';
 
 const createUniqueOptions = (baseOptions: string[], selectedOptions: string[]) =>
@@ -226,28 +180,34 @@ const mapBlockedUsersToSettingsFormValues = (
     label: `Пользователь #${item.blocked_user_id}`,
   }));
 
-const getHabitLabel = (value?: string | null) => {
+const getHabitLabel = (
+  value: string | null | undefined,
+  habitValueLabels: Record<string, string>
+) => {
   const trimmedValue = getTrimmedString(value);
 
   if (!trimmedValue) {
     return '';
   }
 
-  return HABIT_VALUE_LABELS[trimmedValue] ?? trimmedValue;
+  return habitValueLabels[trimmedValue] ?? trimmedValue;
 };
 
-const createProfileHabitLabels = (profile: ProfileResponse) =>
+const createProfileHabitLabels = (
+  profile: ProfileResponse,
+  habitValueLabels: Record<string, string>
+) =>
   Array.from(
     new Set(
       [
-        getHabitLabel(profile.sleep_schedule),
-        getHabitLabel(profile.cleanliness),
-        getHabitLabel(profile.noise_level),
-        getHabitLabel(profile.guest_frequency),
-        getHabitLabel(profile.smoking_preference),
-        getHabitLabel(profile.alcohol_preference),
-        getHabitLabel(profile.room_order_preference),
-        getHabitLabel(profile.pet_preference),
+        getHabitLabel(profile.sleep_schedule, habitValueLabels),
+        getHabitLabel(profile.cleanliness, habitValueLabels),
+        getHabitLabel(profile.noise_level, habitValueLabels),
+        getHabitLabel(profile.guest_frequency, habitValueLabels),
+        getHabitLabel(profile.smoking_preference, habitValueLabels),
+        getHabitLabel(profile.alcohol_preference, habitValueLabels),
+        getHabitLabel(profile.room_order_preference, habitValueLabels),
+        getHabitLabel(profile.pet_preference, habitValueLabels),
       ].filter(Boolean)
     )
   );
@@ -328,11 +288,14 @@ const parseBudgetValue = (
   };
 };
 
-const createProfileHabitsPayload = (habits: string[]): ProfileHabitsPayload =>
+const createProfileHabitsPayload = (
+  habits: string[],
+  habitLabelUpdateValues: Record<string, Partial<ProfileHabitsPayload>>
+): ProfileHabitsPayload =>
   habits.reduce<ProfileHabitsPayload>(
     (payload, habit) => ({
       ...payload,
-      ...(HABIT_LABEL_UPDATE_VALUES[habit] ?? {}),
+      ...(habitLabelUpdateValues[habit] ?? {}),
     }),
     { ...EMPTY_PROFILE_HABIT_PAYLOAD }
   );
@@ -349,23 +312,27 @@ const parseQuietHoursValue = (
   };
 };
 
-const mapProfileToSettingsFormValues = (profile: ProfileResponse): SettingsFormValues => ({
+const mapProfileToSettingsFormValues = (
+  profile: ProfileResponse,
+  habitValueLabels: Record<string, string>
+): SettingsFormValues => ({
   ...createDefaultSettingsFormValues(),
   photos: createProfilePhotoValues(profile),
   name: profile.name ?? '',
   age: profile.age ?? '',
   budget: formatProfileBudget(profile),
   quietHours: formatProfileQuietHours(profile),
-  habits: createProfileHabitLabels(profile),
+  habits: createProfileHabitLabels(profile, habitValueLabels),
   interests: Array.isArray(profile.interests) ? profile.interests : [],
   bio: profile.profile_description ?? '',
 });
 
 const createSettingsFormValuesFromUpdatedProfile = (
   profile: ProfileResponse,
-  fallbackValues: SettingsFormValues
+  fallbackValues: SettingsFormValues,
+  habitValueLabels: Record<string, string>
 ): SettingsFormValues => ({
-  ...mapProfileToSettingsFormValues(profile),
+  ...mapProfileToSettingsFormValues(profile, habitValueLabels),
   blockedUsers: fallbackValues.blockedUsers.map((user) => ({ ...user })),
 });
 
@@ -390,7 +357,8 @@ const resolveSettingsPhotoUrls = async (photos: SettingsPhoto[]): Promise<string
 
 const createProfileUpdatePayload = (
   values: SettingsFormValues,
-  photoUrls: string[]
+  photoUrls: string[],
+  habitLabelUpdateValues: Record<string, Partial<ProfileHabitsPayload>>
 ): ProfileUpdatePayload => ({
   name: values.name.trim() || null,
   age: typeof values.age === 'number' ? values.age : null,
@@ -401,7 +369,7 @@ const createProfileUpdatePayload = (
   interests: values.interests,
   ...parseBudgetValue(values.budget),
   ...parseQuietHoursValue(values.quietHours),
-  ...createProfileHabitsPayload(values.habits),
+  ...createProfileHabitsPayload(values.habits, habitLabelUpdateValues),
 });
 
 const syncBlockedUsers = async (
@@ -455,6 +423,23 @@ const SettingsPage: React.FC = () => {
   );
   const [hasServerProfile, setHasServerProfile] = useState(false);
 
+  const [habitReferences, setHabitReferences] = useState<HabitReferenceMap>(
+    EMPTY_HABIT_REFERENCES
+  );
+  const [interestOptions, setInterestOptions] = useState<ReferenceSelectOption[]>([]);
+
+  const habitOptions = useMemo(
+    () => createHabitOptionsFromReferences(habitReferences),
+    [habitReferences]
+  );
+
+  const habitLabelUpdateValues = useMemo(
+    () => createHabitLabelUpdateValues(habitOptions),
+    [habitOptions]
+  );
+
+  const habitValueLabels = useMemo(() => createHabitValueLabels(habitOptions), [habitOptions]);
+
   const currentFormValues = useMemo<SettingsFormValues>(
     () => ({
       photos: [...photos],
@@ -471,13 +456,13 @@ const SettingsPage: React.FC = () => {
   );
 
   const visibleHabitsOptions = useMemo(
-    () => createUniqueOptions(DEFAULT_HABITS_OPTIONS, habits),
-    [habits]
+    () => createUniqueOptions(habitOptions.map((option) => option.label), habits),
+    [habitOptions, habits]
   );
 
   const visibleInterestsOptions = useMemo(
-    () => createUniqueOptions(DEFAULT_INTERESTS_OPTIONS, interests),
-    [interests]
+    () => createUniqueOptions(interestOptions.map((option) => option.label), interests),
+    [interestOptions, interests]
   );
 
   const applyFormValues = useCallback((values: SettingsFormValues) => {
@@ -603,7 +588,22 @@ const SettingsPage: React.FC = () => {
 
         setCurrentUserId(resolvedUserId);
 
-        const profileResult = await profilesApi.getByUserId(resolvedUserId);
+        const [nextHabitReferences, nextInterestOptions, profileResult] = await Promise.all([
+          referencesApi.listHabitReferences(),
+          referencesApi.listInterestOptions(),
+          profilesApi.getByUserId(resolvedUserId),
+        ]);
+
+        if (isCancelled) {
+          return;
+        }
+
+        setHabitReferences(nextHabitReferences);
+        setInterestOptions(nextInterestOptions);
+
+        const nextHabitValueLabels = createHabitValueLabels(
+          createHabitOptionsFromReferences(nextHabitReferences)
+        );
 
         let apiBlockedUsers: SettingsBlockedUser[] = [];
 
@@ -622,7 +622,7 @@ const SettingsPage: React.FC = () => {
 
         if (profileResult.data) {
           const nextValues = {
-            ...mapProfileToSettingsFormValues(profileResult.data),
+            ...mapProfileToSettingsFormValues(profileResult.data, nextHabitValueLabels),
             blockedUsers: apiBlockedUsers,
           };
 
@@ -727,7 +727,7 @@ const SettingsPage: React.FC = () => {
 
       const result = await profilesApi.updateForUser(
         currentUserId,
-        createProfileUpdatePayload(currentFormValues, photoUrls)
+        createProfileUpdatePayload(currentFormValues, photoUrls, habitLabelUpdateValues)
       );
 
       await syncBlockedUsers(
@@ -740,7 +740,11 @@ const SettingsPage: React.FC = () => {
         throw new Error('profile_update_failed');
       }
 
-      const nextValues = createSettingsFormValuesFromUpdatedProfile(result.data, currentFormValues);
+      const nextValues = createSettingsFormValuesFromUpdatedProfile(
+        result.data,
+        currentFormValues,
+        habitValueLabels
+      );
 
       applyFormValues(nextValues);
       setSavedFormValues(cloneSettingsFormValues(nextValues));

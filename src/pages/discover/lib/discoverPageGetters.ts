@@ -1,4 +1,4 @@
-import type { User, UserFilters } from '../../../entities/user';
+import type { FilterParams, User } from '../../../entities/user';
 import type {
   SidebarCleanlinessValue,
   SidebarGuestValue,
@@ -26,7 +26,7 @@ export function getSidebarChips(user: User | null): string[] {
   return chips;
 }
 
-export function formatSidebarBudget(filters?: UserFilters) {
+export function formatSidebarBudget(filters?: FilterParams) {
   const min = filters?.budgetMin;
   const max = filters?.budgetMax;
 
@@ -45,7 +45,7 @@ export function formatSidebarBudget(filters?: UserFilters) {
   return '20–35 тыс ₽';
 }
 
-export function formatSidebarMoveInDate(filters?: UserFilters) {
+export function formatSidebarMoveInDate(filters?: FilterParams) {
   if (filters?.moveInDate && filters.moveInDate.trim()) {
     return filters.moveInDate;
   }
@@ -53,46 +53,51 @@ export function formatSidebarMoveInDate(filters?: UserFilters) {
   return 'любая';
 }
 
-export function getInitialSidebarNoise(filters?: UserFilters): SidebarNoiseValue {
-  if (filters?.noiseLevel === 'quiet') return 'quiet';
-  if (filters?.noiseLevel === 'moderate') return 'normal';
-  if (filters?.noiseLevel === 'social') return 'loud';
-  if (filters?.quietOnly) return 'quiet';
+export function getInitialSidebarNoise(filters?: FilterParams): SidebarNoiseValue {
+  if (filters?.noiseLevel && filters.noiseLevel !== 'any') {
+    return filters.noiseLevel;
+  }
+
+  if (filters?.quietOnly) {
+    return 'quiet';
+  }
+
   return '';
 }
 
-export function getInitialSidebarSmoking(filters?: UserFilters): SidebarSmokingValue {
-  if (filters?.smokingPreference === 'no') return 'no';
-  if (filters?.smokingPreference === 'outside_only') return 'outside';
-  if (filters?.smokingPreference === 'yes') return 'yes';
+export function getInitialSidebarSmoking(filters?: FilterParams): SidebarSmokingValue {
+  if (filters?.smokingPreference && filters.smokingPreference !== 'any') {
+    return filters.smokingPreference;
+  }
+
   return '';
 }
 
 export function getNoiseLabel(value: SidebarNoiseValue) {
   if (value === 'quiet') return 'Тишина';
-  if (value === 'normal') return 'Норм шум';
-  if (value === 'loud') return 'Шумно';
+  if (value === 'moderate') return 'Норм шум';
+  if (value === 'social') return 'Шумно';
   return 'Шум';
 }
 
 export function getSmokingLabel(value: SidebarSmokingValue) {
   if (value === 'no') return 'Не курю';
-  if (value === 'outside') return 'Только на улице';
+  if (value === 'outside_only') return 'Только на улице';
   if (value === 'yes') return 'Курение ок';
   return 'Курение';
 }
 
 export function getNextNoiseValue(value: SidebarNoiseValue): SidebarNoiseValue {
   if (value === '') return 'quiet';
-  if (value === 'quiet') return 'normal';
-  if (value === 'normal') return 'loud';
+  if (value === 'quiet') return 'moderate';
+  if (value === 'moderate') return 'social';
   return '';
 }
 
 export function getNextSmokingValue(value: SidebarSmokingValue): SidebarSmokingValue {
   if (value === '') return 'no';
-  if (value === 'no') return 'outside';
-  if (value === 'outside') return 'yes';
+  if (value === 'no') return 'outside_only';
+  if (value === 'outside_only') return 'yes';
   return '';
 }
 
@@ -107,17 +112,19 @@ export function parseBudgetInput(value: string) {
   };
 }
 
-export function getInitialSidebarCleanliness(filters?: UserFilters): SidebarCleanlinessValue {
-  if (filters?.cleanliness === 'high') return 'high';
-  if (filters?.cleanliness === 'medium') return 'medium';
-  if (filters?.cleanliness === 'low') return 'low';
+export function getInitialSidebarCleanliness(filters?: FilterParams): SidebarCleanlinessValue {
+  if (filters?.cleanliness && filters.cleanliness !== 'any') {
+    return filters.cleanliness;
+  }
+
   return '';
 }
 
-export function getInitialSidebarGuestFrequency(filters?: UserFilters): SidebarGuestValue {
-  if (filters?.guestFrequency === 'rarely') return 'rarely';
-  if (filters?.guestFrequency === 'sometimes') return 'sometimes';
-  if (filters?.guestFrequency === 'often') return 'often';
+export function getInitialSidebarGuestFrequency(filters?: FilterParams): SidebarGuestValue {
+  if (filters?.guestFrequency && filters.guestFrequency !== 'any') {
+    return filters.guestFrequency;
+  }
+
   return '';
 }
 
@@ -129,6 +136,7 @@ export function getCleanlinessLabel(value: SidebarCleanlinessValue) {
 }
 
 export function getGuestLabel(value: SidebarGuestValue) {
+  if (value === 'never') return 'Без гостей';
   if (value === 'rarely') return 'Гости редко';
   if (value === 'sometimes') return 'Гости иногда';
   if (value === 'often') return 'Гости часто';
@@ -143,7 +151,8 @@ export function getNextCleanlinessValue(value: SidebarCleanlinessValue): Sidebar
 }
 
 export function getNextGuestValue(value: SidebarGuestValue): SidebarGuestValue {
-  if (value === '') return 'rarely';
+  if (value === '') return 'never';
+  if (value === 'never') return 'rarely';
   if (value === 'rarely') return 'sometimes';
   if (value === 'sometimes') return 'often';
   return '';

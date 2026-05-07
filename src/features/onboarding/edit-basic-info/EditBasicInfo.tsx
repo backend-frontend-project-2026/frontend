@@ -18,6 +18,12 @@ import { revokeObjectUrl, validateImageFile } from './lib/basicInfoHelpers';
 const { TextArea } = Input;
 const { Title } = Typography;
 
+type ReferenceNameOption = {
+  value: string;
+  label: string;
+  id: number;
+};
+
 type EditBasicInfoProps = {
   initialValue?: Partial<BasicInfoFormValue>;
   onBack?: () => void;
@@ -51,7 +57,11 @@ export function EditBasicInfo({
   const [errors, setErrors] = useState<BasicInfoErrors>({});
   const [isAvatarUploading, setIsAvatarUploading] = useState(false);
   const [isPhotoUploading, setIsPhotoUploading] = useState(false);
+  const [universityOptions, setUniversityOptions] = useState<ReferenceNameOption[]>([]);
+  const [facultyOptions, setFacultyOptions] = useState<ReferenceNameOption[]>([]);
   const [cityOptions, setCityOptions] = useState<{ value: string; label: string }[]>([]);
+  const [isUniversitiesLoading, setIsUniversitiesLoading] = useState(false);
+  const [isFacultiesLoading, setIsFacultiesLoading] = useState(false);
   const [isCitiesLoading, setIsCitiesLoading] = useState(false);
   const objectUrlsRef = useRef<string[]>([]);
   const uploadedMediaIdsByUrlRef = useRef<Record<string, number>>({});
@@ -61,6 +71,94 @@ export function EditBasicInfo({
       url.startsWith('blob:')
     );
   }, [formValue.avatar, formValue.photos]);
+
+  const selectedUniversityId = useMemo(
+    () => universityOptions.find((option) => option.value === formValue.university)?.id ?? null,
+    [formValue.university, universityOptions]
+  );
+
+  useEffect(() => {
+    let isMounted = true;
+
+    setIsUniversitiesLoading(true);
+
+    referencesApi
+      .listUniversities({ page: 1, page_size: 1000 })
+      .then((result) => {
+        if (!isMounted) {
+          return;
+        }
+
+        setUniversityOptions(
+          (result.data?.items ?? [])
+            .filter((university) => university.id && university.name?.trim())
+            .map((university) => ({
+              id: university.id as number,
+              value: university.name as string,
+              label: university.name as string,
+            }))
+        );
+      })
+      .catch(() => {
+        if (isMounted) {
+          setUniversityOptions([]);
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsUniversitiesLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    if (!selectedUniversityId) {
+      setFacultyOptions([]);
+      return () => {
+        isMounted = false;
+      };
+    }
+
+    setIsFacultiesLoading(true);
+
+    referencesApi
+      .listFaculties(selectedUniversityId, { page: 1, page_size: 1000 })
+      .then((result) => {
+        if (!isMounted) {
+          return;
+        }
+
+        setFacultyOptions(
+          (result.data?.items ?? [])
+            .filter((faculty) => faculty.id && faculty.name?.trim())
+            .map((faculty) => ({
+              id: faculty.id as number,
+              value: faculty.name as string,
+              label: faculty.name as string,
+            }))
+        );
+      })
+      .catch(() => {
+        if (isMounted) {
+          setFacultyOptions([]);
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsFacultiesLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedUniversityId]);
 
   useEffect(() => {
     let isMounted = true;
@@ -452,22 +550,46 @@ export function EditBasicInfo({
 
         <label className="rm-form-field rm-form-field--university">
           <span className="rm-form-label">Вуз</span>
-          <Input
+          <Select
             className="rm-form-input"
-            value={formValue.university}
-            onChange={(event) => setField('university', event.target.value)}
-            placeholder="КФУ"
+            value={formValue.university || undefined}
+            onChange={(value) => {
+              setFormValue((current) => ({
+                ...current,
+                university: value ?? '',
+                faculty: '',
+              }));
+              setErrors((current) => ({
+                ...current,
+                university: undefined,
+                faculty: undefined,
+              }));
+            }}
+            placeholder="Выбери вуз"
+            options={universityOptions}
+            loading={isUniversitiesLoading}
+            showSearch
+            allowClear
+            optionFilterProp="label"
+            notFoundContent={isUniversitiesLoading ? 'Загрузка...' : 'Вузы не найдены'}
           />
           {errors.university ? <small className="rm-form-error">{errors.university}</small> : null}
         </label>
 
         <label className="rm-form-field rm-form-field--faculty">
           <span className="rm-form-label">Факультет</span>
-          <Input
+          <Select
             className="rm-form-input"
-            value={formValue.faculty}
-            onChange={(event) => setField('faculty', event.target.value)}
-            placeholder="Институт ИТИС"
+            value={formValue.faculty || undefined}
+            onChange={(value) => setField('faculty', value ?? '')}
+            placeholder={selectedUniversityId ? 'Выбери факультет' : 'Сначала выбери вуз'}
+            options={facultyOptions}
+            loading={isFacultiesLoading}
+            disabled={!selectedUniversityId}
+            showSearch
+            allowClear
+            optionFilterProp="label"
+            notFoundContent={isFacultiesLoading ? 'Загрузка...' : 'Факультеты не найдены'}
           />
           {errors.faculty ? <small className="rm-form-error">{errors.faculty}</small> : null}
         </label>

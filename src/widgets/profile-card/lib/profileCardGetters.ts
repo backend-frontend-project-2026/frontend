@@ -1,4 +1,4 @@
-import type { User } from '../../../entities/user';
+import type { DiscoverCard, User } from '../../../entities/user';
 
 export function getCleanlinessLabel(value: User['habits']['cleanliness']) {
   switch (value) {
@@ -78,7 +78,7 @@ export function getConditionHighlights(user: User) {
   return conditions.slice(0, 3);
 }
 
-export function getDiscoverChips(user: User): string[] {
+export function getDiscoverChips(user: DiscoverCard): string[] {
   const chips: string[] = [];
 
   if (user.habits.noiseLevel === 'quiet') {
@@ -116,6 +116,6 @@ export function getDiscoverChips(user: User): string[] {
   return chips.slice(0, 4);
 }
 
-export function getPrimaryPhoto(user: User) {
+export function getPrimaryPhoto(user: Pick<User, 'avatar' | 'photos'>) {
   return user.photos[0] || user.avatar;
 }

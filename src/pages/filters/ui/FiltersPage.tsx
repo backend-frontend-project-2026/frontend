@@ -1,6 +1,12 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Button, Input, Switch, Typography } from 'antd';
-import type { User, UserFilters } from '../../../entities/user';
+import type { FilterParams, User } from '../../../entities/user';
+import {
+  EMPTY_HABIT_REFERENCES,
+  referencesApi,
+  type HabitReferenceMap,
+  type ReferenceSelectOption,
+} from '../../../shared/api';
 import {
   applyFiltersToUsers,
   ApplyFiltersButton,
@@ -45,13 +51,75 @@ import {
 
 const { Title } = Typography;
 
+type ChipOption<T extends string> = {
+  value: T;
+  label: string;
+};
+
+type NonEmptyValue<T> = Exclude<T, ''>;
+
+const NOISE_FALLBACK_OPTIONS: Array<ChipOption<NonEmptyValue<MobileNoiseValue>>> = [
+  { value: 'quiet', label: 'Тишина' },
+  { value: 'moderate', label: 'Норм' },
+  { value: 'social', label: 'Шумно' },
+];
+
+const SLEEP_SCHEDULE_FALLBACK_OPTIONS: Array<ChipOption<NonEmptyValue<SleepScheduleValue>>> = [
+  { value: 'early_bird', label: 'Жаворонок' },
+  { value: 'night_owl', label: 'Сова' },
+  { value: 'flexible', label: 'Гибкий' },
+];
+
+const ALCOHOL_FALLBACK_OPTIONS: Array<ChipOption<NonEmptyValue<AlcoholValue>>> = [
+  { value: 'no', label: 'Не пью' },
+  { value: 'rarely', label: 'Редко' },
+  { value: 'socially', label: 'В компании' },
+  { value: 'yes', label: 'Да' },
+];
+
+const ROOM_ORDER_FALLBACK_OPTIONS: Array<ChipOption<NonEmptyValue<RoomOrderValue>>> = [
+  { value: 'strict', label: 'Строго' },
+  { value: 'balanced', label: 'Баланс' },
+  { value: 'flexible', label: 'Гибко' },
+];
+
+const SMOKING_FALLBACK_OPTIONS: Array<ChipOption<NonEmptyValue<DesktopSmokingValue>>> = [
+  { value: 'no', label: 'Не курю' },
+  { value: 'yes', label: 'Курю' },
+  { value: 'outside_only', label: 'Только на улице' },
+];
+
+const PETS_FALLBACK_OPTIONS: Array<ChipOption<NonEmptyValue<DesktopPetsValue>>> = [
+  { value: 'pet_friendly', label: 'Ок' },
+  { value: 'no_pets', label: 'Не ок' },
+  { value: 'has_pets', label: 'Есть питомец' },
+];
+
+function getReferenceChipOptions<T extends string>(
+  options: ReferenceSelectOption[],
+  fallbackOptions: Array<ChipOption<T>>
+): Array<ChipOption<T>> {
+  const allowedValues = fallbackOptions.map((option) => option.value);
+
+  const apiOptions = options
+    .filter((option): option is ReferenceSelectOption & { value: T } =>
+      allowedValues.includes(option.value as T)
+    )
+    .map((option) => ({
+      value: option.value,
+      label: option.label,
+    }));
+
+  return apiOptions.length > 0 ? apiOptions : fallbackOptions;
+}
+
 type FiltersPageProps = {
-  initialFilters?: UserFilters;
+  initialFilters?: FilterParams;
   currentUserUniversity?: string;
   currentUserLocation?: string;
   usersForPreview?: User[];
   onBack?: () => void;
-  onApply?: (filters: UserFilters) => void;
+  onApply?: (filters: FilterParams) => void;
 };
 
 function FilterChip({
@@ -194,6 +262,60 @@ export function FiltersPage({
     getInitialRoomOrder(initialFilters)
   );
 
+  const [habitReferences, setHabitReferences] =
+    useState<HabitReferenceMap>(EMPTY_HABIT_REFERENCES);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    referencesApi
+      .listHabitReferences()
+      .then((references) => {
+        if (isMounted) {
+          setHabitReferences(references);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setHabitReferences(EMPTY_HABIT_REFERENCES);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const noiseOptions = getReferenceChipOptions(
+    habitReferences.noiseLevel,
+    NOISE_FALLBACK_OPTIONS
+  );
+
+  const sleepScheduleOptions = getReferenceChipOptions(
+    habitReferences.sleepSchedule,
+    SLEEP_SCHEDULE_FALLBACK_OPTIONS
+  );
+
+  const alcoholOptions = getReferenceChipOptions(
+    habitReferences.alcoholPreference,
+    ALCOHOL_FALLBACK_OPTIONS
+  );
+
+  const roomOrderOptions = getReferenceChipOptions(
+    habitReferences.roomOrderPreference,
+    ROOM_ORDER_FALLBACK_OPTIONS
+  );
+
+  const smokingOptions = getReferenceChipOptions(
+    habitReferences.smokingPreference,
+    SMOKING_FALLBACK_OPTIONS
+  );
+
+  const petsOptions = getReferenceChipOptions(
+    habitReferences.petPreference,
+    PETS_FALLBACK_OPTIONS
+  );
+
   function resetAll() {
     setOnlyDormitory(false);
     setOnlyRental(false);
@@ -228,8 +350,8 @@ export function FiltersPage({
     setRoomOrderPreference('');
   }
 
-  const liveFilters = useMemo<UserFilters>(() => {
-    const filters: UserFilters = {};
+  const liveFilters = useMemo<FilterParams>(() => {
+    const filters: FilterParams = {};
 
     const min = Number(budgetMin);
     const max = Number(budgetMax);
@@ -307,12 +429,8 @@ export function FiltersPage({
 
     const selectedNoise = mobileNoise || desktopNoise;
 
-    if (selectedNoise === 'quiet') {
-      filters.noiseLevel = 'quiet';
-    } else if (selectedNoise === 'normal') {
-      filters.noiseLevel = 'moderate';
-    } else if (selectedNoise === 'loud') {
-      filters.noiseLevel = 'social';
+    if (selectedNoise) {
+      filters.noiseLevel = selectedNoise;
     }
 
     if (sleepSchedule) {
@@ -332,16 +450,14 @@ export function FiltersPage({
 
     if (noSmokingMobile || desktopSmoking === 'no') {
       filters.smokingPreference = 'no';
-    } else if (desktopSmoking === 'outside') {
-      filters.smokingPreference = 'outside_only';
-    } else if (desktopSmoking === 'yes') {
-      filters.smokingPreference = 'yes';
+    } else if (desktopSmoking) {
+      filters.smokingPreference = desktopSmoking;
     }
 
-    if (petsAllowedMobile || desktopPets === 'ok') {
+    if (petsAllowedMobile) {
       filters.petPreference = 'pet_friendly';
-    } else if (desktopPets === 'not-ok') {
-      filters.petPreference = 'no_pets';
+    } else if (desktopPets) {
+      filters.petPreference = desktopPets;
     }
 
     return filters;
@@ -680,21 +796,14 @@ export function FiltersPage({
             </Title>
 
             <div className="filters-mobile__chips">
-              <FilterChip
-                label="Тишина"
-                selected={mobileNoise === 'quiet'}
-                onClick={() => setMobileNoise('quiet')}
-              />
-              <FilterChip
-                label="Норм"
-                selected={mobileNoise === 'normal'}
-                onClick={() => setMobileNoise('normal')}
-              />
-              <FilterChip
-                label="Шумно"
-                selected={mobileNoise === 'loud'}
-                onClick={() => setMobileNoise('loud')}
-              />
+              {noiseOptions.map((option) => (
+                <FilterChip
+                  key={option.value}
+                  label={option.label}
+                  selected={mobileNoise === option.value}
+                  onClick={() => setMobileNoise(option.value)}
+                />
+              ))}
             </div>
           </section>
 
@@ -704,21 +813,14 @@ export function FiltersPage({
             </Title>
 
             <div className="filters-mobile__chips">
-              <FilterChip
-                label="Жаворонок"
-                selected={sleepSchedule === 'early_bird'}
-                onClick={() => setSleepSchedule('early_bird')}
-              />
-              <FilterChip
-                label="Сова"
-                selected={sleepSchedule === 'night_owl'}
-                onClick={() => setSleepSchedule('night_owl')}
-              />
-              <FilterChip
-                label="Гибкий"
-                selected={sleepSchedule === 'flexible'}
-                onClick={() => setSleepSchedule('flexible')}
-              />
+              {sleepScheduleOptions.map((option) => (
+                <FilterChip
+                  key={option.value}
+                  label={option.label}
+                  selected={sleepSchedule === option.value}
+                  onClick={() => setSleepSchedule(option.value)}
+                />
+              ))}
             </div>
           </section>
 
@@ -728,26 +830,14 @@ export function FiltersPage({
             </Title>
 
             <div className="filters-mobile__chips">
-              <FilterChip
-                label="Не пью"
-                selected={alcoholPreference === 'no'}
-                onClick={() => setAlcoholPreference('no')}
-              />
-              <FilterChip
-                label="Редко"
-                selected={alcoholPreference === 'rarely'}
-                onClick={() => setAlcoholPreference('rarely')}
-              />
-              <FilterChip
-                label="В компании"
-                selected={alcoholPreference === 'socially'}
-                onClick={() => setAlcoholPreference('socially')}
-              />
-              <FilterChip
-                label="Да"
-                selected={alcoholPreference === 'yes'}
-                onClick={() => setAlcoholPreference('yes')}
-              />
+              {alcoholOptions.map((option) => (
+                <FilterChip
+                  key={option.value}
+                  label={option.label}
+                  selected={alcoholPreference === option.value}
+                  onClick={() => setAlcoholPreference(option.value)}
+                />
+              ))}
             </div>
           </section>
 
@@ -757,21 +847,14 @@ export function FiltersPage({
             </Title>
 
             <div className="filters-mobile__chips">
-              <FilterChip
-                label="Строго"
-                selected={roomOrderPreference === 'strict'}
-                onClick={() => setRoomOrderPreference('strict')}
-              />
-              <FilterChip
-                label="Баланс"
-                selected={roomOrderPreference === 'balanced'}
-                onClick={() => setRoomOrderPreference('balanced')}
-              />
-              <FilterChip
-                label="Гибко"
-                selected={roomOrderPreference === 'flexible'}
-                onClick={() => setRoomOrderPreference('flexible')}
-              />
+              {roomOrderOptions.map((option) => (
+                <FilterChip
+                  key={option.value}
+                  label={option.label}
+                  selected={roomOrderPreference === option.value}
+                  onClick={() => setRoomOrderPreference(option.value)}
+                />
+              ))}
             </div>
           </section>
         </div>
@@ -1014,24 +1097,15 @@ export function FiltersPage({
               Курение
             </Title>
             <div className="filters-desktop__chips">
-              <FilterChip
-                compact
-                label="Не курю"
-                selected={desktopSmoking === 'no'}
-                onClick={() => setDesktopSmoking('no')}
-              />
-              <FilterChip
-                compact
-                label="Курю"
-                selected={desktopSmoking === 'yes'}
-                onClick={() => setDesktopSmoking('yes')}
-              />
-              <FilterChip
-                compact
-                label="Только на улице"
-                selected={desktopSmoking === 'outside'}
-                onClick={() => setDesktopSmoking('outside')}
-              />
+              {smokingOptions.map((option) => (
+                <FilterChip
+                  key={option.value}
+                  compact
+                  label={option.label}
+                  selected={desktopSmoking === option.value}
+                  onClick={() => setDesktopSmoking(option.value)}
+                />
+              ))}
             </div>
           </section>
 
@@ -1040,30 +1114,15 @@ export function FiltersPage({
               Алкоголь
             </Title>
             <div className="filters-desktop__chips">
-              <FilterChip
-                compact
-                label="Не пью"
-                selected={alcoholPreference === 'no'}
-                onClick={() => setAlcoholPreference('no')}
-              />
-              <FilterChip
-                compact
-                label="Редко"
-                selected={alcoholPreference === 'rarely'}
-                onClick={() => setAlcoholPreference('rarely')}
-              />
-              <FilterChip
-                compact
-                label="В компании"
-                selected={alcoholPreference === 'socially'}
-                onClick={() => setAlcoholPreference('socially')}
-              />
-              <FilterChip
-                compact
-                label="Да"
-                selected={alcoholPreference === 'yes'}
-                onClick={() => setAlcoholPreference('yes')}
-              />
+              {alcoholOptions.map((option) => (
+                <FilterChip
+                  key={option.value}
+                  compact
+                  label={option.label}
+                  selected={alcoholPreference === option.value}
+                  onClick={() => setAlcoholPreference(option.value)}
+                />
+              ))}
             </div>
           </section>
 
@@ -1072,24 +1131,15 @@ export function FiltersPage({
               Шум
             </Title>
             <div className="filters-desktop__chips">
-              <FilterChip
-                compact
-                label="Тишина"
-                selected={desktopNoise === 'quiet'}
-                onClick={() => setDesktopNoise('quiet')}
-              />
-              <FilterChip
-                compact
-                label="Норм"
-                selected={desktopNoise === 'normal'}
-                onClick={() => setDesktopNoise('normal')}
-              />
-              <FilterChip
-                compact
-                label="Шумно"
-                selected={desktopNoise === 'loud'}
-                onClick={() => setDesktopNoise('loud')}
-              />
+              {noiseOptions.map((option) => (
+                <FilterChip
+                  key={option.value}
+                  compact
+                  label={option.label}
+                  selected={desktopNoise === option.value}
+                  onClick={() => setDesktopNoise(option.value)}
+                />
+              ))}
             </div>
           </section>
 
@@ -1098,24 +1148,15 @@ export function FiltersPage({
               Режим сна
             </Title>
             <div className="filters-desktop__chips">
-              <FilterChip
-                compact
-                label="Жаворонок"
-                selected={sleepSchedule === 'early_bird'}
-                onClick={() => setSleepSchedule('early_bird')}
-              />
-              <FilterChip
-                compact
-                label="Сова"
-                selected={sleepSchedule === 'night_owl'}
-                onClick={() => setSleepSchedule('night_owl')}
-              />
-              <FilterChip
-                compact
-                label="Гибкий"
-                selected={sleepSchedule === 'flexible'}
-                onClick={() => setSleepSchedule('flexible')}
-              />
+              {sleepScheduleOptions.map((option) => (
+                <FilterChip
+                  key={option.value}
+                  compact
+                  label={option.label}
+                  selected={sleepSchedule === option.value}
+                  onClick={() => setSleepSchedule(option.value)}
+                />
+              ))}
             </div>
           </section>
 
@@ -1124,24 +1165,15 @@ export function FiltersPage({
               Порядок в комнате
             </Title>
             <div className="filters-desktop__chips">
-              <FilterChip
-                compact
-                label="Строго"
-                selected={roomOrderPreference === 'strict'}
-                onClick={() => setRoomOrderPreference('strict')}
-              />
-              <FilterChip
-                compact
-                label="Баланс"
-                selected={roomOrderPreference === 'balanced'}
-                onClick={() => setRoomOrderPreference('balanced')}
-              />
-              <FilterChip
-                compact
-                label="Гибко"
-                selected={roomOrderPreference === 'flexible'}
-                onClick={() => setRoomOrderPreference('flexible')}
-              />
+              {roomOrderOptions.map((option) => (
+                <FilterChip
+                  key={option.value}
+                  compact
+                  label={option.label}
+                  selected={roomOrderPreference === option.value}
+                  onClick={() => setRoomOrderPreference(option.value)}
+                />
+              ))}
             </div>
           </section>
 
@@ -1150,18 +1182,15 @@ export function FiltersPage({
               Животные
             </Title>
             <div className="filters-desktop__chips">
-              <FilterChip
-                compact
-                label="Ок"
-                selected={desktopPets === 'ok'}
-                onClick={() => setDesktopPets('ok')}
-              />
-              <FilterChip
-                compact
-                label="Не ок"
-                selected={desktopPets === 'not-ok'}
-                onClick={() => setDesktopPets('not-ok')}
-              />
+              {petsOptions.map((option) => (
+                <FilterChip
+                  key={option.value}
+                  compact
+                  label={option.label}
+                  selected={desktopPets === option.value}
+                  onClick={() => setDesktopPets(option.value)}
+                />
+              ))}
             </div>
           </section>
 

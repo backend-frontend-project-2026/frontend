@@ -1,5 +1,5 @@
-import { useCallback, useMemo, useState, type PropsWithChildren } from 'react';
-import { MOCK_DISCOVER_USERS, type User } from '@/entities/user';
+import { useCallback, useEffect, useMemo, useState, type PropsWithChildren } from 'react';
+import type { User } from '@/entities/user';
 import {
   applyFiltersToUsers,
   INITIAL_DISCOVER_ACTION_STATE,
@@ -8,6 +8,9 @@ import {
   superLikeProfile,
   type DiscoverActionState,
 } from '@/features/discover';
+import { getCurrentUserId } from '@/shared/api/auth/currentUser';
+import { profilesApi } from '@/shared/api/services/profiles';
+import { mapProfileResponsesToUsers } from '@/shared/api/services/profileUserMapper';
 import { DiscoverContext } from './discover-context';
 import { useFiltersFlow } from './filters-context';
 import type { DiscoverContextValue } from './types';
@@ -15,13 +18,47 @@ import { keepOnlyLikedAndSuperLikedIds } from './lib/discoverState';
 
 export function DiscoverProvider({ children }: PropsWithChildren) {
   const { activeFilters } = useFiltersFlow();
+  const [discoverUsers, setDiscoverUsers] = useState<User[]>([]);
   const [discoverState, setDiscoverState] = useState<DiscoverActionState>(
     INITIAL_DISCOVER_ACTION_STATE
   );
 
+  useEffect(() => {
+    let isCancelled = false;
+
+    const loadDiscoverUsers = async () => {
+      try {
+        const [currentUserId, profilesResult] = await Promise.all([
+          getCurrentUserId().catch(() => null),
+          profilesApi.list({ page: 1, page_size: 100 }),
+        ]);
+
+        const users = await mapProfileResponsesToUsers(profilesResult.data?.items ?? []);
+
+        if (!isCancelled) {
+          setDiscoverUsers(
+            currentUserId === null
+              ? users
+              : users.filter((user) => user.id !== String(currentUserId))
+          );
+        }
+      } catch {
+        if (!isCancelled) {
+          setDiscoverUsers([]);
+        }
+      }
+    };
+
+    void loadDiscoverUsers();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
+
   const filteredUsers = useMemo(
-    () => applyFiltersToUsers(MOCK_DISCOVER_USERS, activeFilters),
-    [activeFilters]
+    () => applyFiltersToUsers(discoverUsers, activeFilters),
+    [activeFilters, discoverUsers]
   );
 
   const availableUsers = useMemo(
@@ -50,10 +87,11 @@ export function DiscoverProvider({ children }: PropsWithChildren) {
   const value = useMemo<DiscoverContextValue>(
     () => ({
       discoverState,
+      discoverUsers,
       filteredUsers,
       availableUsers,
       currentDiscoverUser,
-      totalUsersCount: MOCK_DISCOVER_USERS.length,
+      totalUsersCount: discoverUsers.length,
       matchingUsersCount: filteredUsers.length,
       handleLike,
       handleSkip,
@@ -62,6 +100,7 @@ export function DiscoverProvider({ children }: PropsWithChildren) {
     }),
     [
       discoverState,
+      discoverUsers,
       filteredUsers,
       availableUsers,
       currentDiscoverUser,

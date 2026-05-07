@@ -1,8 +1,6 @@
-export type InterestsFormValue = {
-  interests: string[];
-  compatibilityNote: string;
-  customTagDraft: string;
-};
+import type { OnboardingForm } from '../../../entities/user';
+
+export type InterestsFormValue = OnboardingForm['interests'];
 
 export type InterestsErrors = {
   interests?: string;

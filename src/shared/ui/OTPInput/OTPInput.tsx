@@ -41,22 +41,30 @@ const OTPInput = ({ length = 6, value, onChange }: OTPInputProps) => {
 
   return (
     <div className={styles.container}>
-      {Array.from({ length }).map((_, index) => (
-        <input
-          key={index}
-          ref={(el) => {
-            inputs.current[index] = el;
-          }}
-          type="text"
-          inputMode="numeric"
-          maxLength={1}
-          value={digits[index]}
-          onChange={(e) => handleChange(index, e)}
-          onKeyDown={(e) => handleKeyDown(index, e)}
-          onPaste={handlePaste}
-          className={styles.input}
-        />
-      ))}
+      {Array.from({ length }).map((_, index) => {
+        const inputLabel = `Цифра ${index + 1} из ${length} кода подтверждения`;
+
+        return (
+          <label key={index} className={styles.inputLabel}>
+            <span className={styles.visuallyHidden}>{inputLabel}</span>
+            <input
+              ref={(el) => {
+                inputs.current[index] = el;
+              }}
+              type="text"
+              inputMode="numeric"
+              maxLength={1}
+              value={digits[index]}
+              aria-label={inputLabel}
+              autoComplete={index === 0 ? 'one-time-code' : 'off'}
+              onChange={(e) => handleChange(index, e)}
+              onKeyDown={(e) => handleKeyDown(index, e)}
+              onPaste={handlePaste}
+              className={styles.input}
+            />
+          </label>
+        );
+      })}
     </div>
   );
 };

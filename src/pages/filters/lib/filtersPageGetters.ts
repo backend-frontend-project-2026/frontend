@@ -1,4 +1,4 @@
-import type { UserFilters } from '../../../entities/user';
+import type { FilterParams } from '../../../entities/user';
 import { normalizeText } from '../../../shared/utils/texts';
 import type {
   AlcoholValue,
@@ -75,51 +75,62 @@ export function formatStayDuration(value: StayDurationValue) {
   return '';
 }
 
-export function getInitialMobileNoise(filters?: UserFilters): MobileNoiseValue {
-  if (filters?.noiseLevel === 'quiet') return 'quiet';
-  if (filters?.noiseLevel === 'moderate') return 'normal';
-  if (filters?.noiseLevel === 'social') return 'loud';
-  if (filters?.quietOnly) return 'quiet';
+export function getInitialMobileNoise(filters?: FilterParams): MobileNoiseValue {
+  if (filters?.noiseLevel && filters.noiseLevel !== 'any') {
+    return filters.noiseLevel;
+  }
+
+  if (filters?.quietOnly) {
+    return 'quiet';
+  }
+
   return '';
 }
 
-export function getInitialDesktopSmoking(filters?: UserFilters): DesktopSmokingValue {
-  if (filters?.smokingPreference === 'no') return 'no';
-  if (filters?.smokingPreference === 'outside_only') return 'outside';
-  if (filters?.smokingPreference === 'yes') return 'yes';
+export function getInitialDesktopSmoking(filters?: FilterParams): DesktopSmokingValue {
+  if (filters?.smokingPreference && filters.smokingPreference !== 'any') {
+    return filters.smokingPreference;
+  }
+
   return '';
 }
 
-export function getInitialDesktopNoise(filters?: UserFilters): DesktopNoiseValue {
-  if (filters?.noiseLevel === 'quiet') return 'quiet';
-  if (filters?.noiseLevel === 'moderate') return 'normal';
-  if (filters?.noiseLevel === 'social') return 'loud';
-  if (filters?.quietOnly) return 'quiet';
+export function getInitialDesktopNoise(filters?: FilterParams): DesktopNoiseValue {
+  if (filters?.noiseLevel && filters.noiseLevel !== 'any') {
+    return filters.noiseLevel;
+  }
+
+  if (filters?.quietOnly) {
+    return 'quiet';
+  }
+
   return '';
 }
 
-export function getInitialDesktopPets(filters?: UserFilters): DesktopPetsValue {
-  if (filters?.petPreference === 'pet_friendly') return 'ok';
-  if (filters?.petPreference === 'no_pets') return 'not-ok';
+export function getInitialDesktopPets(filters?: FilterParams): DesktopPetsValue {
+  if (filters?.petPreference && filters.petPreference !== 'any') {
+    return filters.petPreference;
+  }
+
   return '';
 }
 
-export function getInitialSleepSchedule(filters?: UserFilters): SleepScheduleValue {
+export function getInitialSleepSchedule(filters?: FilterParams): SleepScheduleValue {
   if (filters?.sleepSchedule === 'early_bird') return 'early_bird';
   if (filters?.sleepSchedule === 'night_owl') return 'night_owl';
   if (filters?.sleepSchedule === 'flexible') return 'flexible';
   return '';
 }
 
-export function getInitialHousingType(filters?: UserFilters): UserFilters['housingType'] | 'any' {
+export function getInitialHousingType(filters?: FilterParams): FilterParams['housingType'] | 'any' {
   return filters?.housingType ?? 'any';
 }
 
-export function getInitialGender(filters?: UserFilters): UserFilters['gender'] | 'any' {
+export function getInitialGender(filters?: FilterParams): FilterParams['gender'] | 'any' {
   return filters?.gender ?? 'any';
 }
 
-export function getInitialAlcohol(filters?: UserFilters): AlcoholValue {
+export function getInitialAlcohol(filters?: FilterParams): AlcoholValue {
   if (filters?.alcoholPreference === 'no') return 'no';
   if (filters?.alcoholPreference === 'rarely') return 'rarely';
   if (filters?.alcoholPreference === 'socially') return 'socially';
@@ -127,7 +138,7 @@ export function getInitialAlcohol(filters?: UserFilters): AlcoholValue {
   return '';
 }
 
-export function getInitialRoomOrder(filters?: UserFilters): RoomOrderValue {
+export function getInitialRoomOrder(filters?: FilterParams): RoomOrderValue {
   if (filters?.roomOrderPreference === 'strict') return 'strict';
   if (filters?.roomOrderPreference === 'balanced') return 'balanced';
   if (filters?.roomOrderPreference === 'flexible') return 'flexible';

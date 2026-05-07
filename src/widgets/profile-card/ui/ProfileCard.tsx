@@ -1,4 +1,4 @@
-import { UserBadge, type User } from '../../../entities/user';
+import { UserBadge, type DiscoverCard, type User } from '../../../entities/user';
 import './profile-card.css';
 import { Button, Typography } from 'antd';
 
@@ -11,30 +11,35 @@ import {
 
 const { Title } = Typography;
 
-type ProfileCardProps = {
-  user: User;
+type ProfileCardCommonProps = {
   className?: string;
-  showActions?: boolean;
   compact?: boolean;
-  variant?: 'default' | 'discover';
+};
+
+type DefaultProfileCardProps = ProfileCardCommonProps & {
+  user: User;
+  showActions?: boolean;
+  variant?: 'default';
   onOpenProfile?: (user: User) => void;
   onLike?: (user: User) => void;
   onSkip?: (user: User) => void;
   onSuperLike?: (user: User) => void;
 };
 
-export function ProfileCard({
-  user,
-  className,
-  showActions = true,
-  compact = false,
-  variant = 'default',
-  onOpenProfile,
-  onLike,
-  onSkip,
-  onSuperLike,
-}: ProfileCardProps) {
-  if (variant === 'discover') {
+type DiscoverProfileCardProps = ProfileCardCommonProps & {
+  user: DiscoverCard;
+  showActions?: false;
+  variant: 'discover';
+  onOpenProfile?: (user: DiscoverCard) => void;
+};
+
+type ProfileCardProps = DefaultProfileCardProps | DiscoverProfileCardProps;
+
+export function ProfileCard(props: ProfileCardProps) {
+  const { user, className, compact = false } = props;
+
+  if (props.variant === 'discover') {
+    const { onOpenProfile } = props;
     const discoverChips = getDiscoverChips(user);
     const photo = getPrimaryPhoto(user);
 
@@ -101,10 +106,12 @@ export function ProfileCard({
     );
   }
 
-  const habits = getHabitHighlights(user);
-  const conditions = getConditionHighlights(user);
-  const interests = user.interests.slice(0, 4);
-  const photo = getPrimaryPhoto(user);
+  const { showActions = true, onSkip, onLike, onSuperLike } = props;
+  const profileUser = props.user;
+  const habits = getHabitHighlights(profileUser);
+  const conditions = getConditionHighlights(profileUser);
+  const interests = profileUser.interests.slice(0, 4);
+  const photo = getPrimaryPhoto(profileUser);
 
   return (
     <article className={['profile-card', className].filter(Boolean).join(' ')}>
@@ -112,7 +119,7 @@ export function ProfileCard({
         {photo ? (
           <img
             src={photo}
-            alt={`${user.name} photo`}
+            alt={`${profileUser.name} photo`}
             className="profile-card-image"
             onError={(event) => {
               event.currentTarget.classList.add('is-hidden');
@@ -120,27 +127,27 @@ export function ProfileCard({
           />
         ) : null}
 
-        <div className="profile-card-fallback">{user.name.charAt(0).toUpperCase()}</div>
+        <div className="profile-card-fallback">{profileUser.name.charAt(0).toUpperCase()}</div>
 
-        {user.verified ? <span className="profile-card-verified">Проверен</span> : null}
+        {profileUser.verified ? <span className="profile-card-verified">Проверен</span> : null}
       </div>
 
       <div className="profile-card-body">
         <header className="profile-card-header">
           <div>
             <Title level={3} className="profile-card-name">
-              {user.name}, {user.age}
+              {profileUser.name}, {profileUser.age}
             </Title>
             <p className="profile-card-subtitle">
-              {user.university} • {user.faculty}
+              {profileUser.university} • {profileUser.faculty}
             </p>
             <p className="profile-card-subtitle profile-card-subtitle-muted">
-              {user.course} • {user.location} • {user.district}
+              {profileUser.course} • {profileUser.location} • {profileUser.district}
             </p>
           </div>
         </header>
 
-        <p className="profile-card-bio">{user.bio}</p>
+        <p className="profile-card-bio">{profileUser.bio}</p>
 
         <section className="profile-card-section">
           <Title level={4} className="profile-card-section-title">
@@ -180,21 +187,21 @@ export function ProfileCard({
             <Button
               htmlType="button"
               className="profile-card-button"
-              onClick={() => onSkip?.(user)}
+              onClick={() => onSkip?.(profileUser)}
             >
               Пропустить
             </Button>
             <Button
               htmlType="button"
               className="profile-card-button profile-card-super-like"
-              onClick={() => onSuperLike?.(user)}
+              onClick={() => onSuperLike?.(profileUser)}
             >
               Супер-лайк
             </Button>
             <Button
               htmlType="button"
               className="profile-card-button profile-card-button-primary"
-              onClick={() => onLike?.(user)}
+              onClick={() => onLike?.(profileUser)}
             >
               Лайк
             </Button>

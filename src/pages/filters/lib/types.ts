@@ -1,8 +1,12 @@
-export type MobileNoiseValue = 'quiet' | 'normal' | 'loud' | '';
-export type DesktopSmokingValue = 'no' | 'yes' | 'outside' | '';
-export type DesktopNoiseValue = 'quiet' | 'normal' | 'loud' | '';
-export type DesktopPetsValue = 'ok' | 'not-ok' | '';
-export type SleepScheduleValue = 'early_bird' | 'night_owl' | 'flexible' | '';
+import type { User } from '../../../entities/user';
+
+export type MobileNoiseValue = User['habits']['noiseLevel'] | '';
+export type DesktopSmokingValue = User['habits']['smokingPreference'] | '';
+export type DesktopNoiseValue = User['habits']['noiseLevel'] | '';
+export type DesktopPetsValue = User['habits']['petPreference'] | '';
+
+export type SleepScheduleValue = User['habits']['sleepSchedule'] | '';
+
 export type StayDurationValue =
   | ''
   | 'any'
@@ -10,5 +14,6 @@ export type StayDurationValue =
   | '3-6 months'
   | '6-12 months'
   | '12+ months';
-export type AlcoholValue = 'no' | 'rarely' | 'socially' | 'yes' | '';
-export type RoomOrderValue = 'strict' | 'balanced' | 'flexible' | '';
+
+export type AlcoholValue = User['habits']['alcoholPreference'] | '';
+export type RoomOrderValue = User['habits']['roomOrderPreference'] | '';

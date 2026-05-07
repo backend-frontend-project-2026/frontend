@@ -53,6 +53,9 @@ export type DiscoverContextValue = {
   currentDiscoverUser: User | null;
   totalUsersCount: number;
   matchingUsersCount: number;
+  loading: boolean;
+  error: Error | null;
+  retry: () => void;
   handleLike: (user: User) => void;
   handleSkip: (user: User) => void;
   handleSuperLike: (user: User) => void;

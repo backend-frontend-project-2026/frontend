@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Button, Input, Typography } from 'antd';
+import { Button, Input, Typography, Skeleton, Alert } from 'antd';
 import type { User, UserFilters } from '../../../entities/user';
 import {
   LikeProfileButton,
@@ -13,6 +13,7 @@ import {
   type ReactionType,
 } from '../../../shared/ui/ReactionFeedback/ReactionFeedback';
 import { getDiscoverEmptyState } from '../lib/emptyState';
+import { useRoomieFlow } from '../../../app/providers/roomie-flow';
 import './discover-page.css';
 
 import {
@@ -121,6 +122,8 @@ export default function DiscoverPage({
   onSkip,
   onSuperLike,
 }: DiscoverPageProps) {
+  const { loading, error, retry } = useRoomieFlow();
+
   const currentUser = users[0] ?? null;
   const emptyState = getDiscoverEmptyState({
     users,
@@ -242,6 +245,199 @@ export default function DiscoverPage({
     onApplyFilters?.(nextFilters);
   }
 
+  const renderMobileContent = () => {
+    if (loading && users.length === 0) {
+      return (
+        <div className="discover-mobile__skeleton">
+          <Skeleton.Image active style={{ width: '100%', height: 300 }} />
+          <Skeleton active paragraph={{ rows: 2 }} />
+        </div>
+      );
+    }
+
+    if (error && users.length === 0) {
+      return (
+        <div className="discover-mobile__error">
+          <Alert
+            message="Ошибка загрузки"
+            description="Не удалось загрузить анкеты. Попробуйте позже."
+            type="error"
+            showIcon
+          />
+          <Button onClick={retry} style={{ marginTop: 16 }}>
+            Повторить
+          </Button>
+        </div>
+      );
+    }
+
+    if (currentUser) {
+      return (
+        <>
+          <div className="discover-mobile__stack">
+            <div className="discover-mobile__stack-layer discover-mobile__stack-layer--back" />
+            <div className="discover-mobile__stack-layer discover-mobile__stack-layer--middle" />
+            <ProfileCard
+              user={currentUser}
+              variant="discover"
+              showActions={false}
+              onOpenProfile={onOpenProfile}
+            />
+          </div>
+
+          {pendingReaction ? (
+            <div className="discover-mobile__feedback">
+              <ReactionFeedback
+                reaction={pendingReaction}
+                messages={DISCOVER_REACTION_FEEDBACK}
+                variant="discover"
+              />
+            </div>
+          ) : null}
+
+          <div className="discover-mobile__actions">
+            <SkipProfileButton
+              className="discover-mobile__action discover-mobile__action--skip"
+              ariaLabel="Пропустить"
+              onClick={() => handleReaction('skip', () => onSkip?.(currentUser))}
+              disabled={Boolean(pendingReaction)}
+            >
+              ✕
+            </SkipProfileButton>
+
+            <SuperLikeProfileButton
+              className="discover-mobile__action discover-mobile__action--super"
+              ariaLabel="Супер-лайк"
+              onClick={() => handleReaction('superlike', () => onSuperLike?.(currentUser))}
+              disabled={Boolean(pendingReaction)}
+            >
+              ★
+            </SuperLikeProfileButton>
+
+            <LikeProfileButton
+              className="discover-mobile__action discover-mobile__action--like"
+              ariaLabel="Лайк"
+              onClick={() => handleReaction('like', () => onLike?.(currentUser))}
+              disabled={Boolean(pendingReaction)}
+            >
+              ♥
+            </LikeProfileButton>
+          </div>
+        </>
+      );
+    }
+
+    if (emptyState) {
+      return (
+        <DiscoverEmptyState
+          title={emptyState.title}
+          text={emptyState.text}
+          buttonText={emptyState.buttonText}
+          onButtonClick={onOpenFilters}
+        />
+      );
+    }
+
+    return null;
+  };
+
+  const renderDesktopContent = () => {
+    if (loading && users.length === 0) {
+      return (
+        <div className="discover-feed__skeleton">
+          <Skeleton.Image active style={{ width: 300, height: 400 }} />
+          <Skeleton active paragraph={{ rows: 3 }} />
+        </div>
+      );
+    }
+
+    if (error && users.length === 0) {
+      return (
+        <div className="discover-feed__error">
+          <Alert
+            message="Ошибка загрузки"
+            description="Не удалось загрузить анкеты. Попробуйте позже."
+            type="error"
+            showIcon
+          />
+          <Button onClick={retry} style={{ marginTop: 16 }}>
+            Повторить
+          </Button>
+        </div>
+      );
+    }
+
+    if (currentUser) {
+      return (
+        <>
+          <ProfileCard
+            user={currentUser}
+            variant="discover"
+            compact
+            showActions={false}
+            onOpenProfile={onOpenProfile}
+          />
+
+          {pendingReaction && (
+            <ReactionFeedback
+              reaction={pendingReaction}
+              messages={DISCOVER_REACTION_FEEDBACK}
+              variant="discover"
+            />
+          )}
+
+          <div className="discover-feed__actions">
+            <SkipProfileButton
+              className="discover-desktop-button discover-desktop-button--soft"
+              onClick={() => handleReaction('skip', () => onSkip?.(currentUser))}
+              disabled={Boolean(pendingReaction)}
+            >
+              <span>Пропуск</span>
+              <span className="discover-desktop-button__icon discover-desktop-button__icon--dark">
+                ↗
+              </span>
+            </SkipProfileButton>
+
+            <SuperLikeProfileButton
+              className="discover-desktop-button discover-desktop-button--soft"
+              onClick={() => handleReaction('superlike', () => onSuperLike?.(currentUser))}
+              disabled={Boolean(pendingReaction)}
+            >
+              <span>Супер-лайк</span>
+              <span className="discover-desktop-button__icon discover-desktop-button__icon--soft">
+                ↗
+              </span>
+            </SuperLikeProfileButton>
+
+            <LikeProfileButton
+              className="discover-desktop-button discover-desktop-button--primary"
+              onClick={() => handleReaction('like', () => onLike?.(currentUser))}
+              disabled={Boolean(pendingReaction)}
+            >
+              <span>Лайк</span>
+              <span className="discover-desktop-button__icon discover-desktop-button__icon--lime">
+                ↗
+              </span>
+            </LikeProfileButton>
+          </div>
+        </>
+      );
+    }
+
+    if (emptyState) {
+      return (
+        <DiscoverEmptyState
+          title={emptyState.title}
+          text={emptyState.text}
+          buttonText={emptyState.buttonText}
+          onButtonClick={onOpenFilters}
+        />
+      );
+    }
+
+    return null;
+  };
+
   return (
     <section className="discover-page">
       <div className="discover-page__mobile">
@@ -249,74 +445,13 @@ export default function DiscoverPage({
           <Title level={1} className="discover-mobile__title">
             Поиск
           </Title>
-
           <Button type="default" className="discover-mobile__filters" onClick={onOpenFilters}>
             <span>Фильтры</span>
             <span className="discover-mobile__filters-icon">↗</span>
           </Button>
         </div>
 
-        {currentUser ? (
-          <>
-            <div className="discover-mobile__stack">
-              <div className="discover-mobile__stack-layer discover-mobile__stack-layer--back" />
-              <div className="discover-mobile__stack-layer discover-mobile__stack-layer--middle" />
-
-              <ProfileCard
-                user={currentUser}
-                variant="discover"
-                showActions={false}
-                onOpenProfile={onOpenProfile}
-              />
-            </div>
-
-            {pendingReaction ? (
-              <div className="discover-mobile__feedback">
-                <ReactionFeedback
-                  reaction={pendingReaction}
-                  messages={DISCOVER_REACTION_FEEDBACK}
-                  variant="discover"
-                />
-              </div>
-            ) : null}
-
-            <div className="discover-mobile__actions">
-              <SkipProfileButton
-                className="discover-mobile__action discover-mobile__action--skip"
-                ariaLabel="Пропустить"
-                onClick={() => handleReaction('skip', () => onSkip?.(currentUser))}
-                disabled={Boolean(pendingReaction)}
-              >
-                ✕
-              </SkipProfileButton>
-
-              <SuperLikeProfileButton
-                className="discover-mobile__action discover-mobile__action--super"
-                ariaLabel="Супер-лайк"
-                onClick={() => handleReaction('superlike', () => onSuperLike?.(currentUser))}
-                disabled={Boolean(pendingReaction)}
-              >
-                ★
-              </SuperLikeProfileButton>
-
-              <LikeProfileButton
-                className="discover-mobile__action discover-mobile__action--like"
-                ariaLabel="Лайк"
-                onClick={() => handleReaction('like', () => onLike?.(currentUser))}
-                disabled={Boolean(pendingReaction)}
-              >
-                ♥
-              </LikeProfileButton>
-            </div>
-          </>
-        ) : emptyState ? (
-          <DiscoverEmptyState
-            title={emptyState.title}
-            text={emptyState.text}
-            buttonText={emptyState.buttonText}
-            onButtonClick={onOpenFilters}
-          />
-        ) : null}
+        {renderMobileContent()}
 
         <BottomNav
           classNamePrefix="discover-mobile"
@@ -335,7 +470,6 @@ export default function DiscoverPage({
             <Title level={2} className="discover-panel__title">
               Фильтры
             </Title>
-
             <Button type="default" className="discover-panel__more-filters" onClick={onOpenFilters}>
               <span>Все фильтры</span>
               <span className="discover-panel__more-filters-icon">↗</span>
@@ -351,7 +485,6 @@ export default function DiscoverPage({
                 placeholder="20–35 тыс ₽"
               />
             </label>
-
             <label className="discover-panel__field">
               <span>Дата заезда</span>
               <Input
@@ -364,7 +497,6 @@ export default function DiscoverPage({
 
           <div className="discover-panel__group">
             <p className="discover-panel__subtitle">Привычки</p>
-
             <div className="discover-panel__chips">
               <Button
                 type="default"
@@ -380,7 +512,6 @@ export default function DiscoverPage({
               >
                 {getNoiseLabel(noiseValue)}
               </Button>
-
               <Button
                 type="default"
                 htmlType="button"
@@ -395,7 +526,6 @@ export default function DiscoverPage({
               >
                 {getSmokingLabel(smokingValue)}
               </Button>
-
               <Button
                 type="default"
                 htmlType="button"
@@ -410,7 +540,6 @@ export default function DiscoverPage({
               >
                 {getCleanlinessLabel(cleanlinessValue)}
               </Button>
-
               <Button
                 type="default"
                 htmlType="button"
@@ -439,7 +568,6 @@ export default function DiscoverPage({
                 ↗
               </span>
             </Button>
-
             <Button
               type="default"
               className="discover-desktop-button discover-desktop-button--primary"
@@ -461,65 +589,7 @@ export default function DiscoverPage({
             <span className="discover-feed__count">{users.length} анкет в подборке</span>
           </div>
 
-          {currentUser ? (
-            <>
-              <ProfileCard
-                user={currentUser}
-                variant="discover"
-                compact
-                showActions={false}
-                onOpenProfile={onOpenProfile}
-              />
-
-              {pendingReaction ? <ReactionFeedback
-                reaction={pendingReaction}
-                messages={DISCOVER_REACTION_FEEDBACK}
-                variant="discover"
-              /> : null}
-
-              <div className="discover-feed__actions">
-                <SkipProfileButton
-                  className="discover-desktop-button discover-desktop-button--soft"
-                  onClick={() => handleReaction('skip', () => onSkip?.(currentUser))}
-                  disabled={Boolean(pendingReaction)}
-                >
-                  <span>Пропуск</span>
-                  <span className="discover-desktop-button__icon discover-desktop-button__icon--dark">
-                    ↗
-                  </span>
-                </SkipProfileButton>
-
-                <SuperLikeProfileButton
-                  className="discover-desktop-button discover-desktop-button--soft"
-                  onClick={() => handleReaction('superlike', () => onSuperLike?.(currentUser))}
-                  disabled={Boolean(pendingReaction)}
-                >
-                  <span>Супер-лайк</span>
-                  <span className="discover-desktop-button__icon discover-desktop-button__icon--soft">
-                    ↗
-                  </span>
-                </SuperLikeProfileButton>
-
-                <LikeProfileButton
-                  className="discover-desktop-button discover-desktop-button--primary"
-                  onClick={() => handleReaction('like', () => onLike?.(currentUser))}
-                  disabled={Boolean(pendingReaction)}
-                >
-                  <span>Лайк</span>
-                  <span className="discover-desktop-button__icon discover-desktop-button__icon--lime">
-                    ↗
-                  </span>
-                </LikeProfileButton>
-              </div>
-            </>
-          ) : emptyState ? (
-            <DiscoverEmptyState
-              title={emptyState.title}
-              text={emptyState.text}
-              buttonText={emptyState.buttonText}
-              onButtonClick={onOpenFilters}
-            />
-          ) : null}
+          {renderDesktopContent()}
         </div>
       </div>
     </section>

@@ -4,8 +4,8 @@ import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { RoutePaths } from '@/app/router/routePaths';
 import { useRoomieFlow } from '@/app/providers/roomie-flow';
 import type { User } from '@/entities/user';
-import UserProfileStatusPage from '@/pages/user-profile/ui/UserProfileStatusPage';
 import { UserProfilePage } from '@/pages/user-profile';
+import NotFoundPage from '@/pages/not-found/ui/NotFoundPage';
 import type { ProfileResponse } from '@/shared/api/generated';
 import { profilesApi } from '@/shared/api/services/profiles';
 import { resolveRouteUserId } from '@/shared/utils/route';
@@ -147,11 +147,11 @@ export function UserProfileRoute() {
   }
 
   if (status === 'not-found') {
-    return <UserProfileStatusPage variant="not-found" />;
+    return <NotFoundPage />;
   }
 
   if (status === 'error' || resolvedUser === null) {
-    return <UserProfileStatusPage variant="error" />;
+    return <NotFoundPage />;
   }
 
   return (

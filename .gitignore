@@ -27,4 +27,3 @@ dist-ssr
 openapi.yaml
 openapi.yml
 openapi.json
-src/shared/api/generated/

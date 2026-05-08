@@ -8,7 +8,8 @@ import {
   Typography,
   Upload,
   type RadioChangeEvent,
-} from 'antd';import type { BasicInfoErrors, BasicInfoFormValue } from './types';
+} from 'antd';
+import type { BasicInfoErrors, BasicInfoFormValue } from './types';
 import './edit-basic-info.css';
 import { DEFAULT_BASIC_INFO_FORM_VALUE } from './constants';
 import { mediaApi, type MediaUploadKind } from '@/shared/api/services/media';
@@ -23,6 +24,20 @@ type ReferenceNameOption = {
   label: string;
   id: number;
 };
+
+type ReferenceWithName = {
+  id?: number;
+  name?: string;
+};
+
+type ReferenceWithRequiredName = ReferenceWithName & {
+  id: number;
+  name: string;
+};
+
+function hasReferenceName(reference: ReferenceWithName): reference is ReferenceWithRequiredName {
+  return typeof reference.id === 'number' && Boolean(reference.name?.trim());
+}
 
 type EditBasicInfoProps = {
   initialValue?: Partial<BasicInfoFormValue>;
@@ -80,7 +95,11 @@ export function EditBasicInfo({
   useEffect(() => {
     let isMounted = true;
 
-    setIsUniversitiesLoading(true);
+    void Promise.resolve().then(() => {
+      if (isMounted) {
+        setIsCitiesLoading(true);
+      }
+    });
 
     referencesApi
       .listUniversities({ page: 1, page_size: 1000 })
@@ -90,13 +109,11 @@ export function EditBasicInfo({
         }
 
         setUniversityOptions(
-          (result.data?.items ?? [])
-            .filter((university) => university.id && university.name?.trim())
-            .map((university) => ({
-              id: university.id as number,
-              value: university.name as string,
-              label: university.name as string,
-            }))
+          (result.data?.items ?? []).filter(hasReferenceName).map((university) => ({
+            id: university.id,
+            value: university.name,
+            label: university.name,
+          }))
         );
       })
       .catch(() => {
@@ -119,13 +136,22 @@ export function EditBasicInfo({
     let isMounted = true;
 
     if (!selectedUniversityId) {
-      setFacultyOptions([]);
+      void Promise.resolve().then(() => {
+        if (isMounted) {
+          setFacultyOptions([]);
+        }
+      });
+
       return () => {
         isMounted = false;
       };
     }
 
-    setIsFacultiesLoading(true);
+    void Promise.resolve().then(() => {
+      if (isMounted) {
+        setIsFacultiesLoading(true);
+      }
+    });
 
     referencesApi
       .listFaculties(selectedUniversityId, { page: 1, page_size: 1000 })
@@ -135,13 +161,11 @@ export function EditBasicInfo({
         }
 
         setFacultyOptions(
-          (result.data?.items ?? [])
-            .filter((faculty) => faculty.id && faculty.name?.trim())
-            .map((faculty) => ({
-              id: faculty.id as number,
-              value: faculty.name as string,
-              label: faculty.name as string,
-            }))
+          (result.data?.items ?? []).filter(hasReferenceName).map((faculty) => ({
+            id: faculty.id,
+            value: faculty.name,
+            label: faculty.name,
+          }))
         );
       })
       .catch(() => {
@@ -163,7 +187,11 @@ export function EditBasicInfo({
   useEffect(() => {
     let isMounted = true;
 
-    setIsCitiesLoading(true);
+    void Promise.resolve().then(() => {
+      if (isMounted) {
+        setIsUniversitiesLoading(true);
+      }
+    });
 
     referencesApi
       .listCities({ page: 1, page_size: 100 })

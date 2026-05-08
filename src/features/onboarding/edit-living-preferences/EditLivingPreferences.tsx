@@ -75,8 +75,12 @@ export function EditLivingPreferences({
   useEffect(() => {
     let isMounted = true;
 
-    setIsHousingTypesLoading(true);
-    setHousingTypesError(null);
+    void Promise.resolve().then(() => {
+      if (isMounted) {
+        setIsHousingTypesLoading(true);
+        setHousingTypesError(null);
+      }
+    });
 
     referencesApi
       .listHousingTypes()
@@ -254,9 +258,7 @@ export function EditLivingPreferences({
             allowClear
             optionFilterProp="label"
             notFoundContent={
-              isHousingTypesLoading
-                ? 'Загрузка...'
-                : housingTypesError || 'Типы жилья не найдены'
+              isHousingTypesLoading ? 'Загрузка...' : housingTypesError || 'Типы жилья не найдены'
             }
           />
           {housingTypesError ? <small className="rm-form-error">{housingTypesError}</small> : null}

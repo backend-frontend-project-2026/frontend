@@ -21,7 +21,7 @@ const ResetPasswordPage = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const handleSubmit = async (_values: FormValues) => {
+  const handleSubmit = async (values: FormValues) => {
     if (!token) {
       message.error('Ссылка недействительна. Запросите новую.');
       return;
@@ -29,8 +29,9 @@ const ResetPasswordPage = () => {
 
     try {
       setLoading(true);
+      void values.password;
       // TODO: заменить на API когда бэкенд добавит эндпоинт
-      // POST /auth/reset-password { token, password: _values.password }
+      // POST /auth/reset-password { token, password: values.password }
       await new Promise((resolve) => setTimeout(resolve, 1000));
       setSuccess(true);
     } catch {
@@ -72,11 +73,7 @@ const ResetPasswordPage = () => {
                   { min: 8, message: 'Минимум 8 символов' },
                 ]}
               >
-                <Input.Password
-                  placeholder="Новый пароль"
-                  className={styles.input}
-                  size="large"
-                />
+                <Input.Password placeholder="Новый пароль" className={styles.input} size="large" />
               </Form.Item>
 
               <Form.Item

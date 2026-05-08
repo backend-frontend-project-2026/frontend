@@ -28,15 +28,25 @@ export function UserProfileRoute() {
     let isCancelled = false;
 
     if (!userId || apiUserId === null) {
-      setResolvedUser(null);
-      setStatus('error');
+      void Promise.resolve().then(() => {
+        if (!isCancelled) {
+          setResolvedUser(null);
+          setStatus('error');
+        }
+      });
+
       return () => {
+        isCancelled = true;
         clearSelectedUser();
       };
     }
 
-    setResolvedUser(null);
-    setStatus('loading');
+    void Promise.resolve().then(() => {
+      if (!isCancelled) {
+        setResolvedUser(null);
+        setStatus('loading');
+      }
+    });
 
     void profilesApi
       .getByUserId(apiUserId)

@@ -232,8 +232,7 @@ export default function DiscoverPage({
   const [pendingReaction, setPendingReaction] = useState<DiscoverReaction | null>(null);
   const reactionTimeoutRef = useRef<number | null>(null);
 
-  const [habitReferences, setHabitReferences] =
-    useState<HabitReferenceMap>(EMPTY_HABIT_REFERENCES);
+  const [habitReferences, setHabitReferences] = useState<HabitReferenceMap>(EMPTY_HABIT_REFERENCES);
 
   const sidebarNoiseOptions = getSidebarOptions(
     habitReferences.noiseLevel,
@@ -256,12 +255,24 @@ export default function DiscoverPage({
   );
 
   useEffect(() => {
-    setBudgetValue(formatSidebarBudget(activeFilters));
-    setMoveInDateValue(activeFilters?.moveInDate ?? '');
-    setNoiseValue(getInitialSidebarNoise(activeFilters));
-    setSmokingValue(getInitialSidebarSmoking(activeFilters));
-    setCleanlinessValue(getInitialSidebarCleanliness(activeFilters));
-    setGuestValue(getInitialSidebarGuestFrequency(activeFilters));
+    let isMounted = true;
+
+    void Promise.resolve().then(() => {
+      if (!isMounted) {
+        return;
+      }
+
+      setBudgetValue(formatSidebarBudget(activeFilters));
+      setMoveInDateValue(activeFilters?.moveInDate ?? '');
+      setNoiseValue(getInitialSidebarNoise(activeFilters));
+      setSmokingValue(getInitialSidebarSmoking(activeFilters));
+      setCleanlinessValue(getInitialSidebarCleanliness(activeFilters));
+      setGuestValue(getInitialSidebarGuestFrequency(activeFilters));
+    });
+
+    return () => {
+      isMounted = false;
+    };
   }, [activeFilters]);
 
   useEffect(() => {
@@ -584,11 +595,13 @@ export default function DiscoverPage({
                 onOpenProfile={() => onOpenProfile?.(currentUser)}
               />
 
-              {pendingReaction ? <ReactionFeedback
-                reaction={pendingReaction}
-                messages={DISCOVER_REACTION_FEEDBACK}
-                variant="discover"
-              /> : null}
+              {pendingReaction ? (
+                <ReactionFeedback
+                  reaction={pendingReaction}
+                  messages={DISCOVER_REACTION_FEEDBACK}
+                  variant="discover"
+                />
+              ) : null}
 
               <div className="discover-feed__actions">
                 <SkipProfileButton

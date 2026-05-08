@@ -116,9 +116,10 @@ export function getInitialDesktopPets(filters?: FilterParams): DesktopPetsValue 
 }
 
 export function getInitialSleepSchedule(filters?: FilterParams): SleepScheduleValue {
-  if (filters?.sleepSchedule === 'early_bird') return 'early_bird';
-  if (filters?.sleepSchedule === 'night_owl') return 'night_owl';
-  if (filters?.sleepSchedule === 'flexible') return 'flexible';
+  if (filters?.sleepSchedule && filters.sleepSchedule !== 'any') {
+    return filters.sleepSchedule;
+  }
+
   return '';
 }
 
@@ -131,16 +132,17 @@ export function getInitialGender(filters?: FilterParams): FilterParams['gender']
 }
 
 export function getInitialAlcohol(filters?: FilterParams): AlcoholValue {
-  if (filters?.alcoholPreference === 'no') return 'no';
-  if (filters?.alcoholPreference === 'rarely') return 'rarely';
-  if (filters?.alcoholPreference === 'socially') return 'socially';
-  if (filters?.alcoholPreference === 'yes') return 'yes';
+  if (filters?.alcoholPreference && filters.alcoholPreference !== 'any') {
+    return filters.alcoholPreference;
+  }
+
   return '';
 }
 
 export function getInitialRoomOrder(filters?: FilterParams): RoomOrderValue {
-  if (filters?.roomOrderPreference === 'strict') return 'strict';
-  if (filters?.roomOrderPreference === 'balanced') return 'balanced';
-  if (filters?.roomOrderPreference === 'flexible') return 'flexible';
+  if (filters?.roomOrderPreference && filters.roomOrderPreference !== 'any') {
+    return filters.roomOrderPreference;
+  }
+
   return '';
 }

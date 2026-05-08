@@ -55,9 +55,7 @@ const ChatContent = ({
 }: ChatContentProps) => (
   <>
     <div className={styles.chat__header}>
-      {showBackButton && onBack && (
-        <Button type="text" icon={<LeftOutlined />} onClick={onBack} />
-      )}
+      {showBackButton && onBack && <Button type="text" icon={<LeftOutlined />} onClick={onBack} />}
       {chatName}
     </div>
     <div className={styles.chat__messages}>
@@ -114,11 +112,15 @@ const ChatsPage = () => {
   useEffect(() => {
     if (!activeChatId) return;
 
-    setLoading(true);
-    setError(null);
-    setChatName('Чат');
-
     const controller = new AbortController();
+
+    void Promise.resolve().then(() => {
+      if (!controller.signal.aborted) {
+        setLoading(true);
+        setError(null);
+        setChatName('Чат');
+      }
+    });
 
     Promise.all([
       chatsApi.getMessages(activeChatId, controller.signal),

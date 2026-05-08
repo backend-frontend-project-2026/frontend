@@ -38,13 +38,26 @@ const MatchesPage = () => {
   const matches = mockMatches;
 
   useEffect(() => {
-    setLoading(true);
-    setError(null);
+    let isMounted = true;
+
+    void Promise.resolve().then(() => {
+      if (isMounted) {
+        setLoading(true);
+        setError(null);
+      }
+    });
+
     const timer = setTimeout(() => {
-      setLoading(false);
+      if (isMounted) {
+        setLoading(false);
+      }
       // TODO: заменить на API когда бэкенд добавит GET /matches
     }, 500);
-    return () => clearTimeout(timer);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+    };
   }, [loadKey]);
 
   if (loading) {
@@ -65,7 +78,7 @@ const MatchesPage = () => {
           title="Не удалось загрузить мэтчи"
           subTitle={error}
           extra={
-            <Button type="primary" onClick={() => setLoadKey(k => k + 1)}>
+            <Button type="primary" onClick={() => setLoadKey((k) => k + 1)}>
               Попробовать снова
             </Button>
           }
@@ -74,7 +87,7 @@ const MatchesPage = () => {
     );
   }
 
-  const filteredMatches = matches.filter(m =>
+  const filteredMatches = matches.filter((m) =>
     m.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -142,7 +155,12 @@ const MatchesPage = () => {
           <h3>Выбери мэтч слева</h3>
           <p>Тут появится переписка и быстрые действия</p>
 
-          <Button type="primary" onClick={() => filteredMatches[0] && navigate(`${RoutePaths.CHATS}/${filteredMatches[0].id}`)}>
+          <Button
+            type="primary"
+            onClick={() =>
+              filteredMatches[0] && navigate(`${RoutePaths.CHATS}/${filteredMatches[0].id}`)
+            }
+          >
             Открыть чат
           </Button>
         </div>

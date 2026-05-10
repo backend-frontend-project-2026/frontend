@@ -1,53 +1,48 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './MatchesPage.module.css';
-import { List, Avatar, Empty, Input, Button, Spin, Result } from 'antd';
+import { List, Avatar, Empty, Input, Button, Spin, Result, Tooltip } from 'antd';
 import { RoutePaths } from '@/app/router/routePaths';
-
-type Match = {
-  id: string;
-  name: string;
-  age: number;
-  lastMessage: string;
-  time: string;
-};
-
-const mockMatches: Match[] = [
-  {
-    id: '1',
-    name: 'Катя',
-    age: 20,
-    lastMessage: 'Около 23:30. А ты?',
-    time: '12:24',
-  },
-  {
-    id: '2',
-    name: 'Оля',
-    age: 19,
-    lastMessage: 'Привет! Договоримся о проживании?',
-    time: '12:12',
-  },
-];
+import { matchesApi } from '@/shared/api/services/matches';
+import { getStoredUser } from '@/shared/api/auth/session';
+import type { MatchItem } from '@/shared/api/generated';
 
 const MatchesPage = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const currentProfileId = useMemo(() => getStoredUser()?.id ?? null, []);
+  const [matches, setMatches] = useState<MatchItem[]>([]);
+  const [fetchState, setFetchState] = useState<{ loading: boolean; error: string | null }>({
+    loading: !!currentProfileId,
+    error: null,
+  });
   const [loadKey, setLoadKey] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
-  const matches = mockMatches;
 
   useEffect(() => {
-    setLoading(true);
-    setError(null);
-    const timer = setTimeout(() => {
-      setLoading(false);
-      // TODO: заменить на API когда бэкенд добавит GET /matches
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [loadKey]);
+    if (!currentProfileId) return;
 
-  if (loading) {
+    setFetchState({ loading: true, error: null });
+
+    const controller = new AbortController();
+
+    matchesApi
+      .getMatches(currentProfileId, controller.signal)
+      .then((data) => {
+        setMatches(data?.items ?? []);
+      })
+      .catch((err: Error) => {
+        if (err.name !== 'AbortError') {
+          setFetchState({ loading: false, error: 'Не удалось загрузить мэтчи' });
+        }
+      })
+      .finally(() => {
+        setFetchState((s) => ({ ...s, loading: false }));
+      });
+
+    return () => controller.abort();
+  }, [currentProfileId, loadKey]);
+
+  if (fetchState.loading) {
     return (
       <div className={styles.page}>
         <div className={styles.spinnerWrapper}>
@@ -57,13 +52,13 @@ const MatchesPage = () => {
     );
   }
 
-  if (error) {
+  if (fetchState.error) {
     return (
       <div className={styles.page}>
         <Result
           status="error"
           title="Не удалось загрузить мэтчи"
-          subTitle={error}
+          subTitle={fetchState.error}
           extra={
             <Button type="primary" onClick={() => setLoadKey(k => k + 1)}>
               Попробовать снова
@@ -114,24 +109,22 @@ const MatchesPage = () => {
             ),
           }}
           renderItem={(m) => (
-            <List.Item
-              key={m.id}
-              onClick={() => navigate(`${RoutePaths.CHATS}/${m.id}`)}
-              style={{ cursor: 'pointer' }}
-            >
-              <List.Item.Meta
-                avatar={<Avatar />}
-                title={
-                  <div className={styles.topRow}>
+            <Tooltip title={!m.chat_id ? 'Чат ещё не создан' : ''}>
+              <List.Item
+                key={m.id}
+                onClick={() => m.chat_id && navigate(`${RoutePaths.CHATS}/${m.chat_id}`)}
+                style={{ cursor: m.chat_id ? 'pointer' : 'default' }}
+              >
+                <List.Item.Meta
+                  avatar={<Avatar />}
+                  title={
                     <span className={styles.name}>
                       {m.name}, {m.age}
                     </span>
-                    <span className={styles.time}>{m.time}</span>
-                  </div>
-                }
-                description={<div className={styles.message}>{m.lastMessage}</div>}
-              />
-            </List.Item>
+                  }
+                />
+              </List.Item>
+            </Tooltip>
           )}
         />
       </div>
@@ -142,9 +135,15 @@ const MatchesPage = () => {
           <h3>Выбери мэтч слева</h3>
           <p>Тут появится переписка и быстрые действия</p>
 
-          <Button type="primary" onClick={() => filteredMatches[0] && navigate(`${RoutePaths.CHATS}/${filteredMatches[0].id}`)}>
-            Открыть чат
-          </Button>
+          <Tooltip title={!filteredMatches[0]?.chat_id ? 'Чат ещё не создан' : ''}>
+            <Button
+              type="primary"
+              disabled={!filteredMatches[0]?.chat_id}
+              onClick={() => filteredMatches[0]?.chat_id && navigate(`${RoutePaths.CHATS}/${filteredMatches[0].chat_id}`)}
+            >
+              Открыть чат
+            </Button>
+          </Tooltip>
         </div>
       </div>
     </div>

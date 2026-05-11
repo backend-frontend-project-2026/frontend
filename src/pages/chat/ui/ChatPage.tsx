@@ -11,6 +11,8 @@ import styles from './ChatPage.module.css';
 
 const { TextArea } = Input;
 
+const POLLING_INTERVAL = 5000;
+
 const ChatLoadingState = ({ className }: { className: string }) => (
   <div className={className}>
     <Spin size="large" />
@@ -40,6 +42,7 @@ interface ChatContentProps {
   onBack?: () => void;
   showBackButton?: boolean;
   sending?: boolean;
+  isPolling?: boolean;
 }
 
 const ChatContent = ({
@@ -52,11 +55,17 @@ const ChatContent = ({
   onBack,
   showBackButton = false,
   sending = false,
+  isPolling = false,
 }: ChatContentProps) => (
   <>
     <div className={styles.chat__header}>
       {showBackButton && onBack && <Button type="text" icon={<LeftOutlined />} onClick={onBack} />}
-      {chatName}
+      <span>{chatName}</span>
+      {isPolling && (
+        <span className={styles.onlineIndicator} title="Обновляется в реальном времени">
+          ●
+        </span>
+      )}
     </div>
     <div className={styles.chat__messages}>
       {messages.map((m) => (
@@ -99,6 +108,7 @@ const ChatsPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [loadKey, setLoadKey] = useState(0);
   const [sending, setSending] = useState(false);
+  const [isPolling, setIsPolling] = useState(false);
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -145,8 +155,36 @@ const ChatsPage = () => {
     return () => controller.abort();
   }, [activeChatId, loadKey]);
 
+  useEffect(() => {
+    if (!activeChatId) return;
+
+    const interval = setInterval(async () => {
+      setIsPolling(true);
+      try {
+        const data = await chatsApi.getMessages(activeChatId);
+        const incomingMessages = data?.items ?? [];
+
+        if (incomingMessages.length) {
+          setMessages((prev) => {
+            const existingIds = new Set(prev.map((m) => m.id));
+            const newItems = incomingMessages.filter((m) => !existingIds.has(m.id));
+            return newItems.length ? [...prev, ...newItems] : prev;
+          });
+        }
+      } catch {
+        // Тихо игнорируем ошибки polling — не показываем error state при фоновом обновлении
+      } finally {
+        setIsPolling(false);
+      }
+    }, POLLING_INTERVAL);
+
+    return () => {
+      clearInterval(interval);
+      setIsPolling(false);
+    };
+  }, [activeChatId]);
+
   // TODO: добавить пагинацию сообщений
-  // TODO: добавить WebSocket для real-time обновлений
   const sendMessage = async () => {
     if (!input.trim() || !activeChatId || !currentProfileId) return;
 
@@ -211,6 +249,7 @@ const ChatsPage = () => {
               onInputChange={setInput}
               onSend={sendMessage}
               sending={sending}
+              isPolling={isPolling}
             />
           )}
         </main>
@@ -244,6 +283,7 @@ const ChatsPage = () => {
               onBack={handleBackToList}
               showBackButton
               sending={sending}
+              isPolling={isPolling}
             />
           )}
         </main>

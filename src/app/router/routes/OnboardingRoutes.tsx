@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { message } from 'antd';
 import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { RoutePaths } from '@/app/router/routePaths';
+import type { OnboardingForm } from '@/entities/user';
 import { withEditMode } from '@/shared/utils/route';
 import { useRoomieFlow } from '@/app/providers/roomie-flow';
 import {
@@ -12,13 +13,6 @@ import {
   OnboardingSummaryPage,
   OnboardingSuccessPage,
 } from '@/pages/onboarding';
-
-import type {
-  BasicInfoFormValue,
-  HabitsFormValue,
-  InterestsFormValue,
-  LivingPreferencesFormValue,
-} from '@/features/onboarding';
 
 import {
   isBasicInfoStepComplete,
@@ -31,12 +25,7 @@ import {
 const ONBOARDING_SAVE_ERROR_MESSAGE =
   'Не удалось сохранить анкету на сервере. Возможна ошибка в вузе или факультете.';
 
-type ResumeDraft = {
-  basicInfo: BasicInfoFormValue;
-  habits: HabitsFormValue;
-  living: LivingPreferencesFormValue;
-  interests: InterestsFormValue;
-};
+type ResumeDraft = OnboardingForm;
 
 function useIsProfileEditMode() {
   const [searchParams] = useSearchParams();

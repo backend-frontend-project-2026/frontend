@@ -1,10 +1,10 @@
-import type { UserFilters } from '../../../../entities/user';
+import type { FilterParams } from '../../../../entities/user';
 
-export function createEmptyDiscoverFilters(): UserFilters {
+export function createEmptyDiscoverFilters(): FilterParams {
   return {};
 }
 
-export function hasActiveFilters(filters: UserFilters): boolean {
+export function hasActiveFilters(filters: FilterParams): boolean {
   return Object.entries(filters).some(([, value]) => {
     if (Array.isArray(value)) {
       return value.length > 0;

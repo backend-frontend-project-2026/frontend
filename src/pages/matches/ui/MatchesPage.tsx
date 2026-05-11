@@ -19,11 +19,23 @@ const MatchesPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    if (!currentProfileId) return;
-
-    setFetchState({ loading: true, error: null });
-
     const controller = new AbortController();
+
+    void Promise.resolve().then(() => {
+      if (controller.signal.aborted) return;
+
+      if (!currentProfileId) {
+        setMatches([]);
+        setFetchState({ loading: false, error: null });
+        return;
+      }
+
+      setFetchState({ loading: true, error: null });
+    });
+
+    if (!currentProfileId) {
+      return () => controller.abort();
+    }
 
     matchesApi
       .getMatches(currentProfileId, controller.signal)
@@ -36,7 +48,9 @@ const MatchesPage = () => {
         }
       })
       .finally(() => {
-        setFetchState((s) => ({ ...s, loading: false }));
+        if (!controller.signal.aborted) {
+          setFetchState((s) => ({ ...s, loading: false }));
+        }
       });
 
     return () => controller.abort();
@@ -60,7 +74,7 @@ const MatchesPage = () => {
           title="Не удалось загрузить мэтчи"
           subTitle={fetchState.error}
           extra={
-            <Button type="primary" onClick={() => setLoadKey(k => k + 1)}>
+            <Button type="primary" onClick={() => setLoadKey((k) => k + 1)}>
               Попробовать снова
             </Button>
           }
@@ -69,7 +83,7 @@ const MatchesPage = () => {
     );
   }
 
-  const filteredMatches = matches.filter(m =>
+  const filteredMatches = matches.filter((m) =>
     m.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -139,7 +153,10 @@ const MatchesPage = () => {
             <Button
               type="primary"
               disabled={!filteredMatches[0]?.chat_id}
-              onClick={() => filteredMatches[0]?.chat_id && navigate(`${RoutePaths.CHATS}/${filteredMatches[0].chat_id}`)}
+              onClick={() =>
+                filteredMatches[0]?.chat_id &&
+                navigate(`${RoutePaths.CHATS}/${filteredMatches[0].chat_id}`)
+              }
             >
               Открыть чат
             </Button>

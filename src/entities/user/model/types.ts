@@ -71,31 +71,3 @@ export type UserBudget = {
   currency: '₽';
   period: 'month';
 };
-
-export type UserFilters = {
-  search?: string;
-  ageMin?: number;
-  ageMax?: number;
-  faculty?: string;
-  course?: string;
-  university?: string;
-  district?: string;
-  location?: string;
-  budgetMin?: number;
-  budgetMax?: number;
-  moveInDate?: string;
-  stayDuration?: StayDuration | 'any';
-  smokingPreference?: SmokingPreference | 'any';
-  alcoholPreference?: AlcoholPreference | 'any';
-  petPreference?: PetPreference | 'any';
-  quietOnly?: boolean;
-  roomOrderPreference?: RoomOrderPreference | 'any';
-  rentalCriteria?: string;
-  interests?: string[];
-  housingType?: HousingType | 'any';
-  gender?: Gender | 'any';
-  noiseLevel?: NoiseLevel | 'any';
-  sleepSchedule?: SleepSchedule | 'any';
-  cleanliness?: CleanlinessLevel | 'any';
-  guestFrequency?: GuestFrequency | 'any';
-};

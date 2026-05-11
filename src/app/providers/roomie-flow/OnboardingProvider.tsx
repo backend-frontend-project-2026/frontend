@@ -1,10 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type PropsWithChildren } from 'react';
-import type {
-  BasicInfoFormValue,
-  HabitsFormValue,
-  InterestsFormValue,
-  LivingPreferencesFormValue,
-} from '@/features/onboarding';
+import type { OnboardingForm } from '@/entities/user';
 import { setOnboardingCompleted, isOnboardingCompleted } from '@/shared/api/auth/session';
 import { OnboardingContext } from './onboarding-context';
 import type {
@@ -43,19 +38,19 @@ export function OnboardingProvider({ children }: PropsWithChildren) {
     setDraft(value);
   }, []);
 
-  const updateBasicInfo = useCallback((value: BasicInfoFormValue) => {
+  const updateBasicInfo = useCallback((value: OnboardingForm['basicInfo']) => {
     setDraft((current) => ({ ...current, basicInfo: value }));
   }, []);
 
-  const updateHabits = useCallback((value: HabitsFormValue) => {
+  const updateHabits = useCallback((value: OnboardingForm['habits']) => {
     setDraft((current) => ({ ...current, habits: value }));
   }, []);
 
-  const updateLiving = useCallback((value: LivingPreferencesFormValue) => {
+  const updateLiving = useCallback((value: OnboardingForm['living']) => {
     setDraft((current) => ({ ...current, living: value }));
   }, []);
 
-  const updateInterests = useCallback((value: InterestsFormValue) => {
+  const updateInterests = useCallback((value: OnboardingForm['interests']) => {
     setDraft((current) => ({ ...current, interests: value }));
   }, []);
 

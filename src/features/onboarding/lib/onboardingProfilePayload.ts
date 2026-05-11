@@ -1,18 +1,10 @@
 import type { ProfileCreate, UniversityResponse, FacultyResponse } from '@/shared/api/generated';
+import type { OnboardingProfilePayload } from '@/shared/api/services/profiles';
 import { referencesApi } from '@/shared/api/services/references';
 import { isIsoDate } from '@/shared/utils/date';
-import type { OnboardingProfilePayload } from '@/shared/api/services/profiles';
-import type { BasicInfoFormValue } from '../edit-basic-info';
-import type { HabitsFormValue } from '../edit-habits';
-import type { InterestsFormValue } from '../edit-interests';
-import type { LivingPreferencesFormValue } from '../edit-living-preferences';
+import type { OnboardingForm } from '@/entities/user';
 
-export type OnboardingProfileDraft = {
-  basicInfo: BasicInfoFormValue;
-  habits: HabitsFormValue;
-  living: LivingPreferencesFormValue;
-  interests: InterestsFormValue;
-};
+export type OnboardingProfileDraft = OnboardingForm;
 
 type OnboardingReferenceIds = {
   universityId: number;
@@ -112,7 +104,7 @@ async function resolveFacultyId(universityId: number, facultyName: string): Prom
 }
 
 function mapBasicInfoToPayload(
-  basicInfo: BasicInfoFormValue,
+  basicInfo: OnboardingForm['basicInfo'],
   referenceIds: OnboardingReferenceIds
 ) {
   const avatarUrl = emptyToUndefined(basicInfo.avatar);
@@ -133,7 +125,7 @@ function mapBasicInfoToPayload(
   };
 }
 
-function mapHabitsToPayload(habits: HabitsFormValue) {
+function mapHabitsToPayload(habits: OnboardingForm['habits']) {
   return {
     sleep_schedule: emptyToUndefined(habits.sleepSchedule),
     cleanliness: emptyToUndefined(habits.cleanliness),
@@ -151,7 +143,7 @@ function mapHabitsToPayload(habits: HabitsFormValue) {
   };
 }
 
-function mapLivingToPayload(living: LivingPreferencesFormValue) {
+function mapLivingToPayload(living: OnboardingForm['living']) {
   return {
     budget_min: parseNullableInteger(living.budgetMin),
     budget_max: parseNullableInteger(living.budgetMax),
@@ -164,7 +156,7 @@ function mapLivingToPayload(living: LivingPreferencesFormValue) {
   };
 }
 
-function mapInterestsToPayload(interests: InterestsFormValue) {
+function mapInterestsToPayload(interests: OnboardingForm['interests']) {
   return {
     interests: interests.interests.map(normalizeText).filter(Boolean),
     compatibility_note: emptyToUndefined(interests.compatibilityNote),

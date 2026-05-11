@@ -59,9 +59,7 @@ const ChatContent = ({
 }: ChatContentProps) => (
   <>
     <div className={styles.chat__header}>
-      {showBackButton && onBack && (
-        <Button type="text" icon={<LeftOutlined />} onClick={onBack} />
-      )}
+      {showBackButton && onBack && <Button type="text" icon={<LeftOutlined />} onClick={onBack} />}
       <span>{chatName}</span>
       {isPolling && (
         <span className={styles.onlineIndicator} title="Обновляется в реальном времени">
@@ -124,11 +122,15 @@ const ChatsPage = () => {
   useEffect(() => {
     if (!activeChatId) return;
 
-    setLoading(true);
-    setError(null);
-    setChatName('Чат');
-
     const controller = new AbortController();
+
+    void Promise.resolve().then(() => {
+      if (!controller.signal.aborted) {
+        setLoading(true);
+        setError(null);
+        setChatName('Чат');
+      }
+    });
 
     Promise.all([
       chatsApi.getMessages(activeChatId, controller.signal),
@@ -160,10 +162,12 @@ const ChatsPage = () => {
       setIsPolling(true);
       try {
         const data = await chatsApi.getMessages(activeChatId);
-        if (data?.items) {
+        const incomingMessages = data?.items ?? [];
+
+        if (incomingMessages.length) {
           setMessages((prev) => {
             const existingIds = new Set(prev.map((m) => m.id));
-            const newItems = data.items.filter((m) => !existingIds.has(m.id));
+            const newItems = incomingMessages.filter((m) => !existingIds.has(m.id));
             return newItems.length ? [...prev, ...newItems] : prev;
           });
         }

@@ -1,9 +1,9 @@
 import type { User } from '../../../entities/user';
 
-export type SidebarNoiseValue = 'quiet' | 'normal' | 'loud' | '';
-export type SidebarSmokingValue = 'no' | 'outside' | 'yes' | '';
-export type SidebarCleanlinessValue = 'high' | 'medium' | 'low' | '';
-export type SidebarGuestValue = 'rarely' | 'sometimes' | 'often' | '';
+export type SidebarNoiseValue = User['habits']['noiseLevel'] | '';
+export type SidebarSmokingValue = User['habits']['smokingPreference'] | '';
+export type SidebarCleanlinessValue = User['habits']['cleanliness'] | '';
+export type SidebarGuestValue = User['habits']['guestFrequency'] | '';
 
 export type DiscoverEmptyState = {
   title: string;

@@ -1,7 +1,6 @@
 import { Navigate, useNavigate } from 'react-router-dom';
 import { RoutePaths } from '@/app/router/routePaths';
 import { useRoomieFlow } from '@/app/providers/roomie-flow';
-import { MOCK_DISCOVER_USERS } from '@/entities/user';
 import DiscoverPage from '@/pages/discover/ui/DiscoverPage';
 import { FiltersPage } from '@/pages/filters';
 
@@ -53,8 +52,14 @@ export function DiscoverRoute() {
 
 export function FiltersRoute() {
   const navigate = useNavigate();
-  const { completed, draft, activeFilters, applyCurrentFilters, clearSkippedProfiles } =
-    useRoomieFlow();
+  const {
+    completed,
+    draft,
+    activeFilters,
+    discoverUsers,
+    applyCurrentFilters,
+    clearSkippedProfiles,
+  } = useRoomieFlow();
 
   if (!completed) {
     return <Navigate to={RoutePaths.ONBOARDING_STEP_1} replace />;
@@ -65,7 +70,7 @@ export function FiltersRoute() {
       initialFilters={activeFilters}
       currentUserUniversity={draft.basicInfo.university}
       currentUserLocation={draft.basicInfo.location}
-      usersForPreview={MOCK_DISCOVER_USERS}
+      usersForPreview={discoverUsers}
       onBack={() => navigate(RoutePaths.DISCOVER)}
       onApply={(filters) => {
         clearSkippedProfiles();

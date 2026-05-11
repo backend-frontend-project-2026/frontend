@@ -117,6 +117,13 @@
   border-top: 1px solid var(--color-border);
 }
 
+.onlineIndicator {
+  color: #52c41a;
+  font-size: 10px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
 /* ========= МОБИЛЬНЫЕ КОНТЕЙНЕРЫ ========= */
 .chatsMobile {
   height: 100vh;

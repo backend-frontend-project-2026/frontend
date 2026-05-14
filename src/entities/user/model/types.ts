@@ -76,11 +76,12 @@ export type UserFilters = {
   search?: string;
   ageMin?: number;
   ageMax?: number;
-  faculty?: string;
-  course?: string;
+  gender?: 'male' | 'female' | 'any';
   university?: string;
-  district?: string;
+  faculty?: string;
   location?: string;
+  district?: string;
+  course?: string;
   budgetMin?: number;
   budgetMax?: number;
   moveInDate?: string;
@@ -93,7 +94,6 @@ export type UserFilters = {
   rentalCriteria?: string;
   interests?: string[];
   housingType?: HousingType | 'any';
-  gender?: Gender | 'any';
   noiseLevel?: NoiseLevel | 'any';
   sleepSchedule?: SleepSchedule | 'any';
   cleanliness?: CleanlinessLevel | 'any';

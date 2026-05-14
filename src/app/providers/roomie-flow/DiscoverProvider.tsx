@@ -12,7 +12,6 @@ function buildProfilesQuery(activeFilters: UserFilters): NonNullable<GetProfiles
     page: 1,
     page_size: 10,
   };
-
   if (activeFilters.ageMin) query.age_min = activeFilters.ageMin;
   if (activeFilters.ageMax) query.age_max = activeFilters.ageMax;
   if (activeFilters.gender && activeFilters.gender !== 'any') query.sex = activeFilters.gender;
@@ -21,7 +20,6 @@ function buildProfilesQuery(activeFilters: UserFilters): NonNullable<GetProfiles
   if (activeFilters.location) query.city = activeFilters.location;
   if (activeFilters.district) query.neighbourhood_id = Number(activeFilters.district);
   if (activeFilters.course) query.course = Number(activeFilters.course);
-
   return query;
 }
 
@@ -93,19 +91,16 @@ export function DiscoverProvider({ children }: PropsWithChildren) {
 
   const handleLike = useCallback((_user: User) => {
     void _user;
-    // TODO: отправить лайк
     removeCurrentUser();
   }, [removeCurrentUser]);
 
   const handleSkip = useCallback((_user: User) => {
     void _user;
-    // TODO: отправить скип
     removeCurrentUser();
   }, [removeCurrentUser]);
 
   const handleSuperLike = useCallback((_user: User) => {
     void _user;
-    // TODO: отправить суперлайк
     removeCurrentUser();
   }, [removeCurrentUser]);
 
@@ -149,9 +144,5 @@ export function DiscoverProvider({ children }: PropsWithChildren) {
     ]
   );
 
-  return (
-    <DiscoverContext.Provider value={value}>
-      {children}
-    </DiscoverContext.Provider>
-  );
+  return <DiscoverContext.Provider value={value}>{children}</DiscoverContext.Provider>;
 }

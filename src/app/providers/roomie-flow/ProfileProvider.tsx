@@ -1,6 +1,9 @@
 // src/app/providers/roomie-flow/ProfileProvider.tsx
 import { useCallback, useMemo, useState, type PropsWithChildren } from 'react';
-import { MOCK_DISCOVER_USERS, type User } from '@/entities/user';
+import type { User } from '@/entities/user';
+import { profilesApi } from '@/shared/api/services/profiles';
+import { mapProfileResponseToUser } from '@/shared/api/services/profileUserMapper';
+import { resolveRouteUserId } from '@/shared/utils/route';
 import { ProfileContext } from './profile-context';
 import type { ProfileContextValue } from './types';
 
@@ -20,8 +23,27 @@ export function ProfileProvider({ children }: PropsWithChildren) {
         return;
       }
 
-      const foundUser = MOCK_DISCOVER_USERS.find((user) => user.id === userId);
-      setSelectedUser(foundUser ?? null);
+      const resolvedUserId = resolveRouteUserId(userId);
+
+      if (resolvedUserId === null) {
+        setSelectedUser(null);
+        return;
+      }
+
+      void profilesApi
+        .getByUserId(resolvedUserId)
+        .then(async (result) => {
+          if (!result.data) {
+            setSelectedUser(null);
+            return;
+          }
+
+          const mappedUser = await mapProfileResponseToUser(result.data, userId);
+          setSelectedUser(mappedUser);
+        })
+        .catch(() => {
+          setSelectedUser(null);
+        });
     },
     []
   );

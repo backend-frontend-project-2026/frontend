@@ -4,6 +4,22 @@
   gap: 10px;
 }
 
+.inputLabel {
+  display: block;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  white-space: nowrap;
+  border: 0;
+  clip: rect(0 0 0 0);
+}
+
 .input {
   width: 48px;
   height: 56px;

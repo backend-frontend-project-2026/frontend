@@ -1,18 +1,7 @@
-import type { User, UserFilters } from '@/entities/user';
+import type { FilterParams, OnboardingForm, User } from '@/entities/user';
 import type { DiscoverActionState } from '@/features/discover';
-import type {
-  BasicInfoFormValue,
-  HabitsFormValue,
-  InterestsFormValue,
-  LivingPreferencesFormValue,
-} from '@/features/onboarding';
 
-export type OnboardingDraft = {
-  basicInfo: BasicInfoFormValue;
-  habits: HabitsFormValue;
-  living: LivingPreferencesFormValue;
-  interests: InterestsFormValue;
-};
+export type OnboardingDraft = OnboardingForm;
 
 export type OnboardingStep = 1 | 2 | 3 | 4;
 
@@ -31,18 +20,18 @@ export type OnboardingContextValue = {
   draft: OnboardingDraft;
   setCurrentStep: (step: OnboardingStep) => void;
   replaceDraft: (value: OnboardingDraft) => void;
-  updateBasicInfo: (value: BasicInfoFormValue) => void;
-  updateHabits: (value: HabitsFormValue) => void;
-  updateLiving: (value: LivingPreferencesFormValue) => void;
-  updateInterests: (value: InterestsFormValue) => void;
+  updateBasicInfo: (value: OnboardingForm['basicInfo']) => void;
+  updateHabits: (value: OnboardingForm['habits']) => void;
+  updateLiving: (value: OnboardingForm['living']) => void;
+  updateInterests: (value: OnboardingForm['interests']) => void;
   finishOnboarding: () => void;
   skipOnboarding: () => void;
 };
 
 export type FiltersContextValue = {
-  activeFilters: UserFilters;
+  activeFilters: FilterParams;
   filtersAreActive: boolean;
-  applyCurrentFilters: (nextFilters?: UserFilters) => void;
+  applyCurrentFilters: (nextFilters?: FilterParams) => void;
   resetFilters: () => void;
 };
 

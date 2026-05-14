@@ -8,7 +8,8 @@ import {
   Typography,
   Upload,
   type RadioChangeEvent,
-} from 'antd';import type { BasicInfoErrors, BasicInfoFormValue } from './types';
+} from 'antd';
+import type { BasicInfoErrors, BasicInfoFormValue } from './types';
 import './edit-basic-info.css';
 import { DEFAULT_BASIC_INFO_FORM_VALUE } from './constants';
 import { mediaApi, type MediaUploadKind } from '@/shared/api/services/media';
@@ -17,6 +18,26 @@ import { revokeObjectUrl, validateImageFile } from './lib/basicInfoHelpers';
 
 const { TextArea } = Input;
 const { Title } = Typography;
+
+type ReferenceNameOption = {
+  value: string;
+  label: string;
+  id: number;
+};
+
+type ReferenceWithName = {
+  id?: number;
+  name?: string;
+};
+
+type ReferenceWithRequiredName = ReferenceWithName & {
+  id: number;
+  name: string;
+};
+
+function hasReferenceName(reference: ReferenceWithName): reference is ReferenceWithRequiredName {
+  return typeof reference.id === 'number' && Boolean(reference.name?.trim());
+}
 
 type EditBasicInfoProps = {
   initialValue?: Partial<BasicInfoFormValue>;
@@ -51,7 +72,11 @@ export function EditBasicInfo({
   const [errors, setErrors] = useState<BasicInfoErrors>({});
   const [isAvatarUploading, setIsAvatarUploading] = useState(false);
   const [isPhotoUploading, setIsPhotoUploading] = useState(false);
+  const [universityOptions, setUniversityOptions] = useState<ReferenceNameOption[]>([]);
+  const [facultyOptions, setFacultyOptions] = useState<ReferenceNameOption[]>([]);
   const [cityOptions, setCityOptions] = useState<{ value: string; label: string }[]>([]);
+  const [isUniversitiesLoading, setIsUniversitiesLoading] = useState(false);
+  const [isFacultiesLoading, setIsFacultiesLoading] = useState(false);
   const [isCitiesLoading, setIsCitiesLoading] = useState(false);
   const objectUrlsRef = useRef<string[]>([]);
   const uploadedMediaIdsByUrlRef = useRef<Record<string, number>>({});
@@ -62,10 +87,111 @@ export function EditBasicInfo({
     );
   }, [formValue.avatar, formValue.photos]);
 
+  const selectedUniversityId = useMemo(
+    () => universityOptions.find((option) => option.value === formValue.university)?.id ?? null,
+    [formValue.university, universityOptions]
+  );
+
   useEffect(() => {
     let isMounted = true;
 
-    setIsCitiesLoading(true);
+    void Promise.resolve().then(() => {
+      if (isMounted) {
+        setIsCitiesLoading(true);
+      }
+    });
+
+    referencesApi
+      .listUniversities({ page: 1, page_size: 1000 })
+      .then((result) => {
+        if (!isMounted) {
+          return;
+        }
+
+        setUniversityOptions(
+          (result.data?.items ?? []).filter(hasReferenceName).map((university) => ({
+            id: university.id,
+            value: university.name,
+            label: university.name,
+          }))
+        );
+      })
+      .catch(() => {
+        if (isMounted) {
+          setUniversityOptions([]);
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsUniversitiesLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    if (!selectedUniversityId) {
+      void Promise.resolve().then(() => {
+        if (isMounted) {
+          setFacultyOptions([]);
+        }
+      });
+
+      return () => {
+        isMounted = false;
+      };
+    }
+
+    void Promise.resolve().then(() => {
+      if (isMounted) {
+        setIsFacultiesLoading(true);
+      }
+    });
+
+    referencesApi
+      .listFaculties(selectedUniversityId, { page: 1, page_size: 1000 })
+      .then((result) => {
+        if (!isMounted) {
+          return;
+        }
+
+        setFacultyOptions(
+          (result.data?.items ?? []).filter(hasReferenceName).map((faculty) => ({
+            id: faculty.id,
+            value: faculty.name,
+            label: faculty.name,
+          }))
+        );
+      })
+      .catch(() => {
+        if (isMounted) {
+          setFacultyOptions([]);
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsFacultiesLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedUniversityId]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    void Promise.resolve().then(() => {
+      if (isMounted) {
+        setIsUniversitiesLoading(true);
+      }
+    });
 
     referencesApi
       .listCities({ page: 1, page_size: 100 })
@@ -452,22 +578,46 @@ export function EditBasicInfo({
 
         <label className="rm-form-field rm-form-field--university">
           <span className="rm-form-label">Вуз</span>
-          <Input
+          <Select
             className="rm-form-input"
-            value={formValue.university}
-            onChange={(event) => setField('university', event.target.value)}
-            placeholder="КФУ"
+            value={formValue.university || undefined}
+            onChange={(value) => {
+              setFormValue((current) => ({
+                ...current,
+                university: value ?? '',
+                faculty: '',
+              }));
+              setErrors((current) => ({
+                ...current,
+                university: undefined,
+                faculty: undefined,
+              }));
+            }}
+            placeholder="Выбери вуз"
+            options={universityOptions}
+            loading={isUniversitiesLoading}
+            showSearch
+            allowClear
+            optionFilterProp="label"
+            notFoundContent={isUniversitiesLoading ? 'Загрузка...' : 'Вузы не найдены'}
           />
           {errors.university ? <small className="rm-form-error">{errors.university}</small> : null}
         </label>
 
         <label className="rm-form-field rm-form-field--faculty">
           <span className="rm-form-label">Факультет</span>
-          <Input
+          <Select
             className="rm-form-input"
-            value={formValue.faculty}
-            onChange={(event) => setField('faculty', event.target.value)}
-            placeholder="Институт ИТИС"
+            value={formValue.faculty || undefined}
+            onChange={(value) => setField('faculty', value ?? '')}
+            placeholder={selectedUniversityId ? 'Выбери факультет' : 'Сначала выбери вуз'}
+            options={facultyOptions}
+            loading={isFacultiesLoading}
+            disabled={!selectedUniversityId}
+            showSearch
+            allowClear
+            optionFilterProp="label"
+            notFoundContent={isFacultiesLoading ? 'Загрузка...' : 'Факультеты не найдены'}
           />
           {errors.faculty ? <small className="rm-form-error">{errors.faculty}</small> : null}
         </label>

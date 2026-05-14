@@ -1,9 +1,4 @@
-import type {
-  BasicInfoFormValue,
-  HabitsFormValue,
-  InterestsFormValue,
-  LivingPreferencesFormValue,
-} from '@/features/onboarding';
+import type { OnboardingForm } from '@/entities/user';
 import { parseQuietInterval } from '@/features/onboarding/edit-habits/lib/quietInterval';
 import {
   parseBudgetRange,
@@ -11,8 +6,8 @@ import {
 } from '@/features/onboarding/edit-living-preferences/lib/livingPreferencesHelpers';
 import { isIsoDate } from '@/shared/utils/date';
 
-export function isBasicInfoStepComplete(value?: Partial<BasicInfoFormValue>) {
-  const nextValue: BasicInfoFormValue = {
+export function isBasicInfoStepComplete(value?: Partial<OnboardingForm['basicInfo']>) {
+  const nextValue: OnboardingForm['basicInfo'] = {
     name: value?.name ?? '',
     age: value?.age ?? '',
     gender: value?.gender ?? '',
@@ -44,8 +39,8 @@ export function isBasicInfoStepComplete(value?: Partial<BasicInfoFormValue>) {
   );
 }
 
-export function isHabitsStepComplete(value?: Partial<HabitsFormValue>) {
-  const nextValue: HabitsFormValue = {
+export function isHabitsStepComplete(value?: Partial<OnboardingForm['habits']>) {
+  const nextValue: OnboardingForm['habits'] = {
     sleepSchedule: value?.sleepSchedule ?? '',
     cleanliness: value?.cleanliness ?? '',
     noiseLevel: value?.noiseLevel ?? '',
@@ -79,8 +74,8 @@ export function isHabitsStepComplete(value?: Partial<HabitsFormValue>) {
   );
 }
 
-export function isLivingStepComplete(value?: Partial<LivingPreferencesFormValue>) {
-  const nextValue: LivingPreferencesFormValue = {
+export function isLivingStepComplete(value?: Partial<OnboardingForm['living']>) {
+  const nextValue: OnboardingForm['living'] = {
     budgetMin: value?.budgetMin ?? '',
     budgetMax: value?.budgetMax ?? '',
     moveInDate: value?.moveInDate ?? '',
@@ -104,8 +99,8 @@ export function isLivingStepComplete(value?: Partial<LivingPreferencesFormValue>
   );
 }
 
-export function isInterestsStepComplete(value?: Partial<InterestsFormValue>) {
-  const nextValue: InterestsFormValue = {
+export function isInterestsStepComplete(value?: Partial<OnboardingForm['interests']>) {
+  const nextValue: OnboardingForm['interests'] = {
     interests: value?.interests ?? [],
     compatibilityNote: value?.compatibilityNote ?? '',
     customTagDraft: value?.customTagDraft ?? '',

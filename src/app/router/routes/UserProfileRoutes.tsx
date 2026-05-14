@@ -3,75 +3,13 @@ import { Spin } from 'antd';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { RoutePaths } from '@/app/router/routePaths';
 import { useRoomieFlow } from '@/app/providers/roomie-flow';
-import type { User } from '@/entities/user';
+import { mapUserToFullProfile, type User } from '@/entities/user';
 import { UserProfilePage } from '@/pages/user-profile';
 import NotFoundPage from '@/pages/not-found/ui/NotFoundPage';
-import type { ProfileResponse } from '@/shared/api/generated';
 import { profilesApi } from '@/shared/api/services/profiles';
+import { mapProfileResponseToUser } from '@/shared/api/services/profileUserMapper';
 import { resolveRouteUserId } from '@/shared/utils/route';
 import styles from './UserProfileRoutes.module.css';
-
-const DEFAULT_PROFILE_USER: Omit<User, 'id'> = {
-  name: 'Пользователь',
-  age: 18,
-  gender: 'male',
-  housingType: 'rental',
-  university: 'Вуз не указан',
-  course: 'Курс не указан',
-  faculty: 'Факультет не указан',
-  location: 'Локация не указана',
-  district: 'Район не указан',
-  bio: 'Пользователь пока не заполнил описание.',
-  interests: [],
-  habits: {
-    sleepSchedule: 'flexible',
-    cleanliness: 'medium',
-    noiseLevel: 'moderate',
-    guestFrequency: 'rarely',
-    petPreference: 'no_pets',
-    smokingPreference: 'no',
-    alcoholPreference: 'no',
-    roomOrderPreference: 'balanced',
-  },
-  budget: {
-    min: 0,
-    max: 0,
-    currency: '₽',
-    period: 'month',
-  },
-  moveInDate: 'Не указано',
-  stayDuration: '6-12 months',
-  idealRoommateDescription: '',
-  rentalCriteria: '',
-  avatar: '',
-  photos: [],
-  isSmokingAllowed: false,
-  hasPets: false,
-  hasQuietHours: false,
-  verified: false,
-  compatibilityNote: '',
-};
-
-function mapProfileResponseToUser(profile: ProfileResponse, routeUserId: string): User {
-  const baseUser: User = {
-    id: routeUserId,
-    ...DEFAULT_PROFILE_USER,
-  };
-
-  return {
-    ...baseUser,
-    id: routeUserId,
-    name: profile.name?.trim() || baseUser.name,
-    age: profile.age ?? baseUser.age,
-    gender: profile.sex === 'female' || profile.sex === 'male' ? profile.sex : baseUser.gender,
-    university: profile.uni_id ? `Вуз #${profile.uni_id}` : baseUser.university,
-    faculty: profile.faculty_id ? `Факультет #${profile.faculty_id}` : baseUser.faculty,
-    course: profile.course ? `${profile.course} курс` : baseUser.course,
-    location: profile.city?.trim() || baseUser.location,
-    district: profile.neighbourhood_id ? `Район #${profile.neighbourhood_id}` : baseUser.district,
-    bio: profile.profile_description?.trim() || baseUser.bio,
-  };
-}
 
 export function UserProfileRoute() {
   const navigate = useNavigate();
@@ -90,42 +28,45 @@ export function UserProfileRoute() {
     let isCancelled = false;
 
     if (!userId || apiUserId === null) {
-      setResolvedUser(null);
-      setStatus('error');
+      Promise.resolve().then(() => {
+        if (!isCancelled) {
+          setResolvedUser(null);
+          setStatus('error');
+        }
+      });
       return () => {
+        isCancelled = true;
         clearSelectedUser();
       };
     }
 
-    setResolvedUser(null);
-    setStatus('loading');
+    Promise.resolve().then(() => {
+      if (!isCancelled) {
+        setResolvedUser(null);
+        setStatus('loading');
+      }
+    });
 
-    void profilesApi
+    profilesApi
       .getByUserId(apiUserId)
-      .then((result) => {
-        if (isCancelled) {
-          return;
-        }
-
+      .then(async (result) => {
+        if (isCancelled) return;
         if (result.data) {
-          const mappedUser = mapProfileResponseToUser(result.data, userId);
+          const mappedUser = await mapProfileResponseToUser(result.data, userId);
+          if (isCancelled) return;
           setResolvedUser(mappedUser);
           openProfile(mappedUser);
           setStatus('ready');
           return;
         }
-
         if (result.response.status === 404) {
           setStatus('not-found');
           return;
         }
-
         setStatus('error');
       })
       .catch(() => {
-        if (!isCancelled) {
-          setStatus('error');
-        }
+        if (!isCancelled) setStatus('error');
       });
 
     return () => {
@@ -146,17 +87,15 @@ export function UserProfileRoute() {
     );
   }
 
-  if (status === 'not-found') {
+  if (status === 'not-found' || status === 'error' || resolvedUser === null) {
     return <NotFoundPage />;
   }
 
-  if (status === 'error' || resolvedUser === null) {
-    return <NotFoundPage />;
-  }
+  const fullProfile = mapUserToFullProfile(resolvedUser);
 
   return (
     <UserProfilePage
-      user={resolvedUser}
+      user={fullProfile}
       onBack={() => navigate(RoutePaths.DISCOVER)}
       onLike={() => {
         handleLike(resolvedUser);
@@ -172,9 +111,7 @@ export function UserProfileRoute() {
       }}
       onReport={() => {
         navigate(RoutePaths.reportByUser(resolvedUser.id), {
-          state: {
-            reportedUserName: resolvedUser.name,
-          },
+          state: { reportedUserName: resolvedUser.name },
         });
       }}
     />

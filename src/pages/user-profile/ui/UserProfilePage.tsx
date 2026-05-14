@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button, ConfigProvider } from 'antd';
-import type { User } from '../../../entities/user';
+import type { FullProfile } from '../../../entities/user';
 import {
   ReactionFeedback,
   type ReactionType,
@@ -20,7 +20,7 @@ import {
 } from '../lib/userProfileGetters';
 
 type UserProfilePageProps = {
-  user: User;
+  user: FullProfile;
   onBack?: () => void;
   onLike?: () => void;
   onSkip?: () => void;

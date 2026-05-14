@@ -1,3 +1,5 @@
+import { lazy, Suspense } from 'react';
+import { Spin } from 'antd';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { RoutePaths } from '@/app/router/routePaths';
 import { ProtectedRoute } from '@/app/router/guards/ProtectedRoute';
@@ -11,37 +13,59 @@ import {
   OnboardingSummaryRoute,
   OnboardingSuccessRoute,
 } from '@/app/router/routes/OnboardingRoutes';
-import { DiscoverRoute, FiltersRoute } from '@/app/router/routes/DiscoverRoutes';
 import { UserProfileRoute } from '@/app/router/routes/UserProfileRoutes';
 
 import AuthLayout from '@/app/layouts/AuthLayout/AuthLayout';
 import AppLayout from '@/app/layouts/AppLayout/AppLayout';
 import MainLayout from '@/app/layouts/MainLayout/MainLayout';
 
-import LandingPage from '@/pages/landing/ui/LandingPage';
+const DiscoverRoute = lazy(() =>
+  import('@/app/router/routes/DiscoverRoutes').then((module) => ({
+    default: module.DiscoverRoute,
+  }))
+);
 
-import AuthPage from '@/pages/auth/ui/AuthPage';
-import VerifyEmailPage from '@/pages/auth/verify-email/ui/VerifyEmailPage';
-import VerifyCodePage from '@/pages/auth/verify-code/ui/VerifyCodePage';
-import SuccessPage from '@/pages/auth/success/ui/SuccessPage';
-import ErrorPage from '@/pages/auth/error/ui/ErrorPage';
-import ForgotPasswordPage from '@/pages/auth/forgot-password/ui/ForgotPasswordPage';
-import ResetPasswordPage from '@/pages/auth/reset-password/ui/ResetPasswordPage';
+const FiltersRoute = lazy(() =>
+  import('@/app/router/routes/DiscoverRoutes').then((module) => ({
+    default: module.FiltersRoute,
+  }))
+);
 
-import MatchesPage from '@/pages/matches/ui/MatchesPage';
-import ProfilePage from '@/pages/profile/ui/ProfilePage';
-import SettingsPage from '@/pages/settings/ui/SettingsPage';
-import AdminReportsPage from '@/pages/admin/reports/ui/AdminReportsPage';
+const ChatPage = lazy(() => import('@/pages/chat/ui/ChatPage'));
 
-import ChatPage from '@/pages/chat/ui/ChatPage';
-import ReportPage from '@/pages/report/ui/ReportPage';
+const LandingPage = lazy(() => import('@/pages/landing/ui/LandingPage'));
 
-import NotFoundPage from '@/pages/not-found/ui/NotFoundPage';
+const AuthPage = lazy(() => import('@/pages/auth/ui/AuthPage'));
+const VerifyEmailPage = lazy(() => import('@/pages/auth/verify-email/ui/VerifyEmailPage'));
+const VerifyCodePage = lazy(() => import('@/pages/auth/verify-code/ui/VerifyCodePage'));
+const SuccessPage = lazy(() => import('@/pages/auth/success/ui/SuccessPage'));
+const ErrorPage = lazy(() => import('@/pages/auth/error/ui/ErrorPage'));
+const ForgotPasswordPage = lazy(() =>
+  import('@/pages/auth/forgot-password/ui/ForgotPasswordPage')
+);
+const ResetPasswordPage = lazy(() =>
+  import('@/pages/auth/reset-password/ui/ResetPasswordPage')
+);
+
+const MatchesPage = lazy(() => import('@/pages/matches/ui/MatchesPage'));
+const ProfilePage = lazy(() => import('@/pages/profile/ui/ProfilePage'));
+const SettingsPage = lazy(() => import('@/pages/settings/ui/SettingsPage'));
+const AdminReportsPage = lazy(() => import('@/pages/admin/reports/ui/AdminReportsPage'));
+const ReportPage = lazy(() => import('@/pages/report/ui/ReportPage'));
+
+const NotFoundPage = lazy(() => import('@/pages/not-found/ui/NotFoundPage'));
+
+const RouteLoadingFallback = () => (
+  <div style={{ minHeight: '50vh', display: 'grid', placeItems: 'center' }}>
+    <Spin size="large" />
+  </div>
+);
 
 export const AppRouter = () => {
   return (
     <BrowserRouter>
-      <Routes>
+      <Suspense fallback={<RouteLoadingFallback />}>
+        <Routes>
         {/* Auth и онбординг */}
         <Route element={<AuthLayout />}>
           <Route path={RoutePaths.AUTH} element={<Navigate to={RoutePaths.LOGIN} replace />} />
@@ -106,9 +130,9 @@ export const AppRouter = () => {
           <Route
             path={RoutePaths.MATCHES}
             element={
-              // <ProtectedRoute>
+              <ProtectedRoute>
                 <MatchesPage />
-              // </ProtectedRoute>
+              </ProtectedRoute>
             }
           />
           <Route
@@ -156,7 +180,8 @@ export const AppRouter = () => {
         </Route>
 
         <Route path={RoutePaths.NOT_FOUND} element={<NotFoundPage />} />
-      </Routes>
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 };

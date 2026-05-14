@@ -11,6 +11,12 @@ import {
   ReactionFeedback,
   type ReactionType,
 } from '../../../shared/ui/ReactionFeedback/ReactionFeedback';
+import {
+  EMPTY_HABIT_REFERENCES,
+  referencesApi,
+  type HabitReferenceMap,
+  type ReferenceSelectOption,
+} from '../../../shared/api';
 import { getDiscoverEmptyState } from '../lib/emptyState';
 import { useRoomieFlow } from '../../../app/providers/roomie-flow';
 import './discover-page.css';
@@ -18,19 +24,11 @@ import './discover-page.css';
 import {
   formatSidebarBudget,
   formatSidebarMoveInDate,
-  getCleanlinessLabel,
-  getGuestLabel,
   getInitialSidebarCleanliness,
   getInitialSidebarGuestFrequency,
   getInitialSidebarNoise,
   getInitialSidebarSmoking,
-  getNextCleanlinessValue,
-  getNextGuestValue,
-  getNextNoiseValue,
-  getNextSmokingValue,
-  getNoiseLabel,
   getSidebarChips,
-  getSmokingLabel,
   parseBudgetInput,
 } from '../lib/discoverPageGetters';
 
@@ -108,6 +106,87 @@ function DiscoverEmptyState({ title, text, buttonText, onButtonClick }: Discover
   );
 }
 
+type SidebarOption<T extends string> = {
+  value: T;
+  label: string;
+};
+
+type NonEmptyValue<T> = Exclude<T, ''>;
+
+const SIDEBAR_NOISE_FALLBACK_OPTIONS: Array<SidebarOption<NonEmptyValue<SidebarNoiseValue>>> = [
+  { value: 'quiet', label: 'Тишина' },
+  { value: 'moderate', label: 'Норм шум' },
+  { value: 'social', label: 'Шумно' },
+];
+
+const SIDEBAR_SMOKING_FALLBACK_OPTIONS: Array<SidebarOption<NonEmptyValue<SidebarSmokingValue>>> = [
+  { value: 'no', label: 'Не курю' },
+  { value: 'outside_only', label: 'Только на улице' },
+  { value: 'yes', label: 'Курение ок' },
+];
+
+const SIDEBAR_CLEANLINESS_FALLBACK_OPTIONS: Array<
+  SidebarOption<NonEmptyValue<SidebarCleanlinessValue>>
+> = [
+  { value: 'high', label: 'Аккуратно' },
+  { value: 'medium', label: 'Средне' },
+  { value: 'low', label: 'Не важно' },
+];
+
+const SIDEBAR_GUEST_FALLBACK_OPTIONS: Array<SidebarOption<NonEmptyValue<SidebarGuestValue>>> = [
+  { value: 'never', label: 'Без гостей' },
+  { value: 'rarely', label: 'Гости редко' },
+  { value: 'sometimes', label: 'Гости иногда' },
+  { value: 'often', label: 'Гости часто' },
+];
+
+function getSidebarOptions<T extends string>(
+  options: ReferenceSelectOption[],
+  fallbackOptions: Array<SidebarOption<T>>
+): Array<SidebarOption<T>> {
+  const allowedValues = fallbackOptions.map((option) => option.value);
+
+  const apiOptions = options
+    .filter((option): option is ReferenceSelectOption & { value: T } =>
+      allowedValues.includes(option.value as T)
+    )
+    .map((option) => ({
+      value: option.value,
+      label: option.label,
+    }));
+
+  return apiOptions.length > 0 ? apiOptions : fallbackOptions;
+}
+
+function getSidebarOptionLabel<T extends string>(
+  value: T | '',
+  options: Array<SidebarOption<T>>,
+  fallbackLabel: string
+): string {
+  return options.find((option) => option.value === value)?.label ?? fallbackLabel;
+}
+
+function getNextSidebarOptionValue<T extends string>(
+  value: T | '',
+  options: Array<SidebarOption<T>>
+): T | '' {
+  if (options.length === 0) {
+    return '';
+  }
+
+  if (!value) {
+    return options[0].value;
+  }
+
+  const currentIndex = options.findIndex((option) => option.value === value);
+
+  if (currentIndex === -1 || currentIndex === options.length - 1) {
+    return '';
+  }
+
+  return options[currentIndex + 1].value;
+}
+
 export default function DiscoverPage({
   users,
   totalUsersCount = users.length,
@@ -156,14 +235,69 @@ export default function DiscoverPage({
   const [pendingReaction, setPendingReaction] = useState<DiscoverReaction | null>(null);
   const reactionTimeoutRef = useRef<number | null>(null);
 
+  const [habitReferences, setHabitReferences] = useState<HabitReferenceMap>(EMPTY_HABIT_REFERENCES);
+
+  const sidebarNoiseOptions = getSidebarOptions(
+    habitReferences.noiseLevel,
+    SIDEBAR_NOISE_FALLBACK_OPTIONS
+  );
+
+  const sidebarSmokingOptions = getSidebarOptions(
+    habitReferences.smokingPreference,
+    SIDEBAR_SMOKING_FALLBACK_OPTIONS
+  );
+
+  const sidebarCleanlinessOptions = getSidebarOptions(
+    habitReferences.cleanliness,
+    SIDEBAR_CLEANLINESS_FALLBACK_OPTIONS
+  );
+
+  const sidebarGuestOptions = getSidebarOptions(
+    habitReferences.guestFrequency,
+    SIDEBAR_GUEST_FALLBACK_OPTIONS
+  );
+
   useEffect(() => {
-    setBudgetValue(formatSidebarBudget(activeFilters));
-    setMoveInDateValue(activeFilters?.moveInDate ?? '');
-    setNoiseValue(getInitialSidebarNoise(activeFilters));
-    setSmokingValue(getInitialSidebarSmoking(activeFilters));
-    setCleanlinessValue(getInitialSidebarCleanliness(activeFilters));
-    setGuestValue(getInitialSidebarGuestFrequency(activeFilters));
+    let isMounted = true;
+
+    void Promise.resolve().then(() => {
+      if (!isMounted) {
+        return;
+      }
+
+      setBudgetValue(formatSidebarBudget(activeFilters));
+      setMoveInDateValue(activeFilters?.moveInDate ?? '');
+      setNoiseValue(getInitialSidebarNoise(activeFilters));
+      setSmokingValue(getInitialSidebarSmoking(activeFilters));
+      setCleanlinessValue(getInitialSidebarCleanliness(activeFilters));
+      setGuestValue(getInitialSidebarGuestFrequency(activeFilters));
+    });
+
+    return () => {
+      isMounted = false;
+    };
   }, [activeFilters]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    referencesApi
+      .listHabitReferences()
+      .then((references) => {
+        if (isMounted) {
+          setHabitReferences(references);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setHabitReferences(EMPTY_HABIT_REFERENCES);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -210,36 +344,20 @@ export default function DiscoverPage({
       nextFilters.moveInDate = moveInDateValue.trim();
     }
 
-    if (noiseValue === 'quiet') {
-      nextFilters.noiseLevel = 'quiet';
-    } else if (noiseValue === 'normal') {
-      nextFilters.noiseLevel = 'moderate';
-    } else if (noiseValue === 'loud') {
-      nextFilters.noiseLevel = 'social';
+    if (noiseValue) {
+      nextFilters.noiseLevel = noiseValue;
     }
 
-    if (smokingValue === 'no') {
-      nextFilters.smokingPreference = 'no';
-    } else if (smokingValue === 'outside') {
-      nextFilters.smokingPreference = 'outside_only';
-    } else if (smokingValue === 'yes') {
-      nextFilters.smokingPreference = 'yes';
+    if (smokingValue) {
+      nextFilters.smokingPreference = smokingValue;
     }
 
-    if (cleanlinessValue === 'high') {
-      nextFilters.cleanliness = 'high';
-    } else if (cleanlinessValue === 'medium') {
-      nextFilters.cleanliness = 'medium';
-    } else if (cleanlinessValue === 'low') {
-      nextFilters.cleanliness = 'low';
+    if (cleanlinessValue) {
+      nextFilters.cleanliness = cleanlinessValue;
     }
 
-    if (guestValue === 'rarely') {
-      nextFilters.guestFrequency = 'rarely';
-    } else if (guestValue === 'sometimes') {
-      nextFilters.guestFrequency = 'sometimes';
-    } else if (guestValue === 'often') {
-      nextFilters.guestFrequency = 'often';
+    if (guestValue) {
+      nextFilters.guestFrequency = guestValue;
     }
 
     onApplyFilters?.(nextFilters);
@@ -281,7 +399,7 @@ export default function DiscoverPage({
               user={currentUser}
               variant="discover"
               showActions={false}
-              onOpenProfile={onOpenProfile}
+              onOpenProfile={() => onOpenProfile?.(currentUser)}
             />
           </div>
 
@@ -375,7 +493,7 @@ export default function DiscoverPage({
             variant="discover"
             compact
             showActions={false}
-            onOpenProfile={onOpenProfile}
+            onOpenProfile={() => onOpenProfile?.(currentUser)}
           />
 
           {pendingReaction && (
@@ -508,9 +626,13 @@ export default function DiscoverPage({
                 ]
                   .filter(Boolean)
                   .join(' ')}
-                onClick={() => setNoiseValue((current) => getNextNoiseValue(current))}
+                onClick={() =>
+                  setNoiseValue((current) =>
+                    getNextSidebarOptionValue(current, sidebarNoiseOptions)
+                  )
+                }
               >
-                {getNoiseLabel(noiseValue)}
+                {getSidebarOptionLabel(noiseValue, sidebarNoiseOptions, 'Шум')}
               </Button>
               <Button
                 type="default"
@@ -522,9 +644,13 @@ export default function DiscoverPage({
                 ]
                   .filter(Boolean)
                   .join(' ')}
-                onClick={() => setSmokingValue((current) => getNextSmokingValue(current))}
+                onClick={() =>
+                  setSmokingValue((current) =>
+                    getNextSidebarOptionValue(current, sidebarSmokingOptions)
+                  )
+                }
               >
-                {getSmokingLabel(smokingValue)}
+                {getSidebarOptionLabel(smokingValue, sidebarSmokingOptions, 'Курение')}
               </Button>
               <Button
                 type="default"
@@ -536,9 +662,13 @@ export default function DiscoverPage({
                 ]
                   .filter(Boolean)
                   .join(' ')}
-                onClick={() => setCleanlinessValue((current) => getNextCleanlinessValue(current))}
+                onClick={() =>
+                  setCleanlinessValue((current) =>
+                    getNextSidebarOptionValue(current, sidebarCleanlinessOptions)
+                  )
+                }
               >
-                {getCleanlinessLabel(cleanlinessValue)}
+                {getSidebarOptionLabel(cleanlinessValue, sidebarCleanlinessOptions, 'Чистота')}
               </Button>
               <Button
                 type="default"
@@ -550,9 +680,13 @@ export default function DiscoverPage({
                 ]
                   .filter(Boolean)
                   .join(' ')}
-                onClick={() => setGuestValue((current) => getNextGuestValue(current))}
+                onClick={() =>
+                  setGuestValue((current) =>
+                    getNextSidebarOptionValue(current, sidebarGuestOptions)
+                  )
+                }
               >
-                {getGuestLabel(guestValue)}
+                {getSidebarOptionLabel(guestValue, sidebarGuestOptions, 'Гости')}
               </Button>
             </div>
           </div>

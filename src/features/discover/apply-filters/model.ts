@@ -1,4 +1,4 @@
-import type { User, UserFilters } from '../../../entities/user';
+import type { FilterParams, User } from '../../../entities/user';
 import { includesNormalizedText, normalizeText } from '../../../shared/utils/texts';
 
 function matchesTextFilter(userValue: string, filterValue?: string): boolean {
@@ -12,7 +12,7 @@ function matchesSelectFilter<T extends string>(
   return !filterValue || filterValue === 'any' || userValue === filterValue;
 }
 
-export function applyFiltersToUsers(users: User[], filters: UserFilters): User[] {
+export function applyFiltersToUsers(users: User[], filters: FilterParams): User[] {
   return users.filter((user) => {
     if (filters.search) {
       const searchable = [

@@ -13,11 +13,12 @@ export function LikeProfileButton({
   onClick,
   className,
   children = 'Лайк',
-  ariaLabel = 'Лайк',
+  ariaLabel = 'Поставить лайк',
   disabled = false,
 }: LikeProfileButtonProps) {
   return (
     <Button
+    
       htmlType="button"
       className={className}
       onClick={onClick}

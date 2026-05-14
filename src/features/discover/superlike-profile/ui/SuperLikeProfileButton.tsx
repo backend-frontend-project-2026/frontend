@@ -13,7 +13,7 @@ export function SuperLikeProfileButton({
   onClick,
   className,
   children = 'Супер-лайк',
-  ariaLabel = 'Супер-лайк',
+  ariaLabel = 'Поставить супер-лайк',
   disabled = false,
 }: SuperLikeProfileButtonProps) {
   return (

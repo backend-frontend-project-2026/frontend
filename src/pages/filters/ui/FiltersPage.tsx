@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Modal, Select, message } from 'antd';
 import type { FilterParams } from '../../../entities/user';
 import {
   EMPTY_HABIT_REFERENCES,
@@ -19,7 +20,6 @@ import type {
 } from './FiltersPage.types';
 
 import {
-  formatStayDuration,
   getInitialAlcohol,
   getInitialDesktopNoise,
   getInitialDesktopPets,
@@ -29,9 +29,6 @@ import {
   getInitialMobileNoise,
   getInitialRoomOrder,
   getInitialSleepSchedule,
-  normalizeBudgetValue,
-  parseStayDurationValue,
-  STAY_DURATION_PROMPT_TEXT,
 } from '../lib/filtersPageGetters';
 
 import type {
@@ -260,31 +257,27 @@ export function FiltersPage({
   }, []);
 
   const noiseOptions = getReferenceChipOptions(habitReferences.noiseLevel, NOISE_FALLBACK_OPTIONS);
-
   const sleepScheduleOptions = getReferenceChipOptions(
     habitReferences.sleepSchedule,
     SLEEP_SCHEDULE_FALLBACK_OPTIONS
   );
-
   const alcoholOptions = getReferenceChipOptions(
     habitReferences.alcoholPreference,
     ALCOHOL_FALLBACK_OPTIONS
   );
-
   const roomOrderOptions = getReferenceChipOptions(
     habitReferences.roomOrderPreference,
     ROOM_ORDER_FALLBACK_OPTIONS
   );
-
   const smokingOptions = getReferenceChipOptions(
     habitReferences.smokingPreference,
     SMOKING_FALLBACK_OPTIONS
   );
-
   const petsOptions = getReferenceChipOptions(habitReferences.petPreference, PETS_FALLBACK_OPTIONS);
 
   function resetAll() {
     setFiltersForm(EMPTY_FILTERS_FORM_STATE);
+    localStorage.removeItem('roomie_filters');
   }
 
   const liveFilters = useMemo<FilterParams>(() => {
@@ -431,55 +424,39 @@ export function FiltersPage({
     currentUserLocation,
   ]);
 
-  function editBudgetRange() {
-    const nextMinRaw = window.prompt('Минимальный бюджет, тыс ₽', budgetMin);
-
-    if (nextMinRaw === null) {
-      return;
-    }
-
-    const nextMaxRaw = window.prompt('Максимальный бюджет, тыс ₽', budgetMax);
-
-    if (nextMaxRaw === null) {
-      return;
-    }
-
-    const nextMin = normalizeBudgetValue(nextMinRaw, budgetMin);
-    const nextMax = normalizeBudgetValue(nextMaxRaw, budgetMax);
-
-    if (Number(nextMin) <= Number(nextMax)) {
-      updateFiltersForm({
-        budgetMin: nextMin,
-        budgetMax: nextMax,
-      });
-      return;
-    }
-
-    updateFiltersForm({
-      budgetMin: nextMax,
-      budgetMax: nextMin,
-    });
-  }
-
-  void editBudgetRange;
+  const [stayModalOpen, setStayModalOpen] = useState(false);
+  const [tempStayDuration, setTempStayDuration] = useState<StayDurationValue>(stayDuration);
 
   function editStayDuration() {
-    const nextValueRaw = window.prompt(STAY_DURATION_PROMPT_TEXT, formatStayDuration(stayDuration));
+    setTempStayDuration(stayDuration);
+    setStayModalOpen(true);
+  }
 
-    if (nextValueRaw === null) {
-      return;
+  function handleStayOk() {
+    setFilterField('stayDuration', tempStayDuration);
+    setStayModalOpen(false);
+  }
+
+  function handleStayCancel() {
+    setStayModalOpen(false);
+  }
+
+  function isAgeRangeValid(): boolean {
+    const min = Number(ageMin);
+    const max = Number(ageMax);
+    // Если оба поля не пустые и min > max – ошибка
+    if (ageMin !== '' && ageMax !== '' && min > max) {
+      message.error('Возраст «от» не может быть больше возраста «до»');
+      return false;
     }
-
-    const nextValue = parseStayDurationValue(nextValueRaw);
-
-    if (!nextValue) {
-      return;
-    }
-
-    setFilterField('stayDuration', nextValue);
+    return true;
   }
 
   function applyFilters() {
+    if (!isAgeRangeValid()) {
+      return;
+    }
+    localStorage.setItem('roomie_filters', JSON.stringify(liveFilters));
     onApply?.(liveFilters);
   }
 
@@ -487,7 +464,6 @@ export function FiltersPage({
     () => applyFiltersToUsers(usersForPreview, liveFilters).length,
     [usersForPreview, liveFilters]
   );
-
   const hasLiveFilters = hasActiveFilters(liveFilters);
   const hasPreviewData = usersForPreview.length > 0;
   const showNoPreviewData = !hasPreviewData;
@@ -535,6 +511,27 @@ export function FiltersPage({
         resetAll={resetAll}
         applyFilters={applyFilters}
       />
+
+      {}
+      <Modal
+        title="Срок аренды"
+        open={stayModalOpen}
+        onOk={handleStayOk}
+        onCancel={handleStayCancel}
+      >
+        <Select
+          style={{ width: '100%' }}
+          value={tempStayDuration}
+          onChange={setTempStayDuration}
+          options={[
+            { value: '1-3 months', label: '1-3 месяца' },
+            { value: '3-6 months', label: '3-6 месяцев' },
+            { value: '6-12 months', label: '6-12 месяцев' },
+            { value: '12+ months', label: '12+ месяцев' },
+          ]}
+        />
+      </Modal>
     </section>
+    
   );
 }

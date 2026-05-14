@@ -512,7 +512,6 @@ export function FiltersPage({
         applyFilters={applyFilters}
       />
 
-      {}
       <Modal
         title="Срок аренды"
         open={stayModalOpen}

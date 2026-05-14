@@ -13,7 +13,7 @@ export function SkipProfileButton({
   onClick,
   className,
   children = 'Пропустить',
-  ariaLabel = 'Пропустить',
+  ariaLabel = 'Пропустить анкету',
   disabled = false,
 }: SkipProfileButtonProps) {
   return (

@@ -24,7 +24,21 @@ function buildProfilesQuery(activeFilters: UserFilters): NonNullable<GetProfiles
 }
 
 export function DiscoverProvider({ children }: PropsWithChildren) {
-  const { activeFilters } = useFiltersFlow();
+  const { activeFilters, applyCurrentFilters } = useFiltersFlow();
+
+  // Загружаем сохранённые фильтры при первом рендере
+  useEffect(() => {
+    const savedFilters = localStorage.getItem('roomie_filters');
+    if (savedFilters) {
+      try {
+        const parsed = JSON.parse(savedFilters);
+        // Применяем загруженные фильтры (если они есть)
+        applyCurrentFilters(parsed);
+      } catch (error) {
+        console.error('Failed to load filters from localStorage', error);
+      }
+    }
+  }, []);
 
   const [users, setUsers] = useState<User[]>([]);
   const [total, setTotal] = useState(0);

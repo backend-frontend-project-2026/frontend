@@ -87,37 +87,49 @@ export function DesktopFiltersPanel({
 
       <div className="filters-desktop__card">
         <section className="filters-desktop__section">
-          <label className="filters-desktop__field">
-            <span className="filters-desktop__label">Бюджет</span>
-            <Input
-              value={[budgetMin, budgetMax].filter(Boolean).join('-')}
-              onChange={(event) => {
-                const values = event.target.value.match(/\d+/g) ?? [];
-                updateFiltersForm({
-                  budgetMin: values[0] ?? '',
-                  budgetMax: values[1] ?? '',
-                });
-              }}
-              placeholder="20-35 тыс ₽"
-            />
-          </label>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <label className="filters-desktop__field">
+              <span className="filters-desktop__label">Бюджет от, тыс ₽</span>
+              <Input
+                type="number"
+                value={budgetMin}
+                onChange={(e) => setFilterField('budgetMin', e.target.value)}
+                placeholder="20"
+              />
+            </label>
+            <label className="filters-desktop__field">
+              <span className="filters-desktop__label">Бюджет до, тыс ₽</span>
+              <Input
+                type="number"
+                value={budgetMax}
+                onChange={(e) => setFilterField('budgetMax', e.target.value)}
+                placeholder="35"
+              />
+            </label>
+          </div>
         </section>
 
         <section className="filters-desktop__section">
-          <label className="filters-desktop__field">
-            <span className="filters-desktop__label">Возраст</span>
-            <Input
-              value={[ageMin, ageMax].filter(Boolean).join('-')}
-              onChange={(event) => {
-                const values = event.target.value.match(/\d+/g) ?? [];
-                updateFiltersForm({
-                  ageMin: values[0] ?? '',
-                  ageMax: values[1] ?? '',
-                });
-              }}
-              placeholder="18-23"
-            />
-          </label>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <label className="filters-desktop__field">
+              <span className="filters-desktop__label">Возраст от</span>
+              <Input
+                type="number"
+                value={ageMin}
+                onChange={(e) => setFilterField('ageMin', e.target.value)}
+                placeholder="18"
+              />
+            </label>
+            <label className="filters-desktop__field">
+              <span className="filters-desktop__label">Возраст до</span>
+              <Input
+                type="number"
+                value={ageMax}
+                onChange={(e) => setFilterField('ageMax', e.target.value)}
+                placeholder="25"
+              />
+            </label>
+          </div>
         </section>
 
         <section className="filters-desktop__section">

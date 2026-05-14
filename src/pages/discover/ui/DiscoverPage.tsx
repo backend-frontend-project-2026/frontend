@@ -40,6 +40,58 @@ import type {
 } from '../lib/types';
 import { BottomNav } from '../../../widgets/bottom-nav';
 
+// Компонент для доступности карточки
+
+interface AccessibleProfileCardProps {
+  user: User;
+  variant: 'discover';
+  compact?: boolean;
+  onOpenProfile?: (user: User) => void;
+  onLike: (user: User) => void;
+  onReaction?: (reaction: DiscoverReaction, callback?: () => void) => void;
+}
+
+function AccessibleProfileCard({
+  user,
+  variant,
+  compact,
+  onOpenProfile,
+  onLike,
+  onReaction,
+}: AccessibleProfileCardProps) {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      if (onReaction) {
+        onReaction('like', () => onLike(user));
+      } else {
+        onLike(user);
+      }
+    }
+  };
+
+  const handleClick = () => {
+    onOpenProfile?.(user);
+  };
+
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+      onClick={handleClick}
+      aria-label={`Открыть профиль (клик) или поставить лайк (Enter/Space) пользователю ${user.name}`}
+    >
+      <ProfileCard
+        user={user}
+        variant={variant}
+        compact={compact}
+        showActions={false}
+      />
+    </div>
+  );
+}
+
 const { Title } = Typography;
 
 type DiscoverReaction = ReactionType;
@@ -395,11 +447,12 @@ export default function DiscoverPage({
           <div className="discover-mobile__stack">
             <div className="discover-mobile__stack-layer discover-mobile__stack-layer--back" />
             <div className="discover-mobile__stack-layer discover-mobile__stack-layer--middle" />
-            <ProfileCard
+            <AccessibleProfileCard
               user={currentUser}
               variant="discover"
-              showActions={false}
               onOpenProfile={() => onOpenProfile?.(currentUser)}
+              onLike={(user) => onLike?.(user)}
+              onReaction={handleReaction}
             />
           </div>
 
@@ -488,12 +541,13 @@ export default function DiscoverPage({
     if (currentUser) {
       return (
         <>
-          <ProfileCard
+          <AccessibleProfileCard
             user={currentUser}
             variant="discover"
             compact
-            showActions={false}
             onOpenProfile={() => onOpenProfile?.(currentUser)}
+            onLike={(user) => onLike?.(user)}
+            onReaction={handleReaction}
           />
 
           {pendingReaction && (

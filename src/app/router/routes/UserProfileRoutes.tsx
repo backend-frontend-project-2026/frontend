@@ -4,8 +4,8 @@ import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { RoutePaths } from '@/app/router/routePaths';
 import { useRoomieFlow } from '@/app/providers/roomie-flow';
 import { mapUserToFullProfile, type User } from '@/entities/user';
-import UserProfileStatusPage from '@/pages/user-profile/ui/UserProfileStatusPage';
 import { UserProfilePage } from '@/pages/user-profile';
+import NotFoundPage from '@/pages/not-found/ui/NotFoundPage';
 import { profilesApi } from '@/shared/api/services/profiles';
 import { mapProfileResponseToUser } from '@/shared/api/services/profileUserMapper';
 import { resolveRouteUserId } from '@/shared/utils/route';
@@ -28,57 +28,45 @@ export function UserProfileRoute() {
     let isCancelled = false;
 
     if (!userId || apiUserId === null) {
-      void Promise.resolve().then(() => {
+      Promise.resolve().then(() => {
         if (!isCancelled) {
           setResolvedUser(null);
           setStatus('error');
         }
       });
-
       return () => {
         isCancelled = true;
         clearSelectedUser();
       };
     }
 
-    void Promise.resolve().then(() => {
+    Promise.resolve().then(() => {
       if (!isCancelled) {
         setResolvedUser(null);
         setStatus('loading');
       }
     });
 
-    void profilesApi
+    profilesApi
       .getByUserId(apiUserId)
       .then(async (result) => {
-        if (isCancelled) {
-          return;
-        }
-
+        if (isCancelled) return;
         if (result.data) {
           const mappedUser = await mapProfileResponseToUser(result.data, userId);
-
-          if (isCancelled) {
-            return;
-          }
-
+          if (isCancelled) return;
           setResolvedUser(mappedUser);
           openProfile(mappedUser);
           setStatus('ready');
           return;
         }
-
         if (result.response.status === 404) {
           setStatus('not-found');
           return;
         }
-
         setStatus('error');
       })
       .catch(() => {
-        if (!isCancelled) {
-          setStatus('error');
-        }
+        if (!isCancelled) setStatus('error');
       });
 
     return () => {
@@ -99,12 +87,8 @@ export function UserProfileRoute() {
     );
   }
 
-  if (status === 'not-found') {
-    return <UserProfileStatusPage variant="not-found" />;
-  }
-
-  if (status === 'error' || resolvedUser === null) {
-    return <UserProfileStatusPage variant="error" />;
+  if (status === 'not-found' || status === 'error' || resolvedUser === null) {
+    return <NotFoundPage />;
   }
 
   const fullProfile = mapUserToFullProfile(resolvedUser);
@@ -127,9 +111,7 @@ export function UserProfileRoute() {
       }}
       onReport={() => {
         navigate(RoutePaths.reportByUser(resolvedUser.id), {
-          state: {
-            reportedUserName: resolvedUser.name,
-          },
+          state: { reportedUserName: resolvedUser.name },
         });
       }}
     />

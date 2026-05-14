@@ -1,14 +1,13 @@
+// src/app/providers/roomie-flow/ProfileProvider.tsx
 import { useCallback, useMemo, useState, type PropsWithChildren } from 'react';
 import type { User } from '@/entities/user';
 import { profilesApi } from '@/shared/api/services/profiles';
 import { mapProfileResponseToUser } from '@/shared/api/services/profileUserMapper';
 import { resolveRouteUserId } from '@/shared/utils/route';
-import { useDiscoverFlow } from './discover-context';
 import { ProfileContext } from './profile-context';
 import type { ProfileContextValue } from './types';
 
 export function ProfileProvider({ children }: PropsWithChildren) {
-  const { currentDiscoverUser } = useDiscoverFlow();
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   const profileUser = useMemo(() => selectedUser, [selectedUser]);
@@ -20,7 +19,7 @@ export function ProfileProvider({ children }: PropsWithChildren) {
   const selectProfileById = useCallback(
     (userId?: string) => {
       if (!userId) {
-        setSelectedUser(currentDiscoverUser ?? null);
+        setSelectedUser(null);
         return;
       }
 
@@ -46,7 +45,7 @@ export function ProfileProvider({ children }: PropsWithChildren) {
           setSelectedUser(null);
         });
     },
-    [currentDiscoverUser]
+    []
   );
 
   const clearSelectedUser = useCallback(() => {

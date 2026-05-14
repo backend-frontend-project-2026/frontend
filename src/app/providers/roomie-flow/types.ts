@@ -37,12 +37,14 @@ export type FiltersContextValue = {
 
 export type DiscoverContextValue = {
   discoverState: DiscoverActionState;
-  discoverUsers: User[];
   filteredUsers: User[];
   availableUsers: User[];
   currentDiscoverUser: User | null;
   totalUsersCount: number;
   matchingUsersCount: number;
+  loading: boolean;
+  error: Error | null;
+  retry: () => void;
   handleLike: (user: User) => void;
   handleSkip: (user: User) => void;
   handleSuperLike: (user: User) => void;

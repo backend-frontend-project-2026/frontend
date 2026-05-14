@@ -9,6 +9,12 @@ export type {
   User,
   UserBudget,
   UserHabits,
+  NoiseLevel,
+  AlcoholPreference,
+  RoomOrderPreference,
+  HousingType,
+  Gender,
+  UserFilters
 } from './model/types';
 
 export type { DiscoverCard, FilterParams, FullProfile, OnboardingForm } from './model/view-models';

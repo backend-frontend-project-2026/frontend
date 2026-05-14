@@ -9,8 +9,9 @@ interface MatchedModalProps {
   matchedName: string;
   matchedAvatar: string;
   matchedUserId: string;
-  onClose: () => void;
+  onWrite: () => void;
   onContinue: () => void;
+  onClose?: () => void;
 }
 
 export const MatchedModal = ({
@@ -19,16 +20,19 @@ export const MatchedModal = ({
   myAvatar,
   matchedName,
   matchedAvatar,
-  onClose,
+  onWrite,
   onContinue,
+  onClose,
 }: MatchedModalProps) => {
-  const handleWrite = () => {
-    onClose();
-    console.log('Написать пользователю', matchedName);
-  };
-
   return (
-    <Modal open={open} footer={null} closable={false} centered width={360}>
+    <Modal
+      open={open}
+      footer={null}
+      closable={false}
+      centered
+      width={360}
+      onCancel={onClose} 
+    >
       <div style={{ textAlign: 'center' }}>
         <Title level={2}>💘 Это мэтч!</Title>
         <Text>Вы и {matchedName} понравились друг другу</Text>
@@ -52,7 +56,7 @@ export const MatchedModal = ({
           </div>
         </Space>
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-          <Button type="primary" block onClick={handleWrite}>
+          <Button type="primary" block onClick={onWrite}>
             Написать
           </Button>
           <Button block onClick={onContinue}>

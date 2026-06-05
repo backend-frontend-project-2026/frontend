@@ -1262,3 +1262,102 @@ button.discover-chip.is-selected,
     display: none;
   }
 }
+/* Анимация свайпа */
+.discover-card--swipe-left {
+  animation: swipeLeft 0.5s ease-out;
+}
+
+.discover-card--swipe-right {
+  animation: swipeRight 0.5s ease-out;
+}
+
+.discover-card--swipe-up {
+  animation: swipeUp 0.5s ease-out;
+}
+
+@keyframes swipeLeft {
+  0% {
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-150%) rotate(-20deg);
+    opacity: 0;
+  }
+}
+
+@keyframes swipeRight {
+  0% {
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(150%) rotate(20deg);
+    opacity: 0;
+  }
+}
+
+@keyframes swipeUp {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-150%) scale(1.1);
+    opacity: 0;
+  }
+}
+
+/* Кнопка Undo */
+.discover-mobile__undo,
+.discover-feed__undo {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.discover-undo-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid #d0d4d9;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 90%);
+  color: #5a5f68;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.discover-undo-button:hover,
+.discover-undo-button:focus,
+.discover-undo-button:focus-visible {
+  border-color: #a8b0bc !important;
+  background: rgb(255 255 255 / 100%) !important;
+  color: #2a2f38 !important;
+  box-shadow: 0 4px 12px rgb(120 123 132 / 15%) !important;
+}
+
+.discover-undo-button.ant-btn {
+  height: auto;
+  box-shadow: none !important;
+}
+
+.discover-undo-button.ant-btn::before {
+  display: none !important;
+}
+
+@media (min-width: 901px) {
+  .discover-feed__undo {
+    margin-top: 16px;
+  }
+
+  .discover-undo-button {
+    min-height: 42px;
+    padding: 0 18px;
+    font-size: 14px;
+  }
+}

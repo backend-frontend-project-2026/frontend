@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Button, Input, Typography, Skeleton, Alert } from 'antd';
+import { Button, Input, Typography, Skeleton, Alert, message } from 'antd';
 import type { User, UserFilters } from '../../../entities/user';
 import {
   LikeProfileButton,
@@ -19,6 +19,7 @@ import {
 } from '../../../shared/api';
 import { getDiscoverEmptyState } from '../lib/emptyState';
 import { useRoomieFlow } from '../../../app/providers/roomie-flow';
+import { useLocalStorage } from '../../../shared/hooks/useLocalStorage';
 import './discover-page.css';
 
 import {
@@ -49,6 +50,7 @@ interface AccessibleProfileCardProps {
   onOpenProfile?: (user: User) => void;
   onLike: (user: User) => void;
   onReaction?: (reaction: DiscoverReaction, callback?: () => void) => void;
+  swipeDirection?: 'left' | 'right' | 'up' | null;
 }
 
 function AccessibleProfileCard({
@@ -58,6 +60,7 @@ function AccessibleProfileCard({
   onOpenProfile,
   onLike,
   onReaction,
+  swipeDirection,
 }: AccessibleProfileCardProps) {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -74,6 +77,8 @@ function AccessibleProfileCard({
     onOpenProfile?.(user);
   };
 
+  const swipeClass = swipeDirection ? `discover-card--swipe-${swipeDirection}` : '';
+
   return (
     <div
       role="button"
@@ -81,6 +86,7 @@ function AccessibleProfileCard({
       onKeyDown={handleKeyDown}
       onClick={handleClick}
       aria-label={`Открыть профиль (клик) или поставить лайк (Enter/Space) пользователю ${user.name}`}
+      className={swipeClass}
     >
       <ProfileCard
         user={user}
@@ -239,6 +245,16 @@ function getNextSidebarOptionValue<T extends string>(
   return options[currentIndex + 1].value;
 }
 
+type ReactionHistoryItem = {
+  userId: string;
+  userName: string;
+  reaction: ReactionType;
+  timestamp: number;
+};
+
+const MAX_HISTORY_SIZE = 100;
+const HISTORY_STORAGE_KEY = 'roomie_discover_history';
+
 export default function DiscoverPage({
   users,
   totalUsersCount = users.length,
@@ -254,6 +270,38 @@ export default function DiscoverPage({
   onSuperLike,
 }: DiscoverPageProps) {
   const { loading, error, retry } = useRoomieFlow();
+
+  const [history, setHistory] = useLocalStorage<ReactionHistoryItem[]>(
+    HISTORY_STORAGE_KEY,
+    []
+  );
+
+  const addReaction = useCallback(
+    (user: User, reaction: ReactionType) => {
+      const newItem: ReactionHistoryItem = {
+        userId: user.id,
+        userName: user.name,
+        reaction,
+        timestamp: Date.now(),
+      };
+
+      setHistory((prev) => {
+        const newHistory = [newItem, ...prev];
+        return newHistory.slice(0, MAX_HISTORY_SIZE);
+      });
+    },
+    [setHistory]
+  );
+
+  const undoLastReaction = useCallback((): ReactionHistoryItem | null => {
+    if (history.length === 0) return null;
+
+    const [first, ...rest] = history;
+    setHistory(rest);
+    return first;
+  }, [history, setHistory]);
+
+  const hasHistory = history.length > 0;
 
   const currentUser = users[0] ?? null;
   const emptyState = getDiscoverEmptyState({
@@ -285,6 +333,7 @@ export default function DiscoverPage({
   );
 
   const [pendingReaction, setPendingReaction] = useState<DiscoverReaction | null>(null);
+  const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | 'up' | null>(null);
   const reactionTimeoutRef = useRef<number | null>(null);
 
   const [habitReferences, setHabitReferences] = useState<HabitReferenceMap>(EMPTY_HABIT_REFERENCES);
@@ -361,11 +410,21 @@ export default function DiscoverPage({
 
   const handleReaction = useCallback(
     (reaction: DiscoverReaction, callback?: () => void) => {
-      if (pendingReaction) {
+      if (pendingReaction || !currentUser) {
         return;
       }
 
       setPendingReaction(reaction);
+
+      if (reaction === 'skip') {
+        setSwipeDirection('left');
+      } else if (reaction === 'like') {
+        setSwipeDirection('right');
+      } else if (reaction === 'superlike') {
+        setSwipeDirection('up');
+      }
+
+      addReaction(currentUser, reaction);
 
       if (reactionTimeoutRef.current !== null) {
         window.clearTimeout(reactionTimeoutRef.current);
@@ -375,10 +434,21 @@ export default function DiscoverPage({
         reactionTimeoutRef.current = null;
         callback?.();
         setPendingReaction(null);
+        setSwipeDirection(null);
       }, 700);
     },
-    [pendingReaction]
+    [pendingReaction, currentUser, addReaction]
   );
+
+  const handleUndo = useCallback(() => {
+    const undone = undoLastReaction();
+    if (undone) {
+      message.info({
+        content: `Отменено: ${undone.userName} - ${DISCOVER_REACTION_FEEDBACK[undone.reaction].title.toLowerCase()}`,
+        duration: 3,
+      });
+    }
+  }, [undoLastReaction]);
 
   function handleApplyDesktopFilters() {
     const nextFilters: UserFilters = {};
@@ -453,6 +523,7 @@ export default function DiscoverPage({
               onOpenProfile={() => onOpenProfile?.(currentUser)}
               onLike={(user) => onLike?.(user)}
               onReaction={handleReaction}
+              swipeDirection={swipeDirection}
             />
           </div>
 
@@ -494,6 +565,19 @@ export default function DiscoverPage({
               ♥
             </LikeProfileButton>
           </div>
+
+          {hasHistory && (
+            <div className="discover-mobile__undo">
+              <Button
+                type="default"
+                onClick={handleUndo}
+                className="discover-undo-button"
+                size="small"
+              >
+                ↶ Отменить
+              </Button>
+            </div>
+          )}
         </>
       );
     }
@@ -548,6 +632,7 @@ export default function DiscoverPage({
             onOpenProfile={() => onOpenProfile?.(currentUser)}
             onLike={(user) => onLike?.(user)}
             onReaction={handleReaction}
+            swipeDirection={swipeDirection}
           />
 
           {pendingReaction && (
@@ -592,6 +677,19 @@ export default function DiscoverPage({
               </span>
             </LikeProfileButton>
           </div>
+
+          {hasHistory && (
+            <div className="discover-feed__undo">
+              <Button
+                type="default"
+                onClick={handleUndo}
+                className="discover-undo-button"
+                size="small"
+              >
+                ↶ Отменить последнее
+              </Button>
+            </div>
+          )}
         </>
       );
     }

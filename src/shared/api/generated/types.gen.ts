@@ -423,6 +423,7 @@ export type ReactionResponse = {
     profile_id?: number;
     reaction_type?: 'like' | 'dislike';
     created_at?: string;
+    mutual?: boolean;
 };
 
 export type ReactionListResponse = {

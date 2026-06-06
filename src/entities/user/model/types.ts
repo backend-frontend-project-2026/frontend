@@ -39,6 +39,8 @@ export type UserHabits = {
 
 export type User = {
   id: string;
+  profileId?: number;
+  dealId?: number;
   name: string;
   age: number;
   gender: Gender;

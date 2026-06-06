@@ -1,15 +1,16 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './MatchesPage.module.css';
 import { List, Avatar, Empty, Input, Button, Spin, Result, Tooltip } from 'antd';
 import { RoutePaths } from '@/app/router/routePaths';
 import { matchesApi } from '@/shared/api/services/matches';
+import { profilesApi } from '@/shared/api/services/profiles';
 import { getStoredUser } from '@/shared/api/auth/session';
 import type { MatchItem } from '@/shared/api/generated';
 
 const MatchesPage = () => {
   const navigate = useNavigate();
-  const currentProfileId = useMemo(() => getStoredUser()?.id ?? null, []);
+  const [currentProfileId, setCurrentProfileId] = useState<number | null>(null);
   const [matches, setMatches] = useState<MatchItem[]>([]);
   const [fetchState, setFetchState] = useState<{ loading: boolean; error: string | null }>({
     loading: !!currentProfileId,
@@ -17,6 +18,28 @@ const MatchesPage = () => {
   });
   const [loadKey, setLoadKey] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    const currentUserId = getStoredUser()?.id;
+
+    if (!currentUserId) {
+      setCurrentProfileId(null);
+      setFetchState({ loading: false, error: null });
+      return;
+    }
+
+    setFetchState({ loading: true, error: null });
+
+    profilesApi
+      .getByUserId(currentUserId)
+      .then((result) => {
+        setCurrentProfileId(result.data?.id ?? null);
+      })
+      .catch(() => {
+        setCurrentProfileId(null);
+        setFetchState({ loading: false, error: 'Не удалось загрузить профиль пользователя' });
+      });
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();

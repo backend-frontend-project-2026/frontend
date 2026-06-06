@@ -7,11 +7,9 @@ import {
 export type MediaUploadKind = 'avatar' | 'profile_photo';
 
 export const mediaApi = {
-  upload: async (
-    file: File,
-    kind: MediaUploadKind
-  ): Promise<MediaUploadResponse> => {
+  upload: async (file: File, kind: MediaUploadKind): Promise<MediaUploadResponse> => {
     const result = await postMediaUpload<true>({
+      security: [{ scheme: 'bearer', type: 'http' }],
       body: {
         file,
         kind,
@@ -24,6 +22,7 @@ export const mediaApi = {
 
   remove: async (mediaId: number): Promise<void> => {
     await deleteMediaByMediaId<true>({
+      security: [{ scheme: 'bearer', type: 'http' }],
       path: {
         media_id: mediaId,
       },

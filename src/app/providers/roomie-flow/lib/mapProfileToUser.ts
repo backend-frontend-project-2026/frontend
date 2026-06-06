@@ -74,6 +74,7 @@ export function mapProfileToUser(profile: ProfileResponse): User {
 
   return {
     id: String(profile.user_id),
+    profileId: profile.id,
     name: profile.name,
     age: profile.age,
     gender: toEnum(profile.sex, GENDERS, 'male'),

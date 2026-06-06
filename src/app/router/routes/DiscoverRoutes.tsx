@@ -56,7 +56,7 @@ export function FiltersRoute() {
     completed,
     draft,
     activeFilters,
-    discoverUsers,
+    filteredUsers,
     applyCurrentFilters,
     clearSkippedProfiles,
   } = useRoomieFlow();
@@ -70,7 +70,7 @@ export function FiltersRoute() {
       initialFilters={activeFilters}
       currentUserUniversity={draft.basicInfo.university}
       currentUserLocation={draft.basicInfo.location}
-      usersForPreview={discoverUsers}
+      usersForPreview={filteredUsers}
       onBack={() => navigate(RoutePaths.DISCOVER)}
       onApply={(filters) => {
         clearSkippedProfiles();

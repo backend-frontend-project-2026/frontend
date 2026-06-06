@@ -1,7 +1,7 @@
 import { getAccessToken } from '@/shared/api/auth/session';
 import { client } from '@/shared/api/generated/client.gen';
 
-const DEFAULT_API_BASE_URL = 'http://localhost:8000';
+const DEFAULT_API_BASE_URL = 'http://localhost:8000/api/v1';
 
 function normalizeBaseUrl(rawUrl?: string): string {
   return (rawUrl ?? DEFAULT_API_BASE_URL).replace(/\/$/, '');

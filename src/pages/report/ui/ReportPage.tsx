@@ -10,12 +10,14 @@ import { usersApi } from '@/shared/api/services/users';
 import { resolveRouteUserId } from '@/shared/utils/route';
 import styles from './ReportPage.module.css';
 
-const reasons = [
-  'Спам',
-  'Оскорбления',
-  'Подозрительный профиль',
-  'Несоответствие анкеты',
-  'Другое',
+type ComplaintReasonValue = 'spam' | 'scam' | 'fake' | 'inappropriate_content' | 'other';
+
+const reasons: Array<{ label: string; value: ComplaintReasonValue }> = [
+  { label: 'Спам', value: 'spam' },
+  { label: 'Мошенничество', value: 'scam' },
+  { label: 'Фейковый профиль', value: 'fake' },
+  { label: 'Неподходящий контент', value: 'inappropriate_content' },
+  { label: 'Другое', value: 'other' },
 ];
 
 type ReportLocationState = {
@@ -49,14 +51,12 @@ export const ReportPage = () => {
   const locationState = location.state as ReportLocationState | null;
   const locationReportedUserName = getSafeName(locationState?.reportedUserName);
 
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selected, setSelected] = useState<ComplaintReasonValue | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isBlocking, setIsBlocking] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
-  const [reportedUserName, setReportedUserName] = useState<string | null>(
-    locationReportedUserName
-  );
+  const [reportedUserName, setReportedUserName] = useState<string | null>(locationReportedUserName);
   const [isTargetLoading, setIsTargetLoading] = useState(false);
   const [targetLoadFailed, setTargetLoadFailed] = useState(false);
 
@@ -201,7 +201,8 @@ export const ReportPage = () => {
 
       setIsBlocked(true);
       message.success('Пользователь заблокирован');
-    } catch {
+    } catch (error) {
+      console.error('Failed to block user', error);
       message.error('Не удалось заблокировать пользователя. Попробуйте ещё раз.');
     } finally {
       setIsBlocking(false);
@@ -235,7 +236,9 @@ export const ReportPage = () => {
 
           <div className={styles.successDetails}>
             <span className={styles.successReasonLabel}>Причина</span>
-            <strong>{selected ?? 'Не указана'}</strong>
+            <strong>
+              {reasons.find((reason) => reason.value === selected)?.label ?? 'Не указана'}
+            </strong>
             <span>Пользователь: {reportTargetName}</span>
             {hasValidReportedUser && <span>ID пользователя: {routeUserId}</span>}
             {isBlocked && <span>Пользователь заблокирован</span>}
@@ -293,14 +296,14 @@ export const ReportPage = () => {
 
         <div className={styles.radioGroup}>
           {reasons.map((reason) => (
-            <label key={reason} className={styles.radioItem}>
+            <label key={reason.value} className={styles.radioItem}>
               <input
                 type="radio"
-                checked={selected === reason}
-                onChange={() => setSelected(reason)}
+                checked={selected === reason.value}
+                onChange={() => setSelected(reason.value)}
                 disabled={isSubmitting}
               />
-              <span>{reason}</span>
+              <span>{reason.label}</span>
             </label>
           ))}
         </div>
